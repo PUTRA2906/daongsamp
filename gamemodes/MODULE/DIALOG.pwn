@@ -18,11 +18,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			mysql_format(g_SQL, query, sizeof(query), "SELECT * FROM `players` WHERE `username` = '%e' LIMIT 1", pData[playerid][pName]);
 			mysql_tquery(g_SQL, query, "AssignPlayerData", "d", playerid);
 			printf("[LOGIN] %s(%d) has successfully login with password(%s)", pData[playerid][pName], playerid, inputtext);
-			SendClientMessageEx(playerid, COLOR_RED, "[!]"WHITE_E" Welcome {FF0000}%s {FFFFFF}To Server Indoluck Roleplay!", pData[playerid][pName]);
-			SendClientMessageEx(playerid, COLOR_RED, "[!]"WHITE_E" Dear {FF0000}%s{FFFFFF},Happy Roleplaying dikota Indoluck Roleplay!", pData[playerid][pName]);
-			SendClientMessage(playerid, COLOR_RED, "[!]"WHITE_E" Jangan Lupa Ikuti Rules Server!");
-			SendClientMessageEx(playerid, COLOR_RED, "[!]"WHITE_E" Player Saat ini {ff0000}%d {ffffff}Yuk Ramaikan lagi!", online);
-			SendClientMessageEx(playerid, COLOR_RED, "[!]"WHITE_E" Server memerlukan waktu "YELLOW_E"%d miliseconds "WHITE_E"untuk memuat data char anda", count);
+			SendClientMessageEx(playerid, COLOR_RIKO, "[!]"WHITE_E" Welcome {FF0000}%s {FFFFFF}To Server Indoluck Roleplay!", pData[playerid][pName]);
+			SendClientMessageEx(playerid, COLOR_RIKO, "[!]"WHITE_E" Dear {FF0000}%s{FFFFFF},Happy Roleplaying dikota Indoluck Roleplay!", pData[playerid][pName]);
+			SendClientMessage(playerid, COLOR_RIKO, "[!]"WHITE_E" Jangan Lupa Ikuti Rules Server!");
+			SendClientMessageEx(playerid, COLOR_RIKO, "[!]"WHITE_E" Player Saat ini {ff0000}%d {ffffff}Yuk Ramaikan lagi!", online);
+			SendClientMessageEx(playerid, COLOR_RIKO, "[!]"WHITE_E" Server memerlukan waktu "YELLOW_E"%d miliseconds "WHITE_E"untuk memuat data char anda", count);
 
 			
 			mysql_format(g_SQL, query1, sizeof(query1), "INSERT INTO loglogin (username,reg_id,password,time) VALUES('%s','%d','%s',CURRENT_TIMESTAMP())", pData[playerid][pName], pData[playerid][pID], inputtext);
