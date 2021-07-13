@@ -287,7 +287,7 @@ CMD:a(playerid, params[])
 		params[i] = EOS;
 	}
 	new mstr[512];
-	format(mstr, sizeof(mstr), "[A] {007FFF}%s {00FF00}%s(%i): {ffffff}%s", GetStaffRank(playerid), pData[playerid][pAdminname], playerid, params);
+	format(mstr, sizeof(mstr), "[A] {007FFF}%s {00FF00}%s(%i): {00FF00}%s", GetStaffRank(playerid), pData[playerid][pAdminname], playerid, params);
 	foreach(new ii : Player)
 	{
 		if(pData[ii][pAdmin] > 0)

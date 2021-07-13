@@ -60,7 +60,7 @@ CMD:editdealer(playerid, params[])
         DealerSave(did);
 		DealerRefresh(did);
 
-        SendAdminMessage(COLOR_RED, "%s has adjusted the location of dealer ID: %d.", pData[playerid][pAdminname], did);
+        SendAdminMessage(COLOR_RED, "%s Changes Location Dealer ID: %d.", pData[playerid][pAdminname], did);
     }
     else if(!strcmp(type, "price", true))
     {
@@ -73,7 +73,7 @@ CMD:editdealer(playerid, params[])
 
         DealerSave(did);
 		DealerRefresh(did);
-        SendAdminMessage(COLOR_RED, "%s has adjusted the price of dealer ID: %d to %d.", pData[playerid][pAdminname], did, price);
+        SendAdminMessage(COLOR_RED, "%s Changes Price Of The Dealer ID: %d to %d.", pData[playerid][pAdminname], did, price);
     }
 	else if(!strcmp(type, "type", true))
     {
@@ -85,7 +85,7 @@ CMD:editdealer(playerid, params[])
         DealerData[did][dealerType] = dtype;
         DealerSave(did);
 		DealerRefresh(did);
-        SendAdminMessage(COLOR_RED, "%s has adjusted the type of dealer ID: %d to %d.", pData[playerid][pAdminname], did, dtype);
+        SendAdminMessage(COLOR_RED, "%s Changes Type Of The Dealer ID: %d to %d.", pData[playerid][pAdminname], did, dtype);
     }
     else if(!strcmp(type, "stock", true))
     {
@@ -96,7 +96,7 @@ CMD:editdealer(playerid, params[])
         DealerData[did][dealerStock] = dStock;
         DealerSave(did);
 		DealerRefresh(did);
-        SendAdminMessage(COLOR_RED, "%s has adjusted the stock of dealer ID: %d with stock %d.", pData[playerid][pAdminname], did, dStock);
+        SendAdminMessage(COLOR_RED, "%s Set Stock Of The Dealer ID: %d with stock %d.", pData[playerid][pAdminname], did, dStock);
     }
     else if(!strcmp(type, "reset", true))
     {
@@ -115,7 +115,7 @@ CMD:editdealer(playerid, params[])
 		DealerData[did][dealerPointZ] = z;
 		DealerSave(did);
 		DealerPointRefresh(did);
-        SendAdminMessage(COLOR_RED, "%s has edit dealer point ID: %d.", pData[playerid][pAdminname], did);
+        SendAdminMessage(COLOR_RED, "%s Change Point Of The Dealer ID: %d.", pData[playerid][pAdminname], did);
     }
     return 1;
 }
