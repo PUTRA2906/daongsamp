@@ -176,8 +176,8 @@ stock SaveObj()
 
 CMD:setalldmtobject(playerid, params[])
 {
-	if(pData[playerid][pAdmin] < 1)
-	if(pData[playerid][pHelper] == 1)
+	if(pData[playerid][pAdmin] < 5)
+	//if(pData[playerid][pHelper] == 1)
 	return PermissionError(playerid);
 
 	for(new idx;idx<MAX_COBJECTS;idx++)
@@ -195,8 +195,8 @@ CMD:setalldmtobject(playerid, params[])
 CMD:createobject(playerid, params[])
 {
 	new String[10000], object;
- 	if(pData[playerid][pAdmin] < 1)
-	if(pData[playerid][pHelper] == 1)
+ 	if(pData[playerid][pAdmin] < 5)
+	//if(pData[playerid][pHelper] == 1)
 	return PermissionError(playerid);
 	{
 		if(sscanf(params, "i", object)) return Usage(playerid, "> /createobject [objectid]");
@@ -228,8 +228,8 @@ CMD:createobject(playerid, params[])
 }
 CMD:onear(playerid, params[])
 {
-    if(pData[playerid][pAdmin] < 1)
-	if(pData[playerid][pHelper] == 1)
+    if(pData[playerid][pAdmin] < 5)
+	//if(pData[playerid][pHelper] == 1)
 	return PermissionError(playerid);
 	{
 		SendClientMessageEx(playerid, COLOR_RED, "Waiting!");
@@ -256,8 +256,8 @@ CMD:onear(playerid, params[])
 CMD:editobject(playerid, params[])
 {
 	new String[10000], idx;
-	if(pData[playerid][pAdmin] < 1)
-	if(pData[playerid][pHelper] == 1)
+	if(pData[playerid][pAdmin] < 5)
+	//if(pData[playerid][pHelper] == 1)
 	return PermissionError(playerid);
 	{
 	 	if(sscanf(params, "s[128]", params))
@@ -370,8 +370,8 @@ CMD:editobject(playerid, params[])
 CMD:cdeleteobject(playerid, params[])
 {
 	new idx, String[10000];
-	if(pData[playerid][pAdmin] < 1)
-	if(pData[playerid][pHelper] == 1)
+	if(pData[playerid][pAdmin] < 5)
+	//if(pData[playerid][pHelper] == 1)
 	return PermissionError(playerid);
 	{
 		if(sscanf(params, "i", idx)) return Usage(playerid, "> /deleteobject [objid]");

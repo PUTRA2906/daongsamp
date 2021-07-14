@@ -1,9 +1,9 @@
-/*==========================================================================•        •===========================================================================================================
+/*==========================================================================ï¿½        ï¿½===========================================================================================================
                                                                 YOU NEVER KNOW IF YOU NEVER TRY!
                                                                  Indoluck Roleplay New Project
-                                                                       ilrp2021©copyright!
+                                                                       ilrp2021ï¿½copyright!
                                                                            #COMEBACK!
-===========================================================================•        •===========================================================================================================
+===========================================================================ï¿½        ï¿½===========================================================================================================
 
 											"CODING ITU BISA DI COPYPASTE TETAPI IDE TIDAK AKAN BISA." - Christian "Tianmetal" Malik.
 Gamemode Author   	: SOIRP/Advanced Roleplay/Indoluck
@@ -60,13 +60,17 @@ new VehicleLastEnterTime[MAX_PLAYERS],
     Warning[MAX_PLAYERS];
 //New GMX
 new CurGMX;
-
+//afk
+new p_tick[MAX_PLAYERS],
+    p_afktime[MAX_PLAYERS];
 //Enum GMX
 forward DoGMX();
 //anti aimbot
 new AimbotWarnings[MAX_PLAYERS];
 //display online
 new online;
+//Mapping
+//new tmpobjid;
 //Actor
 new RaditActor;
 new togtextdraws[MAX_PLAYERS];
@@ -1841,7 +1845,9 @@ public OnGameModeInit()
 	SendRconCommand(gm);
 	format(gm, sizeof(gm), "language %s", TEXT_LANGUAGE);
 	SendRconCommand(gm);
- 	DCC_SetBotActivity("INDOLUCK INDONESIA | "TEXT_GAMEMODE);
+	new statuz[100];
+ 	format(statuz,sizeof(statuz),"%d Players | %d MaxPlayers", online, GetMaxPlayers());
+	DCC_SetBotActivity(statuz);
 	//---- [ Function ]----
 	CreateTextDraw();
 	CreateServerPoint();
@@ -1894,6 +1900,78 @@ public OnGameModeInit()
 	//---- [ Actor ]----//
 	RaditActor = CreateActor(172, 1345.2783,-1761.5256,13.5992, 90.0); // Actor as salesperson in Ammunation
     ApplyActorAnimation(RaditActor, "DEALER", "shop_pay", 4.1, 0, 0, 0, 0, 0); // Pay anim
+	// ____Ws Gerald____
+	tmpobjid = CreateDynamicObject(12929, 2092.584960, -1573.171630, 12.226040, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(920, 2092.220214, -1575.846923, -111097.765625, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(943, 2089.220214, -1567.846923, 13.234201, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(19817, 2092.162353, -1572.994140, 11.220484, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1075, 2089.621582, -1575.569702, -85.771438, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1084, 2088.712890, -1574.666137, 16.226448, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1084, 2090.314453, -1576.155517, -10986.768554, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1085, 2089.389160, -1577.509033, -87.764869, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1077, 2088.229248, -1576.319335, -9987.764648, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1083, 2088.229248, -1576.319335, -11098.764648, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1098, 2089.229248, -1576.319335, -85.764656, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1097, 2088.940673, -1577.002075, 15.231790, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1083, 2088.697998, -1576.428588, 16.232921, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1096, 2089.258789, -1575.997070, -9985.763671, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1085, 2089.225341, -1577.153076, -985.760620, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1084, 2088.728271, -1572.928344, 16.230133, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1263, 2095.988769, -1576.117675, 10.237686, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1039, 2096.776123, -1575.752441, -86.786956, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(2063, 2095.776123, -1579.752441, 13.213044, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(935, 2094.326660, -1575.476318, -986.777099, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1387, 2093.282714, -1575.079223, 17.226051, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1152, 2096.465820, -1573.407348, 15.212773, 0.000000, 0.000000, 450.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1155, 2096.351806, -1573.945678, 16.208110, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(2917, 2094.152587, -1573.015869, -999981.937500, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1390, 2095.343505, -1573.321655, 17.199781, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(19903, 2089.946289, -1573.225341, 8.836521, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(19899, 2089.299804, -1579.344970, 12.223817, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1841, 2088.871093, -1578.868896, 12.232415, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1014, 2092.724121, -1565.742553, -84.779945, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1001, 2090.169921, -1565.158203, 16.176244, 95.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1002, 2093.426757, -1565.536010, -84.822181, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1003, 2093.376220, -1565.421020, 16.167739, 90.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1023, 2092.496093, -1565.684448, -84.818511, 90.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(2714, 2092.636230, -1565.123168, -985.806396, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(19815, 2096.445068, -1576.849731, 14.180511, 0.000000, 0.000000, 270.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(14679, 2095.174316, -1574.077270, -86.785758, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(19899, 2091.355224, -1566.304443, -87.823013, 0.000000, 0.000000, -90.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(10281, 2093.140380, -1582.019042, 17.287075, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1508, 2097.784423, -1567.528808, -987.614257, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(10149, 2096.138183, -1567.072387, -985.626464, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(11102, 2096.808349, -1567.817382, 14.365263, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1728, 2095.423339, -1581.625610, 12.181084, 0.000000, 0.000000, 360.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1720, 2096.639160, -1569.293090, -987.817321, 0.000000, 0.000000, 270.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1722, 2095.887207, -1569.410278, 12.177585, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(2395, 2098.571777, -1596.558837, -987.487243, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(987, 2104.371826, -1595.550292, 12.530209, 0.000000, 0.000000, 240.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(987, 2086.733154, -1605.324707, 12.380502, 0.000000, 0.000000, 140.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(3749, 2092.746093, -1604.535888, 18.380950, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(2990, 2083.163818, -1575.718017, 14.457827, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(2909, 2084.290283, -1576.895751, -984.559082, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(3049, 2080.948974, -1582.124755, -984.523193, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(2990, 2080.352539, -1587.271484, 15.473415, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(987, 2096.684814, -1575.934448, 12.408655, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(987, 2108.008789, -1575.967041, 12.464554, 0.000000, 0.000000, -90.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(987, 2107.787353, -1582.233154, 12.533643, 0.000000, 0.000000, -90.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(639, 2081.469238, -1581.283569, 15.448493, 0.000000, 0.000000, 180.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(5299, 2084.709228, -1578.730346, 3.443974, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1281, 2084.301757, -1586.539916, 13.461508, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1281, 2083.843505, -1590.488159, 13.487107, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1281, 2099.350097, -1584.209228, 13.449150, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1281, 2099.178222, -1588.249267, 13.466442, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(1415, 2101.018310, -1593.958618, 12.498926, 0.000000, 0.000000, 270.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(7390, 2092.709472, -1612.020874, -87.624702, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(11500, 2079.338134, -1605.380249, 12.377853, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(10282, 2080.541259, -1611.679321, -85.620651, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(10282, 2092.455566, -1570.852661, 13.257238, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(10281, 2079.801757, -1606.715209, 19.380554, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(10281, 2077.801757, -1611.715209, -1000065.625000, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(10281, 2079.572021, -1604.584228, 19.534896, 0.000000, 0.000000, 180.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(7392, 2102.009521, -1593.561279, -99976.671875, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+
 	//---- [ Other ]----//
 	CreateDynamicObject(987, 831.75732, -519.75250, 15.43560,   0.00000, -2.00000, 90.00000);
 	CreateDynamicObject(987, 831.66217, -507.75879, 15.86480,   2.00000, -2.00000, 90.00000);
@@ -1909,7 +1987,7 @@ public OnGameModeInit()
 	CreateDynamicObject(987, 831.85498, -482.68753, 16.24480,   0.00000, 0.00000, -180.00000);
 	CreateDynamicObject(987, 806.91943, -519.98999, 15.26480,   0.00000, 0.00000, 0.00000);
 	//anim
- 	txtAnimHelper = TextDrawCreate(542.000000, 417.000000, "Press ~r~k~~GROUP_CONTROL_BWD~ For Clear Anim");
+ 	txtAnimHelper = TextDrawCreate(542.000000, 417.000000, "Press ~r H ~wFor Clear Anim");
     TextDrawUseBox(txtAnimHelper, 0);
     TextDrawFont(txtAnimHelper, 2);
     TextDrawSetShadow(txtAnimHelper,0); // no shadow
@@ -3631,10 +3709,10 @@ public OnGameModeInit()
 	g_discord_twt = DCC_FindChannelById("862531909727944775");
 	g_Discord_adslogs = DCC_FindChannelById("863082017985789962");
 	g_discord_ban = DCC_FindChannelById("862968829919756318");
-	g_discord_admins = DCC_FindChannelById("862532954701824010");
+	g_discord_admins = DCC_FindChannelById("864854692831952936");
 	g_Discord_PcVerived = DCC_FindChannelById("864670614458728458");
 	g_Discord_Information = DCC_FindChannelById("857538441930473482");
-	g_discord_botcmd = DCC_FindChannelById("825587480845615114");
+	g_discord_botcmd = DCC_FindChannelById("864671043763044352");
 	g_Admin_Command = DCC_FindChannelById("835257449349906453");
 	g_discord_logs = DCC_FindChannelById("861303832893325313");
 	//Butcher
@@ -7841,6 +7919,8 @@ public OnPlayerUpdate(playerid)
 {
 	//SAPD Tazer/Taser
 	UpdateTazer(playerid);
+	//Afk
+	p_tick[playerid]++;
 	//SAPD Road Spike
 	CheckPlayerInSpike(playerid);
 	return 1;
@@ -8063,13 +8143,25 @@ ptask PlayerUpdate[999](playerid)
 		GivePlayerMoney(playerid, pData[playerid][pMoney]);
 		//SendAdminMessage(COLOR_RED, "Possible money hacks detected on %s(%i). Check on this player. "LG_E"($%d).", pData[playerid][pName], playerid, GetPlayerMoney(playerid) - pData[playerid][pMoney]);
 	}
+	if(GetPlayerPing(playerid) > 800) // Ping Player
+    {
+        new fmt_msg[128];
+        format(fmt_msg, sizeof fmt_msg, "BotCmd: %s(%i) has been kicked by BOT.", pData[playerid][pName], playerid);
+        SendClientMessageToAll(0xFF5533FF, fmt_msg);
+        format(fmt_msg, sizeof fmt_msg, "Reason: High Ping [%d/800]", GetPlayerPing(playerid));
+        SendClientMessageToAll(0xFF5533FF, fmt_msg);
+        FixedKick(playerid);
+    }
 	//Anti Armour Hacks
 	new Float:A;
 	GetPlayerArmour(playerid, A);
 	if(A > 98)
 	{
+		new fmt_msg[128];
 		SetPlayerArmourEx(playerid, 0);
-		SendClientMessageToAllEx(COLOR_RED, "Anti-Cheat: "GREY2_E"%s(%i) has been auto kicked for armour hacks!", pData[playerid][pName], playerid);
+		SendClientMessageToAllEx(0xFF5533FF, "BotCmd: %s(%i) has been kicked by BOT.", pData[playerid][pName], playerid);
+		format(fmt_msg, sizeof fmt_msg, "Reason: Armour Hacks");
+        SendClientMessageToAll(0xFF5533FF, fmt_msg);
 		FixedKick(playerid);
 		//AutoBan(playerid);
 	}
@@ -8082,7 +8174,7 @@ ptask PlayerUpdate[999](playerid)
 
             if(pData[playerid][pWeapon] >= 1 && pData[playerid][pWeapon] <= 45 && pData[playerid][pWeapon] != 42 && pData[playerid][pWeapon] != 2 && pData[playerid][pGuns][g_aWeaponSlots[pData[playerid][pWeapon]]] != GetPlayerWeapon(playerid))
             {
-                SendAdminMessage(COLOR_RED, "%s(%d) has possibly used weapon hacks (%s), Please to check /spec this player first!", pData[playerid][pName], playerid, ReturnWeaponName(pData[playerid][pWeapon]));
+                SendAdminMessage(COLOR_LOGS, "AdmWarn: "WHITE_E"%s(%d) has possibly used weapon hacks (%s), Please to check /spec this player first!", pData[playerid][pName], playerid, ReturnWeaponName(pData[playerid][pWeapon]));
                 SetWeapons(playerid); //Reload old weapons
                 //AutoBan(playerid);
             }
@@ -8675,4 +8767,19 @@ CMD:setskill(playerid, params[])
 		SendClientMessage(playerid, COLOR_WHITE, String);
 	}
 	return 1;
+}
+ptask AfkCheck[1000](playerid)  {
+	new str[300];
+    if(p_tick[playerid] > 0) {
+        p_tick[playerid] = 0, p_afktime[playerid] = 0;
+        return 1;
+    }
+    if(p_tick[playerid] == 0) {
+        p_afktime[playerid]++;
+    }
+    if(p_afktime[playerid] > 0) {
+        format(str, sizeof str,"[ATIP] %d Second(s)",p_afktime[playerid]);
+        SetPlayerChatBubble(playerid, str, COLOR_LOGS, 10.0, 1000);
+    }
+    return 1;
 }
