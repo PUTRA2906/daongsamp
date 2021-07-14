@@ -1845,9 +1845,9 @@ public OnGameModeInit()
 	SendRconCommand(gm);
 	format(gm, sizeof(gm), "language %s", TEXT_LANGUAGE);
 	SendRconCommand(gm);
-	new statuz[100];
- 	format(statuz,sizeof(statuz),"%d Players | %d MaxPlayers", online, GetMaxPlayers());
-	DCC_SetBotActivity(statuz);
+	//new statuz[100];
+ 	//format(statuz,sizeof(statuz),"%d Players | %d MaxPlayers", online, GetMaxPlayers());
+	//DCC_SetBotActivity(statuz);
 	//---- [ Function ]----
 	CreateTextDraw();
 	CreateServerPoint();
