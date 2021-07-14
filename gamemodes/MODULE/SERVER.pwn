@@ -175,12 +175,12 @@ CreateServerPoint()
 	DrugText = CreateDynamic3DTextLabel(strings, COLOR_GREY, -3811.6951, 1312.7488, 71.4297, 5.0); // product
 
 	CargoMeatPickup = CreateDynamicPickup(1239, 23, 163.5530, -54.8748, 1.5781, -1, -1, -1, 5.0);
-	format(strings, sizeof(strings), "["YELLOW_E"Meat"WHITE_E"]\n"WHITE_E"Cargo Stock: "LG_E"%d\n\n"WHITE_E"Cargo Price: "LG_E"$5 /cargo\n"LB_E"/cargo purchase", ServerCargoMeat);
+	format(strings, sizeof(strings), "["YELLOW_E"Meat"WHITE_E"]\n"WHITE_E"Cargo Stock: "LG_E"%d\n\n"WHITE_E"Cargo Price: "LG_E"$70.0 /cargo\n"LB_E"/cargo purchase", ServerCargoMeat);
 	cMeatText = CreateDynamic3DTextLabel(strings, COLOR_WHITE, 163.5530, -54.8748, 1.5781, 5.0); //Cargo of meat
 
-	CargoSeedPickup = CreateDynamicPickup(1239, 23, -383.0497,-1438.9336,26.3277, -1, -1, -1, 5.0);
-	format(strings, sizeof(strings), "["YELLOW_E"Seed"WHITE_E"]\n"WHITE_E"Cargo Stock: "LG_E"%d\n\n"WHITE_E"Cargo Price: "LG_E"$5 /cargo\n"LB_E"/cargo purchase", ServerCargoSeed);
-	cSeedText = CreateDynamic3DTextLabel(strings, COLOR_WHITE, -383.0497,-1438.9336,26.3277, 5.0); //Cargo of meat
+	// CargoSeedPickup = CreateDynamicPickup(1239, 23, -3811.65, 1313.72, 71.42, -1, -1, -1, 5.0);
+	// format(strings, sizeof(strings), "["YELLOW_E"Seed"WHITE_E"]\n"WHITE_E"Cargo Stock: "LG_E"%d\n\n"WHITE_E"Cargo Price: "LG_E"$80.0 /cargo\n"LB_E"/cargo purchase", ServerCargoSeed);
+	// cSeedText = CreateDynamic3DTextLabel(strings, COLOR_WHITE, -3811.65, 1313.72, 71.42, 5.0); //Cargo of meat
 
 	MeatStoragePickup = CreateDynamicPickup(1239, 23, 964.9350, 2160.0283, 1011.0303, -1, -1, -1, 5.0);
 	format(strings, sizeof(strings), "["YELLOW_E"Meat"WHITE_E"]\n"WHITE_E"Meat Stock: "LG_E"%d\n\n"LB_E"/getmeat", Meat);
@@ -193,7 +193,7 @@ CreateServerPoint()
 
 Server_Percent(price)
 {
-    return floatround((float(price) / 100) * 8500);
+    return floatround((float(price) / 100) * 85);
 }
 
 Server_AddPercent(price)

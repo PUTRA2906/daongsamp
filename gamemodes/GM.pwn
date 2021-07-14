@@ -1,21 +1,20 @@
-/*
+/*==========================================================================�        �===========================================================================================================
+                                                                YOU NEVER KNOW IF YOU NEVER TRY!
+                                                                 Indoluck Roleplay New Project
+                                                                       ilrp2021�copyright!
+                                                                           #COMEBACK!
+===========================================================================�        �===========================================================================================================
 
+											"CODING ITU BISA DI COPYPASTE TETAPI IDE TIDAK AKAN BISA." - Christian "Tianmetal" Malik.
+Gamemode Author   	: SOIRP/Advanced Roleplay/Indoluck
+Team Scripting      : Radeetz & Aldick
+Team Mapping        : Radeetz & Arief
 
-
-╔══╦╗──╔═══╦═══╗
-╚╣╠╣║──║╔═╗║╔═╗║
-─║║║║──║╚═╝║╚═╝║
-─║║║║─╔╣╔╗╔╣╔══╝
-╔╣╠╣╚═╝║║║╚╣║
-╚══╩═══╩╝╚═╩╝
-                                                
-By radit and alexa
-Change Notes: ILRP 1.5.8D
-1. [IMPROVE] jobs Salary
-2. [CHANGE] Login Information and SendMessageClient(Don't Ask This!) color
-3. [ADD] New  Mappings
-3. [CHANGE] Changes Admin Message
-4. [CHANGE] Changes Some SendClientMessage
+Special Thanks To	:
+					- Allah SWT (My God)
+					- Families and Friends
+					- Team Develover SOIRP
+					- Team Develover Adv-Rp
 */
 
 //---- [ Include ]----
@@ -70,8 +69,6 @@ new AimbotWarnings[MAX_PLAYERS];
 new online;
 //Actor
 new RaditActor;
-new p_tick[MAX_PLAYERS],
-    p_afktime[MAX_PLAYERS];
 new togtextdraws[MAX_PLAYERS];
 new Text:txtAnimHelper;
 // Player data
@@ -1801,21 +1798,7 @@ ptask RandoMessages[180000](playerid) {
   new rand = random(5);
   SendClientMessageEx(playerid, -1, "%s", RandomMessage[rand], online);
 }
-ptask AfkCheck[1000](playerid)  {
-	new str[100];
-    if(p_tick[playerid] > 0) {
-        p_tick[playerid] = 0, p_afktime[playerid] = 0;
-        return 1;
-    }
-    if(p_tick[playerid] == 0) {
-        p_afktime[playerid]++;
-    }
-    if(p_afktime[playerid] > 0) {
-        format(str, sizeof str,"[ATIP] %d Seconds",p_afktime[playerid]);
-        SetPlayerChatBubble(playerid, str, COLOR_LOGS, 10.0, 1000);
-    }
-    return 1;
-}
+
 public OnGameModeInit()
 {
 	//mysql_log(ALL);
@@ -1858,13 +1841,18 @@ public OnGameModeInit()
 	SendRconCommand(gm);
 	format(gm, sizeof(gm), "language %s", TEXT_LANGUAGE);
 	SendRconCommand(gm);
- 	DCC_SetBotActivity("%s Online Player(s) | ", online);
+ 	DCC_SetBotActivity("INDOLUCK INDONESIA | "TEXT_GAMEMODE);
 	//---- [ Function ]----
 	CreateTextDraw();
 	CreateServerPoint();
-	CreateGetJobPoint();
+	CreateJoinLumberPoint();
+	CreateJoinTaxiPoint();
+	CreateJoinMechPoint();
+	CreateJoinMinerPoint();
 	CreateJoinProductionPoint();
+	CreateJoinTruckPoint();
 	CreateArmsPoint();
+	CreateJoinFarmerPoint();
 	CreateJoinSmugglerPoint();
 	CreateUnloadPacketPoint();
 	LoadTazerSAPD();
@@ -1921,7 +1909,7 @@ public OnGameModeInit()
 	CreateDynamicObject(987, 831.85498, -482.68753, 16.24480,   0.00000, 0.00000, -180.00000);
 	CreateDynamicObject(987, 806.91943, -519.98999, 15.26480,   0.00000, 0.00000, 0.00000);
 	//anim
- 	txtAnimHelper = TextDrawCreate(542.000000, 417.000000, "Press ~r~H For Clear Anim");
+ 	txtAnimHelper = TextDrawCreate(542.000000, 417.000000, "Press ~r~k~~GROUP_CONTROL_BWD~ For Clear Anim");
     TextDrawUseBox(txtAnimHelper, 0);
     TextDrawFont(txtAnimHelper, 2);
     TextDrawSetShadow(txtAnimHelper,0); // no shadow
@@ -3639,12 +3627,12 @@ public OnGameModeInit()
 	//----------------------------------------------------------------------------------------------------
     CreateDynamicObject(19379, 1435.35657, -1227.07996, 151.31239,   360.00000, 90.00000, 0.00000);
 	CreateDynamicObject(19379, 1424.86401, -1227.07996, 151.31239,   360.00000, 90.00000, 1080.00000);
-	g_Discord_AndroVerifed = DCC_FindChannelById("857898388238237725");
+	g_Discord_AndroVerifed = DCC_FindChannelById("864670614458728458");
 	g_discord_twt = DCC_FindChannelById("862531909727944775");
 	g_Discord_adslogs = DCC_FindChannelById("863082017985789962");
 	g_discord_ban = DCC_FindChannelById("862968829919756318");
 	g_discord_admins = DCC_FindChannelById("862532954701824010");
-	g_Discord_PcVerived = DCC_FindChannelById("857898452985315368");
+	g_Discord_PcVerived = DCC_FindChannelById("864670614458728458");
 	g_Discord_Information = DCC_FindChannelById("857538441930473482");
 	g_discord_botcmd = DCC_FindChannelById("825587480845615114");
 	g_Admin_Command = DCC_FindChannelById("835257449349906453");
@@ -4379,8 +4367,7 @@ public OnPlayerConnect(playerid)
 	//Textdraw Mode
 	pData[playerid][BarHp] = CreatePlayerProgressBar(playerid, 523.000000, 150.000000, 85.500000, 6.500000, -16776961, 100.0, 0);
 	pData[playerid][BarArmour] = CreatePlayerProgressBar(playerid, 523.000000, 167.000000, 85.500000, 6.500000, -1, 100.0, 0);
-	//
-	//PlayAudioStreamForPlayer(playerid, "http://mboxdrive.com/dancin.mp3");
+	
 	//cent money
 	//Server Cent
     Cent[0] = TextDrawCreate(580.000000, 54.000000, ".");
@@ -4443,39 +4430,6 @@ public OnPlayerConnect(playerid)
 	TextDrawSetSelectable(DigiAP[playerid], 0);
 	
 	//PlayAudioStreamForPlayer(playerid, "");
-	//Mapping buatan radit ganteng ~Radeetz
-	RemoveBuildingForPlayer(playerid, 669, 2264.810, -1697.020, 12.640, 0.250);
-    RemoveBuildingForPlayer(playerid, 620, 2272.719, -1697.800, 10.687, 0.250);
-    //----------------------------------[New Alhambra]----------------------------//
-	RemoveBuildingForPlayer(playerid, 5544, 1873.7422, -1682.4766, 34.7969, 0.25);
-	RemoveBuildingForPlayer(playerid, 1524, 1837.6641, -1640.3828, 13.7578, 0.25);
-	RemoveBuildingForPlayer(playerid, 620, 1855.7188, -1741.5391, 10.8047, 0.25);
-	RemoveBuildingForPlayer(playerid, 620, 1879.5078, -1741.4844, 10.8047, 0.25);
-	RemoveBuildingForPlayer(playerid, 620, 1908.2188, -1741.4844, 10.8047, 0.25);
-	RemoveBuildingForPlayer(playerid, 712, 1929.5781, -1736.9063, 21.3906, 0.25);
-	RemoveBuildingForPlayer(playerid, 620, 1931.0391, -1726.3281, 10.8047, 0.25);
-	RemoveBuildingForPlayer(playerid, 620, 1832.3828, -1694.3125, 9.7188, 0.25);
-	RemoveBuildingForPlayer(playerid, 1537, 1837.4375, -1683.9688, 12.3047, 0.25);
-	RemoveBuildingForPlayer(playerid, 1533, 1837.4375, -1683.9531, 12.3047, 0.25);
-	RemoveBuildingForPlayer(playerid, 1537, 1837.4375, -1686.9844, 12.3125, 0.25);
-	RemoveBuildingForPlayer(playerid, 620, 1832.8984, -1670.7656, 9.7188, 0.25);
-	RemoveBuildingForPlayer(playerid, 1533, 1837.4375, -1677.9219, 12.2969, 0.25);
-	RemoveBuildingForPlayer(playerid, 1537, 1837.4375, -1680.9531, 12.2969, 0.25);
-	RemoveBuildingForPlayer(playerid, 1533, 1837.4375, -1680.9375, 12.2969, 0.25);
-	RemoveBuildingForPlayer(playerid, 5408, 1873.7422, -1682.4766, 34.7969, 0.25);
-	RemoveBuildingForPlayer(playerid, 620, 1931.0391, -1702.2891, 10.8047, 0.25);
-	RemoveBuildingForPlayer(playerid, 712, 1929.5781, -1694.4609, 21.3906, 0.25);
-	RemoveBuildingForPlayer(playerid, 620, 1931.0391, -1667.0313, 10.8047, 0.25);
-	RemoveBuildingForPlayer(playerid, 620, 1931.0391, -1637.8984, 10.8047, 0.25);
-	RemoveBuildingForPlayer(playerid, 620, 1855.7188, -1623.2813, 10.8047, 0.25);
-	RemoveBuildingForPlayer(playerid, 620, 1879.5078, -1623.1016, 10.8047, 0.25);
-	RemoveBuildingForPlayer(playerid, 620, 1908.2188, -1622.9844, 10.8047, 0.25);
-	RemoveBuildingForPlayer(playerid, 712, 1929.5781, -1627.6250, 21.3906, 0.25);
-	// Trashmaster
-	RemoveBuildingForPlayer(playerid, 3574, 2226.320, -2168.989, 15.101, 0.250);
-	RemoveBuildingForPlayer(playerid, 3744, 2226.320, -2168.989, 15.101, 0.250);
-	RemoveBuildingForPlayer(playerid, 3574, 2241.300, -2183.979, 15.101, 0.250);
-	RemoveBuildingForPlayer(playerid, 3744, 2241.300, -2183.979, 15.101, 0.250);
 	// Roadmaps
 	RemoveBuildingForPlayer(playerid, 1290, 1348.010, -1447.920, 18.226, 0.250);
 	RemoveBuildingForPlayer(playerid, 1290, 1341.349, -1476.599, 18.226, 0.250);
@@ -6522,8 +6476,8 @@ public OnPlayerHackTeleport(playerid, Float:distance)
 	if(!IsPlayerInRangeOfPoint(playerid, 3.0, x, y, z))
 	{
 		new string[50];
-		format(string, sizeof(string), "BotCmd: %s have detected hack teleport.", pData[playerid][pName]);
-		SendClientMessageToAll(0xFF5533FF, string);
+		format(string, sizeof(string), "%s have detected hack teleport.", pData[playerid][pName]);
+		SendClientMessageToAll(-1, string);
 		Kick(playerid);
 	}
 	return 1;
@@ -6710,12 +6664,11 @@ public OnPlayerEnterCheckpoint(playerid)
 			}
 			if(IsPlayerInRangeOfPoint(playerid, 7.0,sweperpoint12))
 			{
-  				new swp_price = Random(5000, 10000);
 				pData[playerid][pSideJob] = 0;
 				pData[playerid][pSideJobTime] = 600;
 				DisablePlayerCheckpoint(playerid);
-				AddPlayerSalary(playerid, "Sidejob(Sweeper)", swp_price);
-				SendClientMessageEx(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Sweeper)", FormatMoney(swp_price));
+				AddPlayerSalary(playerid, "Sidejob(Sweeper)", 10000);
+				Info(playerid, "Sidejob(Sweeper) telah masuk ke pending salary anda!");
 				RemovePlayerFromVehicle(playerid);
 				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
 			}
@@ -6832,12 +6785,11 @@ public OnPlayerEnterCheckpoint(playerid)
 			}
 			if(IsPlayerInRangeOfPoint(playerid, 7.0,buspoint27))
 			{
-			    new bus_price = Random(10000, 15000);
 				pData[playerid][pSideJob] = 0;
 				pData[playerid][pSideJobTime] = 800;
 				DisablePlayerCheckpoint(playerid);
-				AddPlayerSalary(playerid, "Sidejob(Bus)", bus_price);
-				SendClientMessageEx(playerid, COLOR_LOGS, "JOB: {FFFFFF}You get $%s From Sidejobs(Bus)", FormatMoney(bus_price));
+				AddPlayerSalary(playerid, "Sidejob(Bus)", 13000);
+				Info(playerid, "Sidejob(Bus) telah masuk ke pending salary anda!");
 				RemovePlayerFromVehicle(playerid);
 				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
 			}
@@ -6870,12 +6822,11 @@ public OnPlayerEnterCheckpoint(playerid)
 			}
 			if(IsPlayerInRangeOfPoint(playerid, 4.0,forpoint3))
 			{
-			    new frp_price = Random(4000, 9000);
 				pData[playerid][pSideJob] = 0;
 				pData[playerid][pSideJobTime] = 460;
 				DisablePlayerCheckpoint(playerid);
-				AddPlayerSalary(playerid, "Sidejob(Forklift)", frp_price);
-				SendClientMessageEx(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Forklift)", FormatMoney(frp_price));
+				AddPlayerSalary(playerid, "Sidejob(Forklift)", 10000);
+				Info(playerid, "Sidejob(Forklift) telah masuk ke pending salary anda!");
 				RemovePlayerFromVehicle(playerid);
 				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
 				return 1;
@@ -6884,13 +6835,14 @@ public OnPlayerEnterCheckpoint(playerid)
 	}
     if(SedangAnterPizza[playerid] == 1) // pizza
 	{
-	    new pizz_price = Random(6000, 10000);
         SedangAnterPizza[playerid] = 0;
 	    pData[playerid][pSideJobTime] = 600;
-    	AddPlayerSalary(playerid, "Sidejob(Pizza)", pizz_price);
+    	AddPlayerSalary(playerid, "Sidejob(Pizza)", 5000);
+    	new fmt_str[1280];
     	RemovePlayerAttachedObject(playerid,1);
-    	SendClientMessageEx(playerid, COLOR_JOB, "PIZZA JOB: {FFFFFF}You get $%s From Sidejobs(Pizza)", FormatMoney(pizz_price));
-    	SendClientMessage(playerid,COLOR_JOB, "PIZZA JOB: {ffffff}Kamu berhasil mengirimkan pizza dan mendapat delay 10 menit.");
+    	format(fmt_str, sizeof fmt_str, "PIZZA JOB: {ffffff}Kamu mendapatkan $50.00 dari hasil mengirim pizza dan dimasukkan ke salary.");
+    	SendClientMessage(playerid,COLOR_JOB, "PIZZA JOB: {ffffff}Kamu berhasil mengirimkan pizza dan mendapat delay 15 menit.");
+        SendClientMessage(playerid,COLOR_JOB, fmt_str);
         DisablePlayerCheckpoint(playerid);
 	}
 	//DisablePlayerCheckpoint(playerid);
@@ -7740,11 +7692,11 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		}
 		if(IsAForVeh(vehicleid))
 		{
-			ShowPlayerDialog(playerid, DIALOG_FORKLIFT, DIALOG_STYLE_MSGBOX, "Side Job - Forklift", "Anda akan bekerja sebagai pemuat barang dengan Forklift?\nJangan Keluar kendaraan ketika bekerja!", "Start Job", "Close");
+			ShowPlayerDialog(playerid, DIALOG_FORKLIFT, DIALOG_STYLE_MSGBOX, "Side Job - Forklift", "Anda akan bekerja sebagai pemuat barang dengan Forklift?", "Start Job", "Close");
 		}
 		if(IsASweeperVeh(vehicleid))
 		{
-			ShowPlayerDialog(playerid, DIALOG_SWEEPER, DIALOG_STYLE_MSGBOX, "Side Job - Sweeper", "Anda akan bekerja sebagai pembersih jalan?\nJangan Keluar kendaraan ketika bekerja!", "Start Job", "Close");
+			ShowPlayerDialog(playerid, DIALOG_SWEEPER, DIALOG_STYLE_MSGBOX, "Side Job - Sweeper", "Anda akan bekerja sebagai pembersih jalan?", "Start Job", "Close");
 		}
 		if(IsAPizzaVeh(vehicleid))
 		{
@@ -7752,7 +7704,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		}
 		if(IsABusVeh(vehicleid))
 		{
-			ShowPlayerDialog(playerid, DIALOG_BUS, DIALOG_STYLE_MSGBOX, "Side Job - Bus", "Anda akan bekerja sebagai pengangkut penumpang bus?\nJangan Keluar kendaraan ketika bekerja!", "Start Job", "Close");
+			ShowPlayerDialog(playerid, DIALOG_BUS, DIALOG_STYLE_MSGBOX, "Side Job - Bus", "Anda akan bekerja sebagai pengangkut penumpang bus?", "Start Job", "Close");
 		}
 		if(!IsEngineVehicle(vehicleid))
         {
@@ -7889,7 +7841,6 @@ public OnPlayerUpdate(playerid)
 {
 	//SAPD Tazer/Taser
 	UpdateTazer(playerid);
-	p_tick[playerid]++;
 	//SAPD Road Spike
 	CheckPlayerInSpike(playerid);
 	return 1;
@@ -7956,10 +7907,10 @@ public OnVehicleSpawn(vehicleid)
     		{
 				pvData[ii][cInsu]--;
 				pvData[ii][cClaim] = 1;
-				pvData[ii][cClaimTime] = gettime() + (1 * 86400);
+				pvData[ii][cClaimTime] = gettime() + (1 * 3600);
 				foreach(new pid : Player) if (pvData[ii][cOwner] == pData[pid][pID])
         		{
-            		Info(pid, "Kendaraan anda hancur dan anda masih memiliki insuransi, silahkan ambil di kantor sags setelah 24 jam.");
+            		Info(pid, "Kendaraan anda hancur dan anda masih memiliki insuransi, silahkan ambil di insurance office setelah 3 jam.");
 				}
 				if(IsValidVehicle(pvData[ii][cVeh]))
 					DestroyVehicle(pvData[ii][cVeh]);
@@ -7975,7 +7926,7 @@ public OnVehicleSpawn(vehicleid)
 					mysql_tquery(g_SQL, query);
 					if(IsValidVehicle(pvData[ii][cVeh]))
 						DestroyVehicle(pvData[ii][cVeh]);
-            		Info(pid, "Kendaraan anda hancur dan tidak memiliki insuransi.");
+            		SendClientMessage(pid, COLOR_JOB, "VEHICLE: {FFFFFF}Kendaraan anda hancur dan tidak memiliki insuransi.");
 					Iter_SafeRemove(PVehicles, ii, ii);
 				}
 			}
@@ -8118,20 +8069,10 @@ ptask PlayerUpdate[999](playerid)
 	if(A > 98)
 	{
 		SetPlayerArmourEx(playerid, 0);
-		SendClientMessageToAllEx(0xFF5533FF, "BotCmd: %s(%i) has been auto kicked", pData[playerid][pName], playerid);
-		SendClientMessageToAllEx(0xFF5533FF, "Reason: Armour Hacks ");
+		SendClientMessageToAllEx(COLOR_RED, "Anti-Cheat: "GREY2_E"%s(%i) has been auto kicked for armour hacks!", pData[playerid][pName], playerid);
 		FixedKick(playerid);
 		//AutoBan(playerid);
 	}
-	if(GetPlayerPing(playerid) > 800) // Ping Player
- 	{
-  		new fmt_msg[128];
-    	format(fmt_msg, sizeof fmt_msg, "BotCmd: %s has been kicked by BOT.", pData[playerid][pName]);
-     	SendClientMessageToAll(0xFF5533FF, fmt_msg);
-      	format(fmt_msg, sizeof fmt_msg, "Reason: High Ping [%d/800]", GetPlayerPing(playerid));
-       	SendClientMessageToAll(0xFF5533FF, fmt_msg);
-       	FixedKick(playerid);
-  	}
 	//Weapon AC
 	if(pData[playerid][pSpawned] == 1)
     {

@@ -1,3 +1,11 @@
+CreateJoinLumberPoint()
+{
+	//JOBS
+	new strings[128];
+	CreateDynamicPickup(1239, 23, -265.87, -2213.63, 29.04, -1, -1, -1, 5.0);
+	format(strings, sizeof(strings), "[LUMBER JOBS]\n{ffffff}Jadilah Pekerja Lumber disini\n{7fffd4}/getjob /accept job");
+	CreateDynamic3DTextLabel(strings, COLOR_YELLOW, -265.87, -2213.63, 29.04, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // lumber
+}
 
 #define MAX_TREES 100
 #define TREE_RESPAWN 1800

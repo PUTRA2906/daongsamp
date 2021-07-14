@@ -4,6 +4,15 @@
 // 1634.59, -1841.24, 13.54
 // 1651.04, -1835.13, 13.54
 
+CreateJoinMechPoint()
+{
+	//JOBS
+	new strings[128];
+	CreateDynamicPickup(1239, 23, 1627.54, -1785.21, 13.52, -1);
+	format(strings, sizeof(strings), "[MECH JOBS]\n{ffffff}Jadilah Pekerja Mekanik disini\n{7fff00}/getjob /accept job");
+	CreateDynamic3DTextLabel(strings, COLOR_YELLOW, 1627.54, -1785.21, 13.52, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // Taxi
+}
+
 // Private Vehicle Components
 new pv_spoiler[20][0] =
 {

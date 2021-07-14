@@ -14,7 +14,11 @@ CMD:jobhelp(playerid)
 
 CMD:hauling(playerid)
 {
+    if(pData[playerid][pJob] == 4 || pData[playerid][pJob2] == 4)
+	{
 	ShowPlayerDialog(playerid, DIALOG_TAKEHAULING, DIALOG_STYLE_LIST, "Hauling Mission", "GasStationMission\nDealermission", "Select", "Close");
+	}
+	else return Error(playerid, "You are not trucker job.");
 	return 1;
 }
 
@@ -1120,26 +1124,148 @@ CMD:getjob(playerid, params[])
 	if(pData[playerid][pIDCard] <= 0)
 		return Error(playerid, "Anda tidak memiliki ID-Card.");
 
-	if(IsPlayerInRangeOfPoint(playerid, 3.0, 1395.7670, -20.6278, 1000.9771))
-	{
-		ShowPlayerDialog(playerid, LIST_JOB, DIALOG_STYLE_LIST, "Join Jobs", "Taxi Driver\nMechanic\nLumber Jack\nTrucker\nMiner\nProduction\nFarmer", "Join", "Back");
-	}
-	if(IsPlayerInRangeOfPoint(playerid, 3.0, -3805.5723,1307.4285,75.5859))//smuggler
+	if(pData[playerid][pVip] > 0)
 	{
 		if(pData[playerid][pJob] == 0 || pData[playerid][pJob2] == 0)
 		{
 			if(pData[playerid][pJob] == 0)
 			{
-				pData[playerid][pGetJob] = 8;
-				Info(playerid, "Anda telah berhasil mendaftarkan job Smuggler. /accept job untuk konfirmasi.");
+				if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, -2159.04, 640.36, 1052.38))
+				{
+					pData[playerid][pGetJob] = 1;
+					Info(playerid, "Anda telah berhasil mendaftarkan job Taxi. /accept job untuk konfirmasi.");
+				}
+				else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, 1627.54, -1785.21, 13.52))
+				{
+					pData[playerid][pGetJob] = 2;
+					Info(playerid, "Anda telah berhasil mendaftarkan job mechanic. /accept job untuk konfirmasi.");
+				}
+				else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, -265.87, -2213.63, 29.04))
+				{
+					pData[playerid][pGetJob] = 3;
+					Info(playerid, "Anda telah berhasil mendaftarkan job lumber jack. /accept job untuk konfirmasi.");
+				}
+				else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, -77.38, -1136.52, 1.07))
+				{
+					pData[playerid][pGetJob] = 4;
+					Info(playerid, "Anda telah berhasil mendaftarkan job trucker. /accept job untuk konfirmasi.");
+				}
+				else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, 319.94, 874.77, 20.39))
+				{
+					pData[playerid][pGetJob] = 5;
+					Info(playerid, "Anda telah berhasil mendaftarkan job miner. /accept job untuk konfirmasi.");
+				}
+				else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, -283.02, -2174.36, 28.66))
+				{
+					pData[playerid][pGetJob] = 6;
+					Info(playerid, "Anda telah berhasil mendaftarkan job production. /accept job untuk konfirmasi.");
+				}
+				else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, -383.67, -1438.90, 26.32))
+				{
+					pData[playerid][pGetJob] = 7;
+					Info(playerid, "Anda telah berhasil mendaftarkan job farmer. /accept job untuk konfirmasi.");
+				}
+				else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, 988.890563, -1349.136962, 13.545228))
+				{
+					pData[playerid][pGetJob] = 8;
+					Info(playerid, "Anda telah berhasil mendaftarkan job smuggler. /accept job untuk konfirmasi.");
+				}
+				else return Error(playerid, "Anda sudah memiliki job atau tidak berada di dekat pendaftaran job.");
 			}
 			else if(pData[playerid][pJob2] == 0)
 			{
-				pData[playerid][pGetJob2] = 8;
-				Info(playerid, "Anda telah berhasil mendaftarkan job Smuggler. /accept job untuk konfirmasi.");
+				if(pData[playerid][pJob2] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, -2159.04, 640.36, 1052.38))
+				{
+					pData[playerid][pGetJob2] = 1;
+					Info(playerid, "Anda telah berhasil mendaftarkan job Taxi. /accept job untuk konfirmasi.");
+				}
+				else if(pData[playerid][pJob2] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, 1627.54, -1785.21, 13.52))
+				{
+					pData[playerid][pGetJob2] = 2;
+					Info(playerid, "Anda telah berhasil mendaftarkan job mechanic. /accept job untuk konfirmasi.");
+				}
+				else if(pData[playerid][pJob2] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, -265.87, -2213.63, 29.04))
+				{
+					pData[playerid][pGetJob2] = 3;
+					Info(playerid, "Anda telah berhasil mendaftarkan job lumber jack. /accept job untuk konfirmasi.");
+				}
+				else if(pData[playerid][pJob2] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, -77.38, -1136.52, 1.07))
+				{
+					pData[playerid][pGetJob2] = 4;
+					Info(playerid, "Anda telah berhasil mendaftarkan job trucker. /accept job untuk konfirmasi.");
+				}
+				else if(pData[playerid][pJob2] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, 319.94, 874.77, 20.39))
+				{
+					pData[playerid][pGetJob2] = 5;
+					Info(playerid, "Anda telah berhasil mendaftarkan job miner. /accept job untuk konfirmasi.");
+				}
+				else if(pData[playerid][pJob2] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, -283.02, -2174.36, 28.66))
+				{
+					pData[playerid][pGetJob2] = 6;
+					Info(playerid, "Anda telah berhasil mendaftarkan job production. /accept job untuk konfirmasi.");
+				}
+				else if(pData[playerid][pJob2] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, -383.67, -1438.90, 26.32))
+				{
+					pData[playerid][pGetJob2] = 7;
+					Info(playerid, "Anda telah berhasil mendaftarkan job farmer. /accept job untuk konfirmasi.");
+				}
+				else if(pData[playerid][pJob2] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, 988.890563, -1349.136962, 13.545228))
+				{
+					pData[playerid][pGetJob2] = 8;
+					Info(playerid, "Anda telah berhasil mendaftarkan job smuggler. /accept job untuk konfirmasi.");
+				}
+				else return Error(playerid, "Anda sudah memiliki job atau tidak berada di dekat pendaftaran job.");
 			}
+			else return Error(playerid, "Anda sudah memiliki 2 pekerjaan!");
 		}
 		else return Error(playerid, "Anda sudah memiliki 2 pekerjaan!");
+	}
+	else
+	{
+		if(pData[playerid][pJob] > 0)
+			return Error(playerid, "Anda hanya bisa memiliki 1 pekerjaan!");
+
+		if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, -2159.04, 640.36, 1052.38))
+		{
+			pData[playerid][pGetJob] = 1;
+			Info(playerid, "Anda telah berhasil mendaftarkan job Taxi. /accept job untuk konfirmasi.");
+		}
+		else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, 1627.54, -1785.21, 13.52))
+		{
+			pData[playerid][pGetJob] = 2;
+			Info(playerid, "Anda telah berhasil mendaftarkan job mechanic. /accept job untuk konfirmasi.");
+		}
+		else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, -265.87, -2213.63, 29.04))
+		{
+			pData[playerid][pGetJob] = 3;
+			Info(playerid, "Anda telah berhasil mendaftarkan job lumber jack. /accept job untuk konfirmasi.");
+		}
+		else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, -77.38, -1136.52, 1.07))
+		{
+			pData[playerid][pGetJob] = 4;
+			Info(playerid, "Anda telah berhasil mendaftarkan job trucker. /accept job untuk konfirmasi.");
+		}
+		else if(pData[playerid][pJob2] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, 319.94, 874.77, 20.39))
+		{
+			pData[playerid][pGetJob] = 5;
+			Info(playerid, "Anda telah berhasil mendaftarkan job miner. /accept job untuk konfirmasi.");
+		}
+		else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, -283.02, -2174.36, 28.66))
+		{
+			pData[playerid][pGetJob] = 6;
+			Info(playerid, "Anda telah berhasil mendaftarkan job production. /accept job untuk konfirmasi.");
+		}
+		else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, -383.67, -1438.90, 26.32))
+		{
+			pData[playerid][pGetJob] = 7;
+			Info(playerid, "Anda telah berhasil mendaftarkan job farmer. /accept job untuk konfirmasi.");
+		}
+		else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, 988.890563, -1349.136962, 13.545228))
+		{
+			pData[playerid][pGetJob] = 8;
+			Info(playerid, "Anda telah berhasil mendaftarkan job smuggler. /accept job untuk konfirmasi.");
+		}
+		else return Error(playerid, "Anda sudah memiliki job atau tidak berada di dekat pendaftaran job.");
 	}
 	return 1;
 }
@@ -1915,7 +2041,7 @@ stock PickUpBoombox(playerid)
 	return 1;
 }
 
-CMD:throws(playerid, params[])
+CMD:drop(playerid, params[])
 {
 	if(IsPlayerConnected(playerid))
 	{
@@ -2404,7 +2530,8 @@ CMD:tweet(playerid, params[])
 
 	if(!pData[playerid][pTweet]) return Error(playerid, "Anda tidak mempunyai akun twitter");
     if(!strcmp(pData[playerid][pTname], "None"))
-		return Error(playerid, "Kamu Harus Meminta set nama untuk nama akun Twitter mu.");
+		return Error(playerid, "Kamu Harus set nama untuk nama akun Twitter mu.");
+    if(pData[playerid][pPhoneCredit] <= 0) return Error(playerid, "You dont have phone credits!");
 
 	if(!strlen(params)) return Usage(playerid, "/tweet [teks]");
     
@@ -2412,6 +2539,7 @@ CMD:tweet(playerid, params[])
 	format(string, sizeof(string), "[TWITTER] @%s: %s ", pData[playerid][pTname], params);
 	SendTweetMessage(0x00BFFFFF, string);
 	format(string, sizeof string, "```[TWITTER] @%s: %s ```", pData[playerid][pTname], params);
+	pData[playerid][pPhoneCredit] -= 1;
     DCC_SendChannelMessage(g_discord_twt, string);
 
 	SetPVarInt(playerid, "maketw", gettime() + 5);

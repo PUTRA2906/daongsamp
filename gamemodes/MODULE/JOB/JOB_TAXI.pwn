@@ -1,4 +1,12 @@
 //Job Taxi
+CreateJoinTaxiPoint()
+{
+	//JOBS
+	new strings[128];
+	CreateDynamicPickup(1239, 23, -2159.04, 640.36, 1052.38, -1);
+	format(strings, sizeof(strings), "[TAXI JOBS]\n{ffffff}Jadilah Pekerja Taxi disini\n{7fff00}/getjob /accept job");
+	CreateDynamic3DTextLabel(strings, COLOR_YELLOW, -2159.04, 640.36, 1052.38, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // Taxi
+}
 
 //Taxi
 CMD:taxiduty(playerid)

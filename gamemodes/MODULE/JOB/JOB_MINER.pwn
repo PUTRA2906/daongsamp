@@ -3,6 +3,15 @@
 // 315.07, 926.53, 20.46 > component
 //293.73, 913.17, 20.40 > sell ore
 
+CreateJoinMinerPoint()
+{
+	//JOBS
+	new strings[128];
+	CreateDynamicPickup(1239, 23, 319.94, 874.77, 20.39, -1);
+	format(strings, sizeof(strings), "[MINER JOBS]\n{ffffff}Jadilah Pekerja Miner disini\n{7fffd4}/getjob /accept job");
+	CreateDynamic3DTextLabel(strings, COLOR_YELLOW, 319.94, 874.77, 20.39, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // Miner
+}
+
 RGBAToARGB(rgba)
     return rgba >>> 8 | rgba << 24;
 

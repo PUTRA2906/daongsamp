@@ -287,7 +287,7 @@ CMD:a(playerid, params[])
 		params[i] = EOS;
 	}
 	new mstr[512];
-	format(mstr, sizeof(mstr), "[A] {007FFF}%s {00FF00}%s(%i): {00FF00}%s", GetStaffRank(playerid), pData[playerid][pAdminname], playerid, params);
+	format(mstr, sizeof(mstr), "[A] {007FFF}%s {00FF00}%s(%i): {ffffff}%s", GetStaffRank(playerid), pData[playerid][pAdminname], playerid, params);
 	foreach(new ii : Player)
 	{
 		if(pData[ii][pAdmin] > 0)
@@ -3877,17 +3877,4 @@ CMD:gmx(playerid, params[])
 	    	}
 	    }
 		return 1;
-}
-CMD:nyamar(playerid, params[])
-{
-    if(pData[playerid][pAdmin] < 6)
-            return PermissionError(playerid);
-
-    if(!strlen(params))
-		return SendClientMessage(playerid, 0xCECECEFF, "Gunakan: /nyamar [nickname]");
-
-    extract params -> new string: message[144 + 1]; else return SendClientMessage(playerid, 0xCECECEFF, "Gunakan: /nyamar [nickname]");
-
-	SetPlayerName(playerid, message);
-	return 1;
 }

@@ -1,10 +1,10 @@
-CreateGetJobPoint()
+CreateJoinTruckPoint()
 {
 	//JOBS
 	new strings[128];
-	CreateDynamicPickup(1239, 23, 1395.7670, -20.6278, 1000.9771, -1);
-	format(strings, sizeof(strings), "[GET JOBS]\n{FFFFFF}/getjob to join job");
-	CreateDynamic3DTextLabel(strings, COLOR_YELLOW, 1395.7670, -20.6278, 1000.9771, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // truck
+	CreateDynamicPickup(1239, 23, -77.38, -1136.52, 1.07, -1);
+	format(strings, sizeof(strings), "[TRUCKER JOBS]\n{ffffff}Jadilah Pekerja Trucker disini\n{7fffd4}/getjob /accept job");
+	CreateDynamic3DTextLabel(strings, COLOR_YELLOW, -77.38, -1136.52, 1.07, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // truck
 }
 
 //Vending

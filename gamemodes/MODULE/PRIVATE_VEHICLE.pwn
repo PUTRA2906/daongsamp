@@ -1680,12 +1680,40 @@ CMD:tow(playerid, params[])
 	if(IsPlayerInAnyVehicle(playerid))
 	{
 		new carid = GetPlayerVehicleID(playerid);
-		if(IsATowTruck(carid), IsATowTrTruck(carid))
+		if(IsATowTruck(carid))
 		{
 			new closestcar = GetClosestCar(playerid, carid);
 
 			if(GetDistanceToCar(playerid, closestcar) <= 8 && !IsTrailerAttachedToVehicle(carid))
 			{
+				/*for(new x;x<sizeof(SAGSVehicles);x++)
+				{
+					if(SAGSVehicles[x] == closestcar) return Error(playerid, "You cant tow faction vehicle.");
+					Info(playerid, "You has towed the vehicle in trailer.");
+					AttachTrailerToVehicle(closestcar, carid);
+					return 1;
+				}
+				for(new xx;xx<sizeof(SAPDVehicles);xx++)
+				{
+					if(SAPDVehicles[xx] == closestcar) return Error(playerid, "You cant tow faction vehicle.");
+					Info(playerid, "You has towed the vehicle in trailer.");
+					AttachTrailerToVehicle(closestcar, carid);
+					return 1;
+				}
+				for(new y;y<sizeof(SAMDVehicles);y++)
+				{
+					if(SAMDVehicles[y] == closestcar) return Error(playerid, "You cant tow faction vehicle.");
+					Info(playerid, "You has towed the vehicle in trailer.");
+					AttachTrailerToVehicle(closestcar, carid);
+					return 1;
+				}
+				for(new yy;yy<sizeof(SANAVehicles);yy++)
+				{
+					if(SANAVehicles[yy] == closestcar) return Error(playerid, "You cant tow faction vehicle.");
+					Info(playerid, "You has towed the vehicle in trailer.");
+					AttachTrailerToVehicle(closestcar, carid);
+					return 1;
+				}*/
 				Info(playerid, "You has towed the vehicle in trailer.");
 				AttachTrailerToVehicle(closestcar, carid);
 				return 1;

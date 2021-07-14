@@ -3038,57 +3038,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			ShowPlayerDialog(playerid, DIALOG_TOYEDIT, DIALOG_STYLE_LIST, ""RED_E"SOI:RP "WHITE_E"Player Toys", string, "Select", "Cancel");
 		}
 	}
-	if(dialogid == D_WORK)
-	{
-	    if(!GetPVarInt(playerid,"OnWork"))
-	    {
-	    	if(pData[playerid][pSideJobTime] > 0)
-			{
-				Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
-				return 1;
-			}
-	        SendClientMessage(playerid,COLOR_JOB,"BUTCHER:"WHITE_E" You started working on the Assembly line Go to the Assembly line!");
-	        SetPVarInt(playerid,"OnWork",1);
-	        SetPVarInt(playerid,"OldSkin",GetPlayerSkin(playerid));
-	        SetPlayerCheckpoint(playerid, 940.1020,2127.6326,1011.0303, 1.0);
-	        SetPlayerSkin(playerid,168);
-		}
-		else
-	    {
-		    if(IsValidDynamicObject(playerobject[playerid][0])) DestroyDynamicObject(playerobject[playerid][0]);
-		    else if(IsValidDynamicObject(playerobject[playerid][1])) DestroyDynamicObject(playerobject[playerid][1]);
-		    SetPlayerSkin(playerid,GetPVarInt(playerid,"OldSkin"));
-			new str[144];
-			new salary = GetPVarInt(playerid,"BadMeatDel")*30;
-			
-		    format(str,sizeof(str),"BUTCHER:"WHITE_E" You threw out %d spoiled pieces. Salary: $%d(Spoiled pieces * 30)",GetPVarInt(playerid,"BadMeatDel"), salary);
-		    SendClientMessage(playerid,COLOR_JOB,str);
-		    AddPlayerSalary(playerid, "SideJob(Butcher)", salary);
-		    pData[playerid][pSideJobTime] = 600;
-		    DeletePVar(playerid,"MeatCheck");
-			DeletePVar(playerid,"InWork");
-			DeletePVar(playerid,"MeatCheck");
-			DeletePVar(playerid,"BadMeatDel");
-			DeletePVar(playerid,"BadMeat");
-			DeletePVar(playerid,"OldSkin");
-			DeletePVar(playerid,"OnWork");
-	    }
-	}
-	if(dialogid == D_WORK_INFO)
-	{
-		{
-		    SetPVarInt(playerid,"InWork",1);
-			SetPlayerInterior(playerid,1);
-			SetPlayerVirtualWorld(playerid,playerid+1);
-			SetPlayerPos(playerid,940.8642,2122.3950,1011.0303);
-			SetPlayerCameraPos(playerid,942.328796,2125.278076,1015.023559);
-			SetPlayerCameraLookAt(playerid,942.355163,2125.811279,1014.177917);
-			GoObject(playerid);
-			playerobject[playerid][1] = CreateDynamicObject(1271, 942.249206, 2127.549072, 1010.819091, 0.000000, 0.000000, 0.000000, playerid+1, -1, -1, 300.00, 300.00);
-			SetDynamicObjectMaterial(playerobject[playerid][1], 0, 2702, "pick_up", "CJ_red_FELT", 0x00000000);
-			TogglePlayerControllable(playerid, 0);
-		}
-	}
 	//-----------[ Player Commands Dialog ]----------
 	if(dialogid == DIALOG_HELP)
     {
@@ -3120,6 +3069,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				strcat(str, ""LG_E"VEHICLE: /buyplate - Buy Plate || /buyinsu - Buy Insurance\n");
 				strcat(str, ""LG_E"VEHICLE: /sellpv - sell pv || /givepv - given pv\n");
 				strcat(str, ""LG_E"VEHICLE: /vtoys - edit object modshop || /v para - use vehicle parasute\n");
+				strcat(str, ""LG_E"VEHICLE: /limitspeed - speedlimit\n");
 				ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, ""RED_E"Vehicle", str, "Close", "");
 			}
 			case 3:

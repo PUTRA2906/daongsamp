@@ -721,19 +721,19 @@ GetDealerVehicleCost(carid)
 	if(carid == 413) return 156000; //Pony
 	
 	//Category Kendaraan Sports
-	if(carid == 602) return 255000; //Alpha
-	if(carid == 429) return 256000; //Banshee
-	if(carid == 562) return 582000; //Elegy
-	if(carid == 587) return 244000; //Euros
-	if(carid == 565) return 258000; //Flash
+	if(carid == 602) return 265000; //Alpha
+	if(carid == 429) return 266000; //Banshee
+	if(carid == 562) return 682000; //Elegy
+	if(carid == 587) return 254000; //Euros
+	if(carid == 565) return 288000; //Flash
 	if(carid == 559) return 464000; //Jester
 	if(carid == 561) return 388000; //Stratum
-	if(carid == 560) return 620000; //Sultan
-	if(carid == 506) return 1055000; //Super GT
-	if(carid == 558) return 348000; //Uranus
-	if(carid == 477) return 367000; //Zr-350
-	if(carid == 480) return 285300; //Comet
-	if(carid == 420) return 120000; //Taxi
+	if(carid == 560) return 820000; //Sultan
+	if(carid == 506) return 1255000; //Super GT
+	if(carid == 558) return 388000; //Uranus
+	if(carid == 477) return 467000; //Zr-350
+	if(carid == 480) return 385300; //Comet
+	if(carid == 420) return 125000; //Taxi
 	if(carid == 438) return 50000; //Cabbie
 	if(carid == 403) return 250000; //Linerunner
 	if(carid == 414) return 130000; //Mule
@@ -743,18 +743,18 @@ GetDealerVehicleCost(carid)
 	if(carid == 456) return 220000; //Yankee
 	if(carid == 478) return 145000; //Walton
 	if(carid == 498) return 158000; //Boxville
-	if(carid == 499) return 135000; //Benson
-	if(carid == 514) return 152000; //Tanker
-	if(carid == 515) return 185000; //Roadtrain
-	if(carid == 524) return 148000; //Cement Truck
-	if(carid == 525) return 50000; //Towtruck
-	if(carid == 543) return 80000; //Sadler
-	if(carid == 552) return 12000; //Utility Van
+	if(carid == 499) return 155000; //Benson
+	if(carid == 514) return 252000; //Tanker
+	if(carid == 515) return 385000; //Roadtrain
+	if(carid == 524) return 158000; //Cement Truck
+	if(carid == 525) return 80000; //Towtruck
+	if(carid == 543) return 120000; //Sadler
+	if(carid == 552) return 16000; //Utility Van
 	if(carid == 554) return 185000; //Yosemite
-	if(carid == 578) return 180000; //DFT-30
-	if(carid == 609) return 140000; //Boxville
-	if(carid == 423) return 130000; //Mr Whoopee/Ice cream
-	if(carid == 588) return 132000; //Hotdog
+	if(carid == 578) return 200000; //DFT-30
+	if(carid == 609) return 180000; //Boxville
+	if(carid == 423) return 150000; //Mr Whoopee/Ice cream
+	if(carid == 588) return 162000; //Hotdog
  	return -1;
 }
 

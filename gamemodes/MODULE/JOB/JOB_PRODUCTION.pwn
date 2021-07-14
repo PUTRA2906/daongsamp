@@ -7,6 +7,10 @@ CreateJoinProductionPoint()
 {
 	//JOBS
 	new strings[128];
+	CreateDynamicPickup(1239, 23, -283.02, -2174.36, 28.66, -1);
+	format(strings, sizeof(strings), "[PRODUCTION JOBS]\n{ffffff}Jadilah Pekerja Production disini\n{7fffd4}/getjob /accept job");
+	CreateDynamic3DTextLabel(strings, COLOR_YELLOW, -283.02, -2174.36, 28.66, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // production job
+	
 	format(strings, sizeof(strings), "[PRODUCTION JOBS]\n{FFFFFF}/createproduct");
 	CreateDynamic3DTextLabel(strings, COLOR_YELLOW, -249.79, -2148.05, 29.30, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // production job
 	
@@ -179,7 +183,7 @@ CMD:sellproduct(playerid, params[])
 		RemovePlayerAttachedObject(playerid, 9);
 		SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
 		pData[playerid][CarryProduct] = 0;
-		GivePlayerMoneyEx(playerid, 10000);
+		GivePlayerMoneyEx(playerid, 18000);
 		
 		Product += 10;
 		Server_MinMoney(10000);
@@ -191,7 +195,7 @@ CMD:sellproduct(playerid, params[])
 		RemovePlayerAttachedObject(playerid, 9);
 		SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
 		pData[playerid][CarryProduct] = 0;
-		GivePlayerMoneyEx(playerid, 12000);
+		GivePlayerMoneyEx(playerid, 20000);
 		
 		Product += 10;
 		Server_MinMoney(12000);
@@ -203,7 +207,7 @@ CMD:sellproduct(playerid, params[])
 		RemovePlayerAttachedObject(playerid, 9);
 		SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
 		pData[playerid][CarryProduct] = 0;
-		GivePlayerMoneyEx(playerid, 13000);
+		GivePlayerMoneyEx(playerid, 23000);
 		
 		Product += 10;
 		Server_MinMoney(13000);

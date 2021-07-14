@@ -5,6 +5,15 @@
 //-383.67, -1438.90, 26.32
 //Drug -3811.65, 1313.72, 71.42
 
+CreateJoinFarmerPoint()
+{
+	//JOBS
+	new strings[128];
+	CreateDynamicPickup(1239, 23, -383.67, -1438.90, 26.32, -1, -1, -1, 5.0);
+	format(strings, sizeof(strings), "[FARMER JOBS]\n{ffffff}Jadilah Pekerja Petani disini\n{7fffd4}/getjob /accept job");
+	CreateDynamic3DTextLabel(strings, COLOR_YELLOW, -383.67, -1438.90, 26.32, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1);
+}
+
 #define MAX_PLANT 1000
 
 enum E_PLANT
