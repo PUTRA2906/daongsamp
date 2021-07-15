@@ -1986,15 +1986,6 @@ public OnGameModeInit()
 	CreateDynamicObject(987, 806.70758, -506.13403, 16.20480,   0.00000, 4.00000, -89.00000);
 	CreateDynamicObject(987, 831.85498, -482.68753, 16.24480,   0.00000, 0.00000, -180.00000);
 	CreateDynamicObject(987, 806.91943, -519.98999, 15.26480,   0.00000, 0.00000, 0.00000);
-	//anim
- 	txtAnimHelper = TextDrawCreate(542.000000, 417.000000, "Press ~r H ~wFor Clear Anim");
-    TextDrawUseBox(txtAnimHelper, 0);
-    TextDrawFont(txtAnimHelper, 2);
-    TextDrawSetShadow(txtAnimHelper,0); // no shadow
-    TextDrawSetOutline(txtAnimHelper,1); // thickness 1
-    TextDrawBackgroundColor(txtAnimHelper,0x000000FF);
-    TextDrawColor(txtAnimHelper,0xFFFFFFFF);
-    TextDrawAlignment(txtAnimHelper,3); // align right
 	//int ms13
 	CreateObject(19378, 2192.12988, -1243.15002, 1528.02002,   0.00000, 90.00000, 0.00000);
 	CreateDynamicObject(19378, 2202.62988, -1243.15002, 1528.02002,   0.00000, 90.00000, 0.00000);
@@ -8148,11 +8139,6 @@ ptask PlayerUpdate[999](playerid)
 	}
 	if(GetPlayerPing(playerid) > 800) // Ping Player
     {
-        new fmt_msg[128];
-        format(fmt_msg, sizeof fmt_msg, "BotCmd: %s(%i) has been kicked by BOT.", pData[playerid][pName], playerid);
-        SendClientMessageToAll(0xFF5533FF, fmt_msg);
-        format(fmt_msg, sizeof fmt_msg, "Reason: High Ping [%d/800]", GetPlayerPing(playerid));
-        SendClientMessageToAll(0xFF5533FF, fmt_msg);
         FixedKick(playerid);
     }
 	//Anti Armour Hacks
@@ -8177,7 +8163,7 @@ ptask PlayerUpdate[999](playerid)
 
             if(pData[playerid][pWeapon] >= 1 && pData[playerid][pWeapon] <= 45 && pData[playerid][pWeapon] != 42 && pData[playerid][pWeapon] != 2 && pData[playerid][pGuns][g_aWeaponSlots[pData[playerid][pWeapon]]] != GetPlayerWeapon(playerid))
             {
-                SendAdminMessage(COLOR_LOGS, "AdmWarn: "WHITE_E"%s(%d) has possibly used weapon hacks (%s), Please to check /spec this player first!", pData[playerid][pName], playerid, ReturnWeaponName(pData[playerid][pWeapon]));
+                SendAdminMessage(COLOR_LOGS, ""WHITE_E"%s(%d) has possibly used weapon hacks (%s), Please to check /spec this player first!", pData[playerid][pName], playerid, ReturnWeaponName(pData[playerid][pWeapon]));
                 SetWeapons(playerid); //Reload old weapons
                 //AutoBan(playerid);
             }
