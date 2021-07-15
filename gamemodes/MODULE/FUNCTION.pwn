@@ -288,6 +288,7 @@ function AssignPlayerData(playerid)
 	
 	cache_get_value_name_int(0, "pegawai", pData[playerid][pWsEmplooye]);
 	cache_get_value_name_int(0, "trash", pData[playerid][pTrash]);
+	cache_get_value_name_int(0, "berry", pData[playerid][pBerry]);
 	/*cache_get_value_name_int(0, "truckskill", pData[playerid][pTruckSkill]);
 	cache_get_value_name_int(0, "mechskill", pData[playerid][pMechSkill]);
 	cache_get_value_name_int(0, "smuggskill", pData[playerid][pSmuggSkill]);*/

@@ -84,14 +84,15 @@ CMD:takebankmoney(playerid, params[])
 
 		if(VehDepositor[vehicleid] < 1) return Error(playerid, "Kamu Tidak Punya Uang Bank di kendaraan anda");
 		pData[playerid][pDepositor] += 1;
-		if((carid = Vehicle_Nearest(playerid)) != -1)
+  		if((carid = Vehicle_Nearest(playerid)) != -1)
 		{
 			if(IsValidVehicle(pvData[carid][cVeh]))
 			{
-				pvData[carid][cDepositor] -= 1;
+				pvData[carid][cLumber] -= 1;
 			}
 		}
 	}
+    pData[playerid][pDepositor] += 1;
 	else return Error(playerid, "You are not depositor jobs.");
 	return 1;
 }

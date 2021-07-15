@@ -3164,7 +3164,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				new str[3500];
 				strcat(str, ""LB_E"GUIDE: Farmers Job berada didaerah Flint Country\nBeli Bibit Tanaman lalu Tanam bibit tersebut\nJika tanaman sudah tumbuh panen tanaman lalu jual!\n");
 				strcat(str, ""LB_E"");
-				strcat(str, ""WHITE_E"COMMAND: /plant /buy (seeds) \n");
+				strcat(str, ""WHITE_E"COMMAND: /plant /buy (seeds) /berry (press N) \n");
 				ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, ""WHITE_E"Farmers Jobs", str, "Close", "");
 			}
 			case 5:

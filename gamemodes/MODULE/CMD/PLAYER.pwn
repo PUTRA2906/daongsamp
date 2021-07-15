@@ -1684,7 +1684,7 @@ CMD:give(playerid, params[])
         if(sscanf(params, "us[24]d", otherid, name, ammount))
 		{
 			Usage(playerid, "/give [playerid] [name] [ammount]");
-			Info(playerid, "Names: bandage, medicine, snack, sprunk, material, component, marijuana");
+			Info(playerid, "Names: bandage, medicine, snack, sprunk, material, component, marijuana, berry");
 			return 1;
 		}
 		if(otherid == INVALID_PLAYER_ID || otherid == playerid || !NearPlayer(playerid, otherid, 3.0))
@@ -1793,6 +1793,18 @@ CMD:give(playerid, params[])
 			ApplyAnimation(playerid, "DEALER", "shop_pay", 4.0, 0, 0, 0, 0, 0);
 			ApplyAnimation(otherid, "DEALER", "shop_pay", 4.0, 0, 0, 0, 0, 0);
 		}
+		else if(strcmp(name,"berry",true) == 0)
+		{
+			if(pData[playerid][pBerry] < ammount)
+				return Error(playerid, "Item anda tidak cukup.");
+
+			pData[playerid][pBerry] -= ammount;
+			pData[otherid][pBerry] += ammount;
+			Info(playerid, "Anda telah berhasil memberikan Berry kepada %s sejumlah %d.", ReturnName(otherid), ammount);
+			Info(otherid, "%s telah berhasil memberikan Berry kepada anda sejumlah %d.", ReturnName(playerid), ammount);
+			ApplyAnimation(playerid, "DEALER", "shop_pay", 4.0, 0, 0, 0, 0, 0);
+			ApplyAnimation(otherid, "DEALER", "shop_pay", 4.0, 0, 0, 0, 0, 0);
+		}
 	}
 	return 1;
 }
@@ -1804,7 +1816,7 @@ CMD:use(playerid, params[])
         if(isnull(params)) 
 		{
             Usage(playerid, "/use [name]");
-            Info(playerid, "Names: bandage, snack, sprunk, gas, medicine, marijuana, boombox");
+            Info(playerid, "Names: bandage, snack, sprunk, gas, medicine, marijuana, boombox, berry");
             return 1;
         }
 		if(strcmp(params,"bandage",true) == 0) 
@@ -1958,6 +1970,15 @@ CMD:use(playerid, params[])
 			SetPVarInt(playerid, "BBVW", GetPlayerVirtualWorld(playerid));
 			ApplyAnimation(playerid,"BOMBER","BOM_Plant",4.0,0,0,0,0,0);
 		    ApplyAnimation(playerid,"BOMBER","BOM_Plant",4.0,0,0,0,0,0);
+		}
+        else if(strcmp(params,"berry",true) == 0)
+		{
+			if(pData[playerid][pBerry] < 1)
+				return Error(playerid, "You dont have berry.");
+				
+			pData[playerid][pHunger] += 8;
+			pData[playerid][pBerry]--;
+			ApplyAnimation(playerid,"SMOKING","M_smkstnd_loop",2.1,0,0,0,0,0);
 		}
 	}
 	return 1;

@@ -175,6 +175,7 @@ UpdatePlayerData(playerid)
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`togtweet` = '%d', ", cQuery, pData[playerid][pTogTweet]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`pegawai` = '%d', ", cQuery, pData[playerid][pWsEmplooye]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`trash` = '%d', ", cQuery, pData[playerid][pTrash]);
+	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`berry` = '%d', ", cQuery, pData[playerid][pBerry]);
 	// mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`truckskill` = '%d', ", cQuery, pData[playerid][pTruckSkill]);
 	// mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`mechskill` = '%d', ", cQuery, pData[playerid][pMechSkill]);
 	// mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`smuggskill` = '%d', ", cQuery, pData[playerid][pSmuggSkill]);
@@ -1282,6 +1283,10 @@ DisplayItems(playerid, p2)
 	if(pData[p2][pTrash] > 0)
 	{
 		format(lstr, sizeof(lstr), "%s\nTrash\t%d", lstr, pData[p2][pTrash]);
+	}
+	if(pData[p2][pBerry] > 0)
+	{
+		format(lstr, sizeof(lstr), "%s\nBerry\t%d", lstr, pData[p2][pBerry]);
 	}
 	for(new i = 0; i < 13; i ++)
     {
