@@ -1521,23 +1521,23 @@ ServerLabels()
 	
 	CreateDynamicPickup(1239, 23, 2246.46, -1757.03, 1014.77, -1);
 	format(strings, sizeof(strings), "[BANK]\n{FFFFFF}/newrek - create new rekening");
-	CreateDynamic3DTextLabel(strings, COLOR_LBLUE, 2246.46, -1757.03, 1014.77, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // bank
+	CreateDynamic3DTextLabel(strings, COLOR_LOGS, 2246.46, -1757.03, 1014.77, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // bank
 	
 	CreateDynamicPickup(1239, 23, 2246.55, -1750.25, 1014.77, -1);
 	format(strings, sizeof(strings), "[BANK]\n{FFFFFF}/bank - access rekening");
-	CreateDynamic3DTextLabel(strings, COLOR_LBLUE, 2246.55, -1750.25, 1014.77, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // bank
+	CreateDynamic3DTextLabel(strings, COLOR_LOGS, 2246.55, -1750.25, 1014.77, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // bank
 	
 	CreateDynamicPickup(1239, 23, 2461.21, 2270.42, 91.67, -1);
-	format(strings, sizeof(strings), "[IKLAN]\n{FFFFFF}/ads - public ads");
-	CreateDynamic3DTextLabel(strings, COLOR_ORANGE2, 2461.21, 2270.42, 91.67, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // iklan
+	format(strings, sizeof(strings), "[Ads]\n{FFFFFF}/ads - public ads");
+	CreateDynamic3DTextLabel(strings, COLOR_LOGS, 2461.21, 2270.42, 91.67, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // iklan
 	
 	CreateDynamicPickup(1239, 23, 1254.7303, -2059.5728, 59.5827, -1);
-	format(strings, sizeof(strings), "[TelpUmum]\n{FFFFFF}/cu - $5");
-	CreateDynamic3DTextLabel(strings, COLOR_ORANGE2, 1254.7303, -2059.5728,59.5827 , 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // cu
+	format(strings, sizeof(strings), "[Payphone]\n{FFFFFF}/cu - $5");
+	CreateDynamic3DTextLabel(strings, COLOR_LOGS, 1254.7303, -2059.5728,59.5827 , 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // cu
 	
 	CreateDynamicPickup(1239, 23, 1773.6583, -1015.3002, 23.9609, -1);
-	format(strings, sizeof(strings), "[TelpUmum]\n{FFFFFF}/cu - $5");
-	CreateDynamic3DTextLabel(strings, COLOR_ORANGE2, 1773.6583, -1015.3002, 23.9609 , 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // cu
+	format(strings, sizeof(strings), "[Payphone]\n{FFFFFF}/cu - $5");
+	CreateDynamic3DTextLabel(strings, COLOR_LOGS, 1773.6583, -1015.3002, 23.9609 , 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // cu
 
 	//meat
 	CreateDynamicPickup(1239, 23, 942.3542, 2117.8999, 1011.0303, -1, -1, -1, 5.0);

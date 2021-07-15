@@ -477,8 +477,8 @@ Bisnis_Refresh(id)
         }
 		bData[id][bPickPoint] = CreateDynamicPickup(1274, 23, bData[id][bPointX], bData[id][bPointY], bData[id][bPointZ]+0.2, id, bData[id][bInt], _, 4);
 		
-		format(tstr, 128, "[ID: %d]\n"RED_E"Bisnis Point\n"LG_E"use '/buy' here", id);
-		bData[id][bLabelPoint] = CreateDynamic3DTextLabel(tstr, COLOR_YELLOW, bData[id][bPointX], bData[id][bPointY], bData[id][bPointZ]+0.5, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, id, bData[id][bInt]);
+		format(tstr, 128, "[ID: %d]\n"LB_E"Bisnis Point\n"LB_E"Use '/buy' In Here", id);
+		bData[id][bLabelPoint] = CreateDynamic3DTextLabel(tstr, COLOR_LOGS, bData[id][bPointX], bData[id][bPointY], bData[id][bPointZ]+0.5, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, id, bData[id][bInt]);
 		
 		//bData[id][bCP] = CreateDynamicCP(bData[id][bIntposX], bData[id][bIntposY], bData[id][bIntposZ], 1.0, id, bData[id][bInt], -1, 3.0);
         bData[id][bLabel] = CreateDynamic3DTextLabel(string, COLOR_GREEN, bData[id][bExtposX], bData[id][bExtposY], bData[id][bExtposZ]+0.5, 2.5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, 0, 0);
