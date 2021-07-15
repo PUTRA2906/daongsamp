@@ -1358,6 +1358,7 @@ function OnUnbanQueryData(adminid, BannedName[])
 	if(cache_num_rows() > 0)
 	{
 		new banIP[16], query[128];
+		new string[100];
 		cache_get_value_name(0, "ip", banIP);
 		mysql_format(g_SQL, query, sizeof(query), "DELETE FROM banneds WHERE ip = '%s'", banIP);
 		mysql_tquery(g_SQL, query);
