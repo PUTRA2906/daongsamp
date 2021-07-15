@@ -1362,7 +1362,9 @@ function OnUnbanQueryData(adminid, BannedName[])
 		mysql_format(g_SQL, query, sizeof(query), "DELETE FROM banneds WHERE ip = '%s'", banIP);
 		mysql_tquery(g_SQL, query);
 
-		SendClientMessageToAllEx(COLOR_RED, "Server: "GREY2_E"%s(%i) has unbanned %s from the server.", pData[adminid][pAdminname], adminid, BannedName);
+		SendClientMessageToAllEx(0xFF5533FF, "AdmCmd: %s(%i) Has Unbanned %s From This Server.", pData[adminid][pAdminname], adminid, BannedName);
+		format(string, sizeof string, "```Banned: %s(%i) Has Unbanned %s. From This Server```",  pData[adminid][pAdminname], adminid, BannedName);
+		DCC_SendChannelMessage(g_discord_ban, string);
 	}
 	else
 	{

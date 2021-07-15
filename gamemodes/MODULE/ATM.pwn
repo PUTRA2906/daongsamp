@@ -63,7 +63,7 @@ function LoadATM()
 			Iter_Add(ATMS, id);
 	    	i++;
 		}
-		printf("[Dynamic ATM] Number of Loaded: %d.", i);
+		printf("[MySQL Atm] Atm Loaded Number: %d.", i);
 	}
 }
 

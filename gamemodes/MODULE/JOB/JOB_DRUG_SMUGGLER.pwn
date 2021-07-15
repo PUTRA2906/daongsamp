@@ -70,7 +70,7 @@ function reloadpacket()
 }
 function unloadpacket(playerid)
 {
-	new packet_price = Random(10000, 20000);
+	new packet_price = Random(20000, 30000);
 	AddPlayerSalary(playerid, "IlegalJob(Drug Smuggler)", packet_price);
 	SendClientMessageEx(playerid, COLOR_LOGS, "SMUGGLER: {FFFFFF}You get $%s from delivering packet", FormatMoney(packet_price));
 	ClearAnimations(playerid), SetPlayerSpecialAction(playerid, 0);

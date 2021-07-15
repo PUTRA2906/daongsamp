@@ -8022,6 +8022,8 @@ ServerVehicle()
 	SAPDVehicles[25] = AddStaticVehicleEx(497,1547.7992,-1643.6317,28.5923,91.2595,0,1, VEHICLE_RESPAWN, 1); // Maverick
  	SAPDVehicles[26] = AddStaticVehicleEx(411,1578.5643,-1710.6968,5.6112,0.0933,0,1, VEHICLE_RESPAWN, 1); // Infernus
 	SAPDVehicles[27] = AddStaticVehicleEx(411,1574.3217,-1710.7924,5.6117,0.8341,0,1, VEHICLE_RESPAWN, 1); // Infernus
+	SAPDVehicles[28] = AddStaticVehicleEx(522,1562.4324,-1710.7955,5.8906,0.0933,0,1, VEHICLE_RESPAWN, 1); // Infernus
+	SAPDVehicles[29] = AddStaticVehicleEx(522,1566.4917,-1710.3234,5.8906,0.8341,0,1, VEHICLE_RESPAWN, 1); // Infernus
 
 	for(new x;x<sizeof(SAPDVehicles);x++)
 	{

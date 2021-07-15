@@ -143,23 +143,23 @@ CreateServerPoint()
 	//JOBS
 	MatPickup = CreateDynamicPickup(1239, 23, -258.54, -2189.92, 28.97, -1, -1, -1, 5.0);
 	format(strings, sizeof(strings), "[Material]\n"WHITE_E"Material Stock: "LG_E"%d\n\n"WHITE_E"Material Price: "LG_E"%s /item\n\n"WHITE_E"Lumber Price: "LG_E"%s /item\n"LB_E"/buy", Material, FormatMoney(MaterialPrice), FormatMoney(LumberPrice));
-	MatText = CreateDynamic3DTextLabel(strings, COLOR_YELLOW, -258.54, -2189.92, 28.97, 5.0); // lumber
+	MatText = CreateDynamic3DTextLabel(strings, COLOR_LOGS, -258.54, -2189.92, 28.97, 5.0); // lumber
 	
 	CompPickup = CreateDynamicPickup(1239, 23, 315.07, 926.53, 20.46, -1, -1, -1, 5.0);
 	format(strings, sizeof(strings), "[Miner]\n"WHITE_E"Component Stock: "LG_E"%d\n\n"WHITE_E"Component Price: "LG_E"%s /item\n"LB_E"/buy", Component, FormatMoney(ComponentPrice));
-	CompText = CreateDynamic3DTextLabel(strings, COLOR_YELLOW, 315.07, 926.53, 20.46, 5.0); // comp
+	CompText = CreateDynamic3DTextLabel(strings, COLOR_LOGS, 315.07, 926.53, 20.46, 5.0); // comp
 	
 	GasOilPickup = CreateDynamicPickup(1239, 23, 336.70, 895.54, 20.40, -1, -1, -1, 5.0);
 	format(strings, sizeof(strings), "[Miner]\n"WHITE_E"GasOil Stock: "LG_E"%d liters\n\n"WHITE_E"GasOil Price: "LG_E"%s /liters\n"LB_E"/buy", GasOil, FormatMoney(GasOilPrice));
-	GasOilText = CreateDynamic3DTextLabel(strings, COLOR_YELLOW, 336.70, 895.54, 20.40, 5.0); // gasoil
+	GasOilText = CreateDynamic3DTextLabel(strings, COLOR_LOGS, 336.70, 895.54, 20.40, 5.0); // gasoil
 	
 	OrePickup = CreateDynamicPickup(1239, 23, 293.73, 913.17, 20.40, -1, -1, -1, 5.0);
 	format(strings, sizeof(strings), "[Miner]\n"WHITE_E"Ore Metal Price: "LG_E"%s / item\n\n"WHITE_E"Ore Coal Price: "LG_E"%s /item\n"LB_E"/ore sell", FormatMoney(MetalPrice), FormatMoney(CoalPrice));
-	OreText = CreateDynamic3DTextLabel(strings, COLOR_YELLOW, 293.73, 913.17, 20.40, 5.0); // sell ore
+	OreText = CreateDynamic3DTextLabel(strings, COLOR_LOGS, 293.73, 913.17, 20.40, 5.0); // sell ore
 	
 	ProductPickup = CreateDynamicPickup(1239, 23, -279.67, -2148.42, 28.54, -1, -1, -1, 5.0);
 	format(strings, sizeof(strings), "[PRODUCT]\n"WHITE_E"Product Stock: "LG_E"%d\n\n"WHITE_E"Product Price: "LG_E"%s /item\n"LB_E"/buy /sellproduct", Product, FormatMoney(ProductPrice));
-	ProductText = CreateDynamic3DTextLabel(strings, COLOR_YELLOW, -279.67, -2148.42, 28.54, 5.0); // product
+	ProductText = CreateDynamic3DTextLabel(strings, COLOR_LOGS, -279.67, -2148.42, 28.54, 5.0); // product
 	
 	ApotekPickup = CreateDynamicPickup(1239, 23, 1435.34, -23.91, 1000.92, -1, -1, -1, 5.0);
 	format(strings, sizeof(strings), "[Hospital]\n"WHITE_E"Apotek Stock: "LG_E"%d\n"LB_E"/buy", Apotek);

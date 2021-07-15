@@ -455,7 +455,7 @@ function LoadPlayerVehicle(playerid)
 				pvData[i][cVeh] = 0;
 			}
 		}
-		printf("[P_VEHICLE] Loaded player vehicle from: %s(%d)", pData[playerid][pName], playerid);
+		printf("[Private Veh Logs] Loaded Vehicle Of The Player: %s(%d)", pData[playerid][pName], playerid);
 	}
 	return 1;
 }
@@ -632,6 +632,7 @@ function OnVehCreated(playerid, oid, pid, model, color1, color2, Float:x, Float:
 	Iter_Add(PVehicles, i);
 	OnPlayerVehicleRespawn(i);
 	Servers(playerid, "Anda telah membuat kendaraan kepada %s dengan (model=%d, color1=%d, color2=%d)", pData[oid][pName], model, color1, color2);
+	SendAdminMessage(COLOR_LOGS, "Admins %s Membuat Kendaraan Kepada %s (model=%d, color1=%d, color2=%d)", pData[playerid][pAdminname], pData[oid][pName], model, color1, color2);
 	return 1;
 }
 

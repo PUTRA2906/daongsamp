@@ -3708,7 +3708,7 @@ public OnGameModeInit()
 	g_Discord_AndroVerifed = DCC_FindChannelById("864670614458728458");
 	g_discord_twt = DCC_FindChannelById("862531909727944775");
 	g_Discord_adslogs = DCC_FindChannelById("863082017985789962");
-	g_discord_ban = DCC_FindChannelById("862968829919756318");
+	g_discord_ban = DCC_FindChannelById("865071798650535936");
 	g_discord_admins = DCC_FindChannelById("864854692831952936");
 	g_Discord_PcVerived = DCC_FindChannelById("864670614458728458");
 	g_Discord_Information = DCC_FindChannelById("857538441930473482");
@@ -6688,65 +6688,66 @@ public OnPlayerEnterCheckpoint(playerid)
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,sweperpoint1))
 			{
 				SetPlayerCheckpoint(playerid, sweperpoint2, 7.0);
-				GameTextForPlayer(playerid, "~g~Bersih!", 1000, 3);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,sweperpoint2))
 			{
 				SetPlayerCheckpoint(playerid, sweperpoint3, 7.0);
-				GameTextForPlayer(playerid, "~g~Bersih!", 1000, 3);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,sweperpoint3))
 			{
 				SetPlayerCheckpoint(playerid, sweperpoint4, 7.0);
-				GameTextForPlayer(playerid, "~g~Bersih!", 1000, 3);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,sweperpoint4))
 			{
 				SetPlayerCheckpoint(playerid, sweperpoint5, 7.0);
-			    GameTextForPlayer(playerid, "~g~Bersih!", 1000, 3);
+			    GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,sweperpoint5))
 			{
 				SetPlayerCheckpoint(playerid, sweperpoint6, 7.0);
-				GameTextForPlayer(playerid, "~g~Bersih!", 1000, 3);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,sweperpoint6))
 			{
 				SetPlayerCheckpoint(playerid, sweperpoint7, 7.0);
-				GameTextForPlayer(playerid, "~g~Bersih!", 1000, 3);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,sweperpoint7))
 			{
 				SetPlayerCheckpoint(playerid, sweperpoint8, 7.0);
-				GameTextForPlayer(playerid, "~g~Bersih!", 1000, 3);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,sweperpoint8))
 			{
 				SetPlayerCheckpoint(playerid, sweperpoint9, 7.0);
-				GameTextForPlayer(playerid, "~g~Bersih!", 1000, 3);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,sweperpoint9))
 			{
 				SetPlayerCheckpoint(playerid, sweperpoint10, 7.0);
-				GameTextForPlayer(playerid, "~g~Bersih!", 1000, 3);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,sweperpoint10))
 			{
 				SetPlayerCheckpoint(playerid, sweperpoint11, 7.0);
-				GameTextForPlayer(playerid, "~g~Bersih!", 1000, 3);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,sweperpoint11))
 			{
 				SetPlayerCheckpoint(playerid, sweperpoint12, 7.0);
-				GameTextForPlayer(playerid, "~g~Bersih!", 1000, 3);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if(IsPlayerInRangeOfPoint(playerid, 7.0,sweperpoint12))
 			{
+				new swp_price = Random(10000, 19000);
 				pData[playerid][pSideJob] = 0;
-				pData[playerid][pSideJobTime] = 600;
+				pData[playerid][pSideJobTime] = 300;
 				DisablePlayerCheckpoint(playerid);
-				AddPlayerSalary(playerid, "Sidejob(Sweeper)", 10000);
-				Info(playerid, "Sidejob(Sweeper) telah masuk ke pending salary anda!");
+				AddPlayerSalary(playerid, "Sidejob(Sweeper)", swp_price);
+				SendClientMessage(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Sweeper)", FormatMoney(swp_price));
 				RemovePlayerFromVehicle(playerid);
 				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
 			}
@@ -6863,11 +6864,12 @@ public OnPlayerEnterCheckpoint(playerid)
 			}
 			if(IsPlayerInRangeOfPoint(playerid, 7.0,buspoint27))
 			{
+				new bus_price = Random(10000, 20000);
 				pData[playerid][pSideJob] = 0;
 				pData[playerid][pSideJobTime] = 800;
 				DisablePlayerCheckpoint(playerid);
-				AddPlayerSalary(playerid, "Sidejob(Bus)", 13000);
-				Info(playerid, "Sidejob(Bus) telah masuk ke pending salary anda!");
+				AddPlayerSalary(playerid, "Sidejob(Bus)", bus_price);
+				SendClientMessage(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Bus)", FormatMoney(bus_price));
 				RemovePlayerFromVehicle(playerid);
 				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
 			}
@@ -6900,11 +6902,12 @@ public OnPlayerEnterCheckpoint(playerid)
 			}
 			if(IsPlayerInRangeOfPoint(playerid, 4.0,forpoint3))
 			{
+				new frc_price = Random(9000, 15000);
 				pData[playerid][pSideJob] = 0;
 				pData[playerid][pSideJobTime] = 460;
 				DisablePlayerCheckpoint(playerid);
-				AddPlayerSalary(playerid, "Sidejob(Forklift)", 10000);
-				Info(playerid, "Sidejob(Forklift) telah masuk ke pending salary anda!");
+				AddPlayerSalary(playerid, "Sidejob(Forklift)", frc_price);
+				SendClientMessage(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Forklift)", FormatMoney(frc_price));
 				RemovePlayerFromVehicle(playerid);
 				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
 				return 1;
