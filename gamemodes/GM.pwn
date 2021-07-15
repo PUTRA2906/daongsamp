@@ -8210,10 +8210,10 @@ ptask PlayerUpdate[999](playerid)
 		GivePlayerMoney(playerid, pData[playerid][pMoney]);
 		//SendAdminMessage(COLOR_RED, "Possible money hacks detected on %s(%i). Check on this player. "LG_E"($%d).", pData[playerid][pName], playerid, GetPlayerMoney(playerid) - pData[playerid][pMoney]);
 	}
-	if(GetPlayerPing(playerid) > 800) // Ping Player
-    {
-        FixedKick(playerid);
-    }
+	// if(GetPlayerPing(playerid) > 800) // Ping Player
+    // {
+    //     FixedKick(playerid);
+    // }
 	//Anti Armour Hacks
 	new Float:A;
 	GetPlayerArmour(playerid, A);
