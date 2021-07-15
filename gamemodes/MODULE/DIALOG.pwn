@@ -17,7 +17,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			new count = random(1500);
 			mysql_format(g_SQL, query, sizeof(query), "SELECT * FROM `players` WHERE `username` = '%e' LIMIT 1", pData[playerid][pName]);
 			mysql_tquery(g_SQL, query, "AssignPlayerData", "d", playerid);
-			printf("[LOGIN] %s(%d) has successfully login with password(%s)", pData[playerid][pName], playerid, inputtext);
+			printf("[LOGS] %s(%d) Succesfuly Login With Password(%s)", pData[playerid][pName], playerid, inputtext);
 			SendClientMessageEx(playerid, COLOR_RIKO, "[!]"WHITE_E" Welcome {FF0000}%s {FFFFFF}To Server Indoluck Roleplay!", pData[playerid][pName]);
 			SendClientMessageEx(playerid, COLOR_RIKO, "[!]"WHITE_E" Dear {FF0000}%s{FFFFFF},Happy Roleplaying dikota Indoluck Roleplay!", pData[playerid][pName]);
 			SendClientMessage(playerid, COLOR_RIKO, "[!]"WHITE_E" Jangan Lupa Ikuti Rules Server!");

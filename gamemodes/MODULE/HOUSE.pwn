@@ -394,7 +394,7 @@ House_Refresh(houseid)
             hData[houseid][hPickup] = CreateDynamicPickup(1273, 23, hData[houseid][hExtposX], hData[houseid][hExtposY], hData[houseid][hExtposZ]+0.2, 0, 0, _, 10.0);
         }
 		//hData[houseid][hCP] = CreateDynamicCP(hData[houseid][hIntposX], hData[houseid][hIntposY], hData[houseid][hIntposZ], 1.0, houseid, hData[houseid][hInt], -1, 3.0);
-        hData[houseid][hLabel] = CreateDynamic3DTextLabel(string, COLOR_LBLUE, hData[houseid][hExtposX], hData[houseid][hExtposY], hData[houseid][hExtposZ]+0.5, 2.5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, 0, 0);
+        hData[houseid][hLabel] = CreateDynamic3DTextLabel(string, COLOR_LOGS, hData[houseid][hExtposX], hData[houseid][hExtposY], hData[houseid][hExtposZ]+0.5, 2.5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, 0, 0);
     }
     return 1;
 }
@@ -453,7 +453,7 @@ CMD:createhouse(playerid, params[])
 		return PermissionError(playerid);
 	
 	new hid = Iter_Free(Houses), address[128];
-	if(hid == -1) return Error(playerid, "You cant create more door!");
+	if(hid == -1) return Error(playerid, "You Can Create More House!");
 	new price, type, query[512];
 	if(sscanf(params, "dd", price, type)) return Usage(playerid, "/createhouse [price] [type, 1.small 2.medium 3.Big]");
 	format(hData[hid][hOwner], 128, "-");
@@ -570,7 +570,7 @@ CMD:edithouse(playerid, params[])
         House_Save(hid);
 		House_Refresh(hid);
 
-        SendAdminMessage(COLOR_LRED, "%s has adjusted the location of house ID: %d.", pData[playerid][pAdminname], hid);
+        SendAdminMessage(COLOR_LOGS, "%s Changes Location Of The House ID: %d.", pData[playerid][pAdminname], hid);
     }
     else if(!strcmp(type, "interior", true))
     {
@@ -592,7 +592,7 @@ CMD:edithouse(playerid, params[])
                 SetCameraBehindPlayer(i);
             }
         }*/
-        SendAdminMessage(COLOR_RED, "%s has adjusted the interior spawn of house ID: %d.", pData[playerid][pAdminname], hid);
+        SendAdminMessage(COLOR_LOGS, "%s Changes Interior Of The HOUSE ID: %d.", pData[playerid][pAdminname], hid);
     }
     else if(!strcmp(type, "locked", true))
     {
@@ -609,10 +609,10 @@ CMD:edithouse(playerid, params[])
 		House_Refresh(hid);
 
         if(locked) {
-            SendAdminMessage(COLOR_RED, "%s has locked house ID: %d.", pData[playerid][pAdminname], hid);
+            SendAdminMessage(COLOR_LOGS, "%s Has Locked Of The House ID: %d.", pData[playerid][pAdminname], hid);
         }
         else {
-            SendAdminMessage(COLOR_RED, "%s has unlocked house ID: %d.", pData[playerid][pAdminname], hid);
+            SendAdminMessage(COLOR_LOGS, "%s Has Unclocked Of The House ID: %d.", pData[playerid][pAdminname], hid);
         }
     }
     else if(!strcmp(type, "price", true))
@@ -626,7 +626,7 @@ CMD:edithouse(playerid, params[])
 
         House_Save(hid);
 		House_Refresh(hid);
-        SendAdminMessage(COLOR_RED, "%s has adjusted the price of house ID: %d to %d.", pData[playerid][pAdminname], hid, price);
+        SendAdminMessage(COLOR_LOGS, "%s Changes Price Of The House ID: %d to %d.", pData[playerid][pAdminname], hid, price);
     }
 	else if(!strcmp(type, "type", true))
     {
@@ -639,7 +639,7 @@ CMD:edithouse(playerid, params[])
 		House_Type(hid);
         House_Save(hid);
 		House_Refresh(hid);
-        SendAdminMessage(COLOR_RED, "%s has adjusted the type of house ID: %d to %d.", pData[playerid][pAdminname], hid, htype);
+        SendAdminMessage(COLOR_LOGS, "%s Changes Type Of The House ID: %d to %d.", pData[playerid][pAdminname], hid, htype);
     }
     else if(!strcmp(type, "owner", true))
     {
@@ -652,14 +652,14 @@ CMD:edithouse(playerid, params[])
   
         House_Save(hid);
 		House_Refresh(hid);
-        SendAdminMessage(COLOR_RED, "%s has adjusted the owner of house ID: %d to %s", pData[playerid][pAdminname], hid, owners);
+        SendAdminMessage(COLOR_LOGS, "%s Changes Owner Of The House ID: %d to %s", pData[playerid][pAdminname], hid, owners);
     }
     else if(!strcmp(type, "reset", true))
     {
         HouseReset(hid);
 		House_Save(hid);
 		House_Refresh(hid);
-        SendAdminMessage(COLOR_RED, "%s has reset house ID: %d.", pData[playerid][pAdminname], hid);
+        SendAdminMessage(COLOR_LOGS, "%s Has Reset Of The House ID: %d.", pData[playerid][pAdminname], hid);
     }
 	else if(!strcmp(type, "delete", true))
 	{
@@ -686,7 +686,7 @@ CMD:edithouse(playerid, params[])
 		new query[128];
 		mysql_format(g_SQL, query, sizeof(query), "DELETE FROM houses WHERE ID=%d", hid);
 		mysql_tquery(g_SQL, query);
-        SendAdminMessage(COLOR_RED, "%s has delete house ID: %d.", pData[playerid][pAdminname], hid);
+        SendAdminMessage(COLOR_LOGS, "%s Has Delete Of The House ID: %d.", pData[playerid][pAdminname], hid);
 	}
     return 1;
 }

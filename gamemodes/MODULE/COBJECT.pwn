@@ -232,7 +232,7 @@ CMD:onear(playerid, params[])
 	//if(pData[playerid][pHelper] == 1)
 	return PermissionError(playerid);
 	{
-		SendClientMessageEx(playerid, COLOR_RED, "Waiting!");
+		SendClientMessageEx(playerid, COLOR_LOGS, "SERVER: Waiting!");
 		new Float:X, Float:Y, Float:Z;
 		new Float:X2, Float:Y2, Float:Z2;
   		GetPlayerPos(playerid, X2, Y2, Z2);

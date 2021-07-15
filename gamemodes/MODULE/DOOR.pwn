@@ -65,14 +65,14 @@ Doors_Updatelabel(id)
 		if(dData[id][dGarage] == 1)
 		{
 			new mstr[512];
-			format(mstr,sizeof(mstr),"[ID: %d]\n"LB_E"%s\n{FFFFFF}Press {FF0000} 'ALT' {FFFFFF}To Enter", id, dData[id][dName]);
+			format(mstr,sizeof(mstr),"[ID: %d]\n"LB_E"%s\n{FFFFFF}Press '{FF0000}ALT{FFFFFF}' To Enter", id, dData[id][dName]);
 			dData[id][dPickupext] = CreateDynamicPickup(19130, 23, dData[id][dExtposX], dData[id][dExtposY], dData[id][dExtposZ], dData[id][dExtvw], dData[id][dExtint]);
 			dData[id][dLabelext] = CreateDynamic3DTextLabel(mstr, COLOR_LOGS, dData[id][dExtposX], dData[id][dExtposY], dData[id][dExtposZ]+0.35, 15.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, dData[id][dExtvw], dData[id][dExtint]);
 		}
 		else
 		{
 			new mstr[512];
-			format(mstr,sizeof(mstr),"[ID: %d]\n"LB_E"%s\n{FFFFFF}Press {FF0000} 'ENTER' {FFFFFF}To Enter", id, dData[id][dName]);
+			format(mstr,sizeof(mstr),"[ID: %d]\n"LB_E"%s\n{FFFFFF}Press '{FF0000}ENTER{FFFFFF}' To Enter", id, dData[id][dName]);
 			dData[id][dPickupext] = CreateDynamicPickup(19130, 23, dData[id][dExtposX], dData[id][dExtposY], dData[id][dExtposZ], dData[id][dExtvw], dData[id][dExtint]);
 			dData[id][dLabelext] = CreateDynamic3DTextLabel(mstr, COLOR_LOGS, dData[id][dExtposX], dData[id][dExtposY], dData[id][dExtposZ]+0.35, 15.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, dData[id][dExtvw], dData[id][dExtint]);
 		}
@@ -82,7 +82,7 @@ Doors_Updatelabel(id)
 			if(dData[id][dGarage] == 1)
 			{
 				new mstr[512];
-				format(mstr,sizeof(mstr),"[ID: %d]\n"LB_E"%s\n{FFFFFF}Press {FF0000} 'ALT' {FFFFFF}To Exit", id, dData[id][dName]);
+				format(mstr,sizeof(mstr),"[ID: %d]\n"LB_E"%s\n{FFFFFF}Press '{FF0000}ALT{FFFFFF}' To Exit", id, dData[id][dName]);
 
 				dData[id][dLabelint] = CreateDynamic3DTextLabel(mstr, COLOR_LOGS, dData[id][dIntposX], dData[id][dIntposY], dData[id][dIntposZ]+0.7, 5.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, dData[id][dIntvw], dData[id][dIntint]);
 				dData[id][dPickupint] = CreateDynamicPickup(19130, 23, dData[id][dIntposX], dData[id][dIntposY], dData[id][dIntposZ], dData[id][dIntvw], dData[id][dIntint], -1, 7);
@@ -90,7 +90,7 @@ Doors_Updatelabel(id)
 			else
 			{
 				new mstr[512];
-				format(mstr,sizeof(mstr),"[ID: %d]\n"LB_E"%s\n{FFFFFF}Press {FF0000} 'ENTER' {FFFFFF}To Exit", id, dData[id][dName]);
+				format(mstr,sizeof(mstr),"[ID: %d]\n"LB_E"%s\n{FFFFFF}Press '{FF0000}ENTER{FFFFFF}' To Exit", id, dData[id][dName]);
 
 				dData[id][dLabelint] = CreateDynamic3DTextLabel(mstr, COLOR_LOGS, dData[id][dIntposX], dData[id][dIntposY], dData[id][dIntposZ]+0.7, 5.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, dData[id][dIntvw], dData[id][dIntint]);
 				dData[id][dPickupint] = CreateDynamicPickup(19130, 23, dData[id][dIntposX], dData[id][dIntposY], dData[id][dIntposZ], dData[id][dIntvw], dData[id][dIntint], -1, 7);
