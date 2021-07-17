@@ -8009,7 +8009,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		}
 		if(IsASweeperVeh(vehicleid))
 		{
-			ShowPlayerDialog(playerid, DIALOG_SWEEPER, DIALOG_STYLE_MSGBOX, "Side Job - Sweeper", "1.Route A\tPershing Square\n2.Route B\tIdlewood\n3.Route C\tMaintenance", "Start Job", "Close");
+			ShowPlayerDialog(playerid, DIALOG_SWEEPER, DIALOG_STYLE_LIST, "Side Job - Sweeper", "1.Route A\tPershing Square\n2.Route B\tIdlewood\n3.Route C\tMaintenance", "Start Job", "Close");
 		}
 		if(IsAPizzaVeh(vehicleid))
 		{
@@ -8017,7 +8017,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		}
 		if(IsABusVeh(vehicleid))
 		{
-			ShowPlayerDialog(playerid, DIALOG_BUS, DIALOG_STYLE_MSGBOX, "Side Job - Bus", "1.Route A\tLos Santos Bank\n2.Route B\tMarket\n3.Route C\tMaintenance", "Start Job", "Close");
+			ShowPlayerDialog(playerid, DIALOG_BUS, DIALOG_STYLE_LIST, "Side Job - Bus", "1.Route A\tLos Santos Bank\n2.Route B\tMarket\n3.Route C\tMaintenance", "Start Job", "Close");
 		}
 		if(!IsEngineVehicle(vehicleid))
         {
