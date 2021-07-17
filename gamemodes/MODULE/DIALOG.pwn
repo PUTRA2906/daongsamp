@@ -18,11 +18,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			mysql_format(g_SQL, query, sizeof(query), "SELECT * FROM `players` WHERE `username` = '%e' LIMIT 1", pData[playerid][pName]);
 			mysql_tquery(g_SQL, query, "AssignPlayerData", "d", playerid);
 			printf("[LOGS] %s(%d) Succesfuly Login With Password(%s)", pData[playerid][pName], playerid, inputtext);
-			SendClientMessageEx(playerid, COLOR_RED, "[!]"WHITE_E" Welcome {FF0000}%s {FFFFFF}To Server Indoluck Roleplay!", pData[playerid][pName]);
-			SendClientMessageEx(playerid, COLOR_RED, "[!]"WHITE_E" Dear {FF0000}%s{FFFFFF},Happy Roleplaying dikota Indoluck Roleplay!", pData[playerid][pName]);
-			SendClientMessage(playerid, COLOR_RED, "[!]"WHITE_E" Jangan Lupa Ikuti Rules Server!");
-			SendClientMessageEx(playerid, COLOR_RED, "[!]"WHITE_E" Player Saat ini {FF0000}%d {FFFFFF}Yuk Ramaikan lagi!", online);
-			SendClientMessageEx(playerid, COLOR_RED, "[!]"WHITE_E" Server memerlukan waktu "YELLOW_E"%d miliseconds "WHITE_E"untuk memuat data char anda", count);
+			SendClientMessage(playerid, -1, "");
+			SendClientMessage(playerid, -1, "");
+			SendMessage(playerid, ""WHITE_E" Welcome {FF0000}%s {FFFFFF}To Server Indoluck Roleplay!", pData[playerid][pName]);
+			SendMessage(playerid, ""WHITE_E" Dear {FF0000}%s{FFFFFF},Happy Roleplaying dikota Indoluck Roleplay!", pData[playerid][pName]);
+			SendMessage(playerid, ""WHITE_E" Jangan Lupa Ikuti Rules Server!");
+			SendMessage(playerid, ""WHITE_E" Player Saat ini {FF0000}%d {FFFFFF}Yuk Ramaikan lagi!", online);
+			SendMessage(playerid, ""WHITE_E" Server memerlukan waktu "YELLOW_E"%d miliseconds "WHITE_E"untuk memuat data char anda", count);
 
 			
 			mysql_format(g_SQL, query1, sizeof(query1), "INSERT INTO loglogin (username,reg_id,password,time) VALUES('%s','%d','%s',CURRENT_TIMESTAMP())", pData[playerid][pName], pData[playerid][pID], inputtext);
@@ -12080,7 +12082,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					else if(pData[playerid][pSideJobTime] == 0)
 					{
 						pData[playerid][pSideJob] = 2;
-						SetPlayerCheckpoint(playerid, cpswep1, 7.0);
+						SetPlayerRaceCheckpoint(playerid, 1, cpswep1, 0.0, 0.0, 0.0, 7.0);
 						InfoTD_MSG(playerid, 3000, "Follow the checkpoint!");
 					}
 				}
@@ -12097,7 +12099,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						RemovePlayerFromVehicle(playerid);
 						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
-						SendClientMessage(playerid, COLOR_RIKO, "JOBS: Maaf Rute ini sedang dalam tahap perbaikan");
+						SendClientMessage(playerid, COLOR_JOB, "JOBS: "WHITE_E"Sorry This Route is Under Construction");
 					}
 				}
 			}
@@ -12143,7 +12145,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					else if(pData[playerid][pSideJobTime] == 0)
 					{
 						pData[playerid][pSideJob] = 2;
-						SetPlayerCheckpoint(playerid, cpbus1, 7.0);
+						SetPlayerRaceCheckpoint(playerid, 1, cpbus1, 0.0, 0.0, 0.0, 7.0);
 						InfoTD_MSG(playerid, 3000, "Follow the checkpoint!");
 					}
 				}
@@ -12160,7 +12162,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						RemovePlayerFromVehicle(playerid);
 						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
-						SendClientMessage(playerid, COLOR_RIKO, "JOBS: Maaf Rute ini sedang dalam tahap perbaikan");
+						SendClientMessage(playerid, COLOR_JOB, "JOBS: "WHITE_E"Sorry This Route is Under Construction ");
 					}
 				}
 			}

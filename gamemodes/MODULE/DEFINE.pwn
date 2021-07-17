@@ -56,6 +56,8 @@ GetXYBehindPoint11(Float:x,Float:y,&Float:x2,&Float:y2,Float:A,Float:distance)
 #define Usage(%1,%2) SendClientMessage(%1, -1, ""RIKO"USAGE: "WHITE_E""%2)
 #define Error(%1,%2) SendClientMessageEx(%1, -1, ""RED_E"ERROR: "WHITE_E""%2)
 #define PermissionError(%0) SendClientMessage(%0, COLOR_RED, "ERROR: "WHITE_E"You are not allowed to use this commands!")
+#define SendMessage(%0,%1) \
+	SendClientMessageEx(%0, COLOR_YELLOW, "»{FFFFFF} "%1)
 
 #define PRESSED(%0) \
     (((newkeys & (%0)) == (%0)) && ((oldkeys & (%0)) != (%0)))

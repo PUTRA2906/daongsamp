@@ -3702,7 +3702,7 @@ public OnGameModeInit()
 	g_Discord_adslogs = DCC_FindChannelById("863082017985789962");
 	g_discord_ban = DCC_FindChannelById("865071798650535936");
 	g_discord_admins = DCC_FindChannelById("864854692831952936");
-	g_Discord_PcVerived = DCC_FindChannelById("864670614458728458");
+	g_Discord_PcVerived = DCC_FindChannelById("865873292921798666");
 	g_Discord_Information = DCC_FindChannelById("857538441930473482");
 	g_discord_botcmd = DCC_FindChannelById("864671043763044352");
 	g_Admin_Command = DCC_FindChannelById("835257449349906453");
@@ -6812,47 +6812,47 @@ public OnPlayerEnterCheckpoint(playerid)
 		{
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep1))
 			{
-				SetPlayerCheckpoint(playerid, cpswep2, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpswep2, 0.0, 0.0, 0.0, 7.0);
 				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep2))
 			{
-				SetPlayerCheckpoint(playerid, cpswep3, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpswep3, 0.0, 0.0, 0.0, 7.0);
 				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep3))
 			{
-				SetPlayerCheckpoint(playerid, cpswep4, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpswep4, 0.0, 0.0, 0.0, 7.0);
 				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep4))
 			{
-				SetPlayerCheckpoint(playerid, cpswep5, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpswep5, 0.0, 0.0, 0.0, 7.0);
 			    GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep5))
 			{
-				SetPlayerCheckpoint(playerid, cpswep6, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpswep6, 0.0, 0.0, 0.0, 7.0);
 				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep6))
 			{
-				SetPlayerCheckpoint(playerid, cpswep7, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpswep7, 0.0, 0.0, 0.0, 7.0);
 				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep7))
 			{
-				SetPlayerCheckpoint(playerid, cpswep8, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpswep8, 0.0, 0.0, 0.0, 7.0);
 				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep8))
 			{
-				SetPlayerCheckpoint(playerid, cpswep9, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpswep9, 0.0, 0.0, 0.0, 7.0);
 				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep9))
 			{
-				SetPlayerCheckpoint(playerid, cpswep10, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpswep10, 0.0, 0.0, 0.0, 7.0);
 				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep10))
@@ -6860,7 +6860,7 @@ public OnPlayerEnterCheckpoint(playerid)
 				new swp_price = Random(10000, 19000);
 				pData[playerid][pSideJob] = 0;
 				pData[playerid][pSideJobTime] = 300;
-				DisablePlayerCheckpoint(playerid);
+				DisablePlayerRaceCheckpoint(playerid);
 				AddPlayerSalary(playerid, "Sidejob(Sweeper Route B)", swp_price);
 				SendClientMessage(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Sweeper)", FormatMoney(swp_price));
 				RemovePlayerFromVehicle(playerid);
@@ -6995,104 +6995,104 @@ public OnPlayerEnterCheckpoint(playerid)
 		new vehicleid = GetPlayerVehicleID(playerid);
 		if(GetVehicleModel(vehicleid) == 431)
 		{
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus1))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus1))
 			{
-				SetPlayerCheckpoint(playerid, cpbus2, 7.0);
+				SetPlayerRaceCheckpoint(playerid, cpbus2, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus2))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus2))
 			{
-				SetPlayerCheckpoint(playerid, cpbus3, 7.0);
+				SetPlayerRaceCheckpoint(playerid, cpbus3, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus3))
-			{
-				SetPlayerCheckpoint(playerid, cpbus4, 7.0);
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus3))
+			{	
+				SetPlayerRaceCheckpoint(playerid, cpbus4, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus4))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus4))
 			{
-				SetPlayerCheckpoint(playerid, cpbus5, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus5, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus5))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus5))
 			{
-				SetPlayerCheckpoint(playerid, cpbus6, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus6, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus6))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus6))
 			{
-				SetPlayerCheckpoint(playerid, cpbus7, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus7, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus7))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus7))
 			{
-				SetPlayerCheckpoint(playerid, cpbus8, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus8, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus8))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus8))
 			{
-				SetPlayerCheckpoint(playerid, cpbus9, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus9, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus9))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus9))
 			{
-				SetPlayerCheckpoint(playerid, cpbus10, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus10, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus10))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus10))
 			{
-				SetPlayerCheckpoint(playerid, cpbus11, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus11, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus11))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus11))
 			{
-				SetPlayerCheckpoint(playerid, cpbus12, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus12, 0.0, 0.0, 0.0, 7.0);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus12))
 			{
-				SetPlayerCheckpoint(playerid, cpbus13, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus13, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus13))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus13))
 			{
-				SetPlayerCheckpoint(playerid, cpbus14, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus14, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus14))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus14))
 			{
-				SetPlayerCheckpoint(playerid, cpbus15, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus15, 0.0, 0.0, 0.0, 7.0);
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus15))
 			{
-				SetPlayerCheckpoint(playerid, cpbus16, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus16, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus16))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus16))
 			{
-				SetPlayerCheckpoint(playerid, cpbus17, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus17, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus17))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus17))
 			{
-				SetPlayerCheckpoint(playerid, cpbus18, 7.0);
+				SetPlayerRaceCheckpoint(playerid, cpbus18, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus18))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus18))
 			{
-				SetPlayerCheckpoint(playerid, cpbus19, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus19, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus19))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus19))
 			{
-				SetPlayerCheckpoint(playerid, cpbus20, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus20, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus20))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus20))
 			{
-				SetPlayerCheckpoint(playerid, cpbus21, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus21, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus21))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus21))
 			{
-				SetPlayerCheckpoint(playerid, cpbus22, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus22, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus22))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus22))
 			{
-				SetPlayerCheckpoint(playerid, cpbus23, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus23, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus23))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus23))
 			{
-				SetPlayerCheckpoint(playerid, cpbus24, 7.0);
+				SetPlayerRaceCheckpoint(playerid, 1, cpbus24, 0.0, 0.0, 0.0, 7.0);
 			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus24))
+			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus24))
 			{
 				new bus_price = Random(10000, 20000);
 				pData[playerid][pSideJob] = 0;
 				pData[playerid][pSideJobTime] = 800;
-				DisablePlayerCheckpoint(playerid);
+				DisablePlayerRaceCheckpoint(playerid);
 				AddPlayerSalary(playerid, "Sidejob(Bus Route B)", bus_price);
 				SendClientMessage(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Bus)", FormatMoney(bus_price));
 				RemovePlayerFromVehicle(playerid);
