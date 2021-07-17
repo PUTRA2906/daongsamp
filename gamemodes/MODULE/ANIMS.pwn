@@ -242,6 +242,21 @@ CMD:sit(playerid,params[])
 	}
 	return 1;
 }
+
+CMD:misc(playerid,params[])
+{
+	new anim;
+
+	if(GetPlayerState(playerid) != PLAYER_STATE_ONFOOT || pData[playerid][pInjured] == 1) return Error(playerid, "You can't do at this moment.");
+
+	if(sscanf(params, "d", anim)) return Usage(playerid,"/misc [1-2]");
+	switch(anim){
+		case 1: ApplyAnimation(playerid, "CAR", "flag_drop", 4.1, 0, 0, 0, 0, 0);
+		case 2: ApplyAnimation(playerid, "PED", "bomber", 4.1, 0, 0, 0, 0, 0);
+		default: return Usage(playerid,"/misc [1-2]");
+	}
+	return 1;
+}
 	
 /*CMD:sleep(playerid,params[])
 {

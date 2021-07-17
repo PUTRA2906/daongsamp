@@ -132,7 +132,7 @@ CMD:buydealer(playerid, params[])
 			if(strcmp(DealerData[bid][dealerOwner], "-")) 
 				return Error(playerid, "Someone already owns this dealership.");
 
-			/*if(pData[playerid][pVip] == 1)
+			if(pData[playerid][pVip] == 1)
 			{
 			    #if LIMIT_PER_PLAYER > 0
 				if(Player_DealerCount(playerid) + 1 > 1) return Error(playerid, "You can't buy any more dealership.");
@@ -155,7 +155,7 @@ CMD:buydealer(playerid, params[])
 				#if LIMIT_PER_PLAYER > 0
 				if(Player_DealerCount(playerid) + 1 > 1) return Error(playerid, "You can't buy any more dealership.");
 				#endif
-			}*/
+			}
 
 			GivePlayerMoneyEx(playerid, -DealerData[bid][dealerPrice]);
 			Server_AddMoney(DealerData[bid][dealerPrice]);

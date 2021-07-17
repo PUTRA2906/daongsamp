@@ -71,8 +71,6 @@ new AimbotWarnings[MAX_PLAYERS];
 new online;
 //Mapping
 //new tmpobjid;
-//Actor
-new RaditActor;
 new togtextdraws[MAX_PLAYERS];
 new Text:txtAnimHelper;
 // Player data
@@ -1409,7 +1407,7 @@ function ForkliftTake(playerid)
 			TogglePlayerControllable(playerid, 1);
 
 			SetPVarInt(playerid, "box", CreateDynamicObject(2912,0,0,0,0,0,0));
-			AttachObjectToVehicle(GetPVarInt(playerid, "box"), GetPlayerVehicleID(playerid), -0.10851, 0.62915, 0.87082, 0.0, 0.0, 0.0);
+			AttachDynamicObjectToVehicle(GetPVarInt(playerid, "box"), GetPlayerVehicleID(playerid), -0.10851, 0.62915, 0.87082, 0.0, 0.0, 0.0);
 			return 1;
 		}
 		else if(pData[playerid][pActivityTime] < 100)
@@ -1903,9 +1901,6 @@ public OnGameModeInit()
 	SetTimer("settime",1000,true);
 	//SetTimer("CheckPlayers",1000,true);
 	
-	//---- [ Actor ]----//
-	RaditActor = CreateActor(172, 1345.2783,-1761.5256,13.5992, 90.0); // Actor as salesperson in Ammunation
-    ApplyActorAnimation(RaditActor, "DEALER", "shop_pay", 4.1, 0, 0, 0, 0, 0); // Pay anim
 	// ____Ws Gerald____
 	tmpobjid = CreateDynamicObject(12929, 2092.584960, -1573.171630, 12.226040, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
 	tmpobjid = CreateDynamicObject(920, 2092.220214, -1575.846923, -111097.765625, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
@@ -4416,7 +4411,7 @@ public OnPlayerConnect(playerid)
 	{
 		if(pData[ii][pTogLog] == 0)
 		{
-			SendClientMessageEx(ii, COLOR_RED, "[JOIN]"WHITE_E" %s (%d) Is Now Joined To The Server "YELLOW_E"(%s, %s)", pData[playerid][pName], playerid, city, country);
+			SendClientMessageEx(ii, COLOR_RED, "[JOIN]"WHITE_E" %s (%d) Is now joined to the Server "YELLOW_E"(%s, %s)", pData[playerid][pName], playerid, city, country);
 		}
 	}
  	format(fmt_join, sizeof fmt_join, "```[JOIN] %s (%d) Is Now Joined To The Server (%s, %s)```",  pData[playerid][pName], playerid, city, country);
@@ -6017,7 +6012,7 @@ public OnPlayerEditDynamicObject(playerid, STREAMER_TAG_OBJECT: objectid, respon
 	{
 	    if(response == EDIT_RESPONSE_FINAL)
 	    {
-	        new etid = pData[playerid][EditingTreeID];
+	        new etid = pData[playerid][EditingBerryID];
 	        BerryData[etid][berryX] = x;
 	        BerryData[etid][berryY] = y;
 	        BerryData[etid][berryZ] = z;
@@ -6032,12 +6027,12 @@ public OnPlayerEditDynamicObject(playerid, STREAMER_TAG_OBJECT: objectid, respon
 			Streamer_SetFloatData(STREAMER_TYPE_3D_TEXT_LABEL, BerryData[etid][berryLabel], E_STREAMER_Z, BerryData[etid][berryZ] + 1.5);
 
 		    Berry_Save(etid);
-	        pData[playerid][EditingTreeID] = -1;
+	        pData[playerid][EditingBerryID] = -1;
 	    }
 
 	    if(response == EDIT_RESPONSE_CANCEL)
 	    {
-	        new etid = pData[playerid][EditingTreeID];
+	        new etid = pData[playerid][EditingBerryID];
 	        SetDynamicObjectPos(objectid, BerryData[etid][berryX], BerryData[etid][berryY], BerryData[etid][berryZ]);
 	        SetDynamicObjectRot(objectid, BerryData[etid][berryRX], BerryData[etid][berryRY], BerryData[etid][berryRZ]);
 	        pData[playerid][EditingBerryID] = -1;
@@ -6803,7 +6798,70 @@ public OnPlayerEnterCheckpoint(playerid)
 				pData[playerid][pSideJob] = 0;
 				pData[playerid][pSideJobTime] = 300;
 				DisablePlayerCheckpoint(playerid);
-				AddPlayerSalary(playerid, "Sidejob(Sweeper)", swp_price);
+				AddPlayerSalary(playerid, "Sidejob(Sweeper Route A)", swp_price);
+				SendClientMessage(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Sweeper)", FormatMoney(swp_price));
+				RemovePlayerFromVehicle(playerid);
+				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
+			}
+		}
+	}
+    if(pData[playerid][pSideJob] == 1)
+	{
+		new vehicleid = GetPlayerVehicleID(playerid);
+		if(GetVehicleModel(vehicleid) == 574)
+		{
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep1))
+			{
+				SetPlayerCheckpoint(playerid, cpswep2, 7.0);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep2))
+			{
+				SetPlayerCheckpoint(playerid, cpswep3, 7.0);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep3))
+			{
+				SetPlayerCheckpoint(playerid, cpswep4, 7.0);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep4))
+			{
+				SetPlayerCheckpoint(playerid, cpswep5, 7.0);
+			    GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep5))
+			{
+				SetPlayerCheckpoint(playerid, cpswep6, 7.0);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep6))
+			{
+				SetPlayerCheckpoint(playerid, cpswep7, 7.0);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep7))
+			{
+				SetPlayerCheckpoint(playerid, cpswep8, 7.0);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep8))
+			{
+				SetPlayerCheckpoint(playerid, cpswep9, 7.0);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep9))
+			{
+				SetPlayerCheckpoint(playerid, cpswep10, 7.0);
+				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep10))
+			{
+				new swp_price = Random(10000, 19000);
+				pData[playerid][pSideJob] = 0;
+				pData[playerid][pSideJobTime] = 300;
+				DisablePlayerCheckpoint(playerid);
+				AddPlayerSalary(playerid, "Sidejob(Sweeper Route B)", swp_price);
 				SendClientMessage(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Sweeper)", FormatMoney(swp_price));
 				RemovePlayerFromVehicle(playerid);
 				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
@@ -6925,7 +6983,117 @@ public OnPlayerEnterCheckpoint(playerid)
 				pData[playerid][pSideJob] = 0;
 				pData[playerid][pSideJobTime] = 800;
 				DisablePlayerCheckpoint(playerid);
-				AddPlayerSalary(playerid, "Sidejob(Bus)", bus_price);
+				AddPlayerSalary(playerid, "Sidejob(Bus Route A)", bus_price);
+				SendClientMessage(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Bus)", FormatMoney(bus_price));
+				RemovePlayerFromVehicle(playerid);
+				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
+			}
+		}
+	}
+    if(pData[playerid][pSideJob] == 2)
+	{
+		new vehicleid = GetPlayerVehicleID(playerid);
+		if(GetVehicleModel(vehicleid) == 431)
+		{
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus1))
+			{
+				SetPlayerCheckpoint(playerid, cpbus2, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus2))
+			{
+				SetPlayerCheckpoint(playerid, cpbus3, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus3))
+			{
+				SetPlayerCheckpoint(playerid, cpbus4, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus4))
+			{
+				SetPlayerCheckpoint(playerid, cpbus5, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus5))
+			{
+				SetPlayerCheckpoint(playerid, cpbus6, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus6))
+			{
+				SetPlayerCheckpoint(playerid, cpbus7, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus7))
+			{
+				SetPlayerCheckpoint(playerid, cpbus8, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus8))
+			{
+				SetPlayerCheckpoint(playerid, cpbus9, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus9))
+			{
+				SetPlayerCheckpoint(playerid, cpbus10, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus10))
+			{
+				SetPlayerCheckpoint(playerid, cpbus11, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus11))
+			{
+				SetPlayerCheckpoint(playerid, cpbus12, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus12))
+			{
+				SetPlayerCheckpoint(playerid, cpbus13, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus13))
+			{
+				SetPlayerCheckpoint(playerid, cpbus14, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus14))
+			{
+				SetPlayerCheckpoint(playerid, cpbus15, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus15))
+			{
+				SetPlayerCheckpoint(playerid, cpbus16, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus16))
+			{
+				SetPlayerCheckpoint(playerid, cpbus17, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus17))
+			{
+				SetPlayerCheckpoint(playerid, cpbus18, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus18))
+			{
+				SetPlayerCheckpoint(playerid, cpbus19, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus19))
+			{
+				SetPlayerCheckpoint(playerid, cpbus20, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus20))
+			{
+				SetPlayerCheckpoint(playerid, cpbus21, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus21))
+			{
+				SetPlayerCheckpoint(playerid, cpbus22, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus22))
+			{
+				SetPlayerCheckpoint(playerid, cpbus23, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus23))
+			{
+				SetPlayerCheckpoint(playerid, cpbus24, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus24))
+			{
+				new bus_price = Random(10000, 20000);
+				pData[playerid][pSideJob] = 0;
+				pData[playerid][pSideJobTime] = 800;
+				DisablePlayerCheckpoint(playerid);
+				AddPlayerSalary(playerid, "Sidejob(Bus Route B)", bus_price);
 				SendClientMessage(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Bus)", FormatMoney(bus_price));
 				RemovePlayerFromVehicle(playerid);
 				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
@@ -6939,7 +7107,7 @@ public OnPlayerEnterCheckpoint(playerid)
 		{
 			if (IsPlayerInRangeOfPoint(playerid, 4.0,forpoint1))
 			{
-				SetPlayerCheckpoint(playerid, 1284.6956,1317.4347,10.8203, 4.0);
+				SetPlayerCheckpoint(playerid, 2400.02,-2565.49,13.21, 4.0);
 				TogglePlayerControllable(playerid, 0);
 				pData[playerid][pActivity] = SetTimerEx("ForkliftTake", 1300, true, "i", playerid);
 				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Mengangkat Box...");
@@ -6949,7 +7117,7 @@ public OnPlayerEnterCheckpoint(playerid)
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 4.0,forpoint2))
 			{
-				SetPlayerCheckpoint(playerid, 1468.4348,1056.0305,10.8203, 4.0);
+				SetPlayerCheckpoint(playerid, 2752.89,-2392.60,13.64, 4.0);
 				TogglePlayerControllable(playerid, 0);
 				pData[playerid][pActivity] = SetTimerEx("ForkliftDown", 1300, true, "i", playerid);
 				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Meletakkan Box...");
@@ -7219,7 +7387,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 							PlayerPlaySound(playerid, 1131, 0.0, 0.0, 0.0);
 
 							new effect_object = CreateObject(18695, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), effect_object2 = -1;
-							AttachObjectToVehicle
+							AttachDynamicObjectToVehicle
 							(
 								effect_object, vehicleid,
 								FIRE_INFO[vehicle_modelid - 400][fire_OFFSET_X], FIRE_INFO[vehicle_modelid - 400][fire_OFFSET_Y], FIRE_INFO[vehicle_modelid - 400][fire_OFFSET_Z],
@@ -7229,7 +7397,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 							if(FIRE_INFO[vehicle_modelid - 400][fire_MIRROR])
 							{
 								effect_object2 = CreateObject(18695, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-								AttachObjectToVehicle
+								AttachDynamicObjectToVehicle
 								(
 									effect_object2, vehicleid,
 									-FIRE_INFO[vehicle_modelid - 400][fire_OFFSET_X], FIRE_INFO[vehicle_modelid - 400][fire_OFFSET_Y], FIRE_INFO[vehicle_modelid - 400][fire_OFFSET_Z],
@@ -7841,7 +8009,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		}
 		if(IsASweeperVeh(vehicleid))
 		{
-			ShowPlayerDialog(playerid, DIALOG_SWEEPER, DIALOG_STYLE_MSGBOX, "Side Job - Sweeper", "Anda akan bekerja sebagai pembersih jalan?", "Start Job", "Close");
+			ShowPlayerDialog(playerid, DIALOG_SWEEPER, DIALOG_STYLE_MSGBOX, "Side Job - Sweeper", "1.Route A\tPershing Square\n2.Route B\tIdlewood\n3.Route C\tMaintenance", "Start Job", "Close");
 		}
 		if(IsAPizzaVeh(vehicleid))
 		{
@@ -7849,7 +8017,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		}
 		if(IsABusVeh(vehicleid))
 		{
-			ShowPlayerDialog(playerid, DIALOG_BUS, DIALOG_STYLE_MSGBOX, "Side Job - Bus", "Anda akan bekerja sebagai pengangkut penumpang bus?", "Start Job", "Close");
+			ShowPlayerDialog(playerid, DIALOG_BUS, DIALOG_STYLE_MSGBOX, "Side Job - Bus", "1.Route A\tLos Santos Bank\n2.Route B\tMarket\n3.Route C\tMaintenance", "Start Job", "Close");
 		}
 		if(!IsEngineVehicle(vehicleid))
         {

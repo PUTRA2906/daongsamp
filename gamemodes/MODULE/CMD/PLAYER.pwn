@@ -1135,7 +1135,7 @@ CMD:getjob(playerid, params[])
 					pData[playerid][pGetJob] = 1;
 					Info(playerid, "Anda telah berhasil mendaftarkan job Taxi. /accept job untuk konfirmasi.");
 				}
-				else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, 1627.54, -1785.21, 13.52))
+				else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, 2171.0276,-2238.5984,13.3178))
 				{
 					pData[playerid][pGetJob] = 2;
 					Info(playerid, "Anda telah berhasil mendaftarkan job mechanic. /accept job untuk konfirmasi.");
@@ -1165,7 +1165,7 @@ CMD:getjob(playerid, params[])
 					pData[playerid][pGetJob] = 7;
 					Info(playerid, "Anda telah berhasil mendaftarkan job farmer. /accept job untuk konfirmasi.");
 				}
-				else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, 988.890563, -1349.136962, 13.545228))
+				else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, -3805.5723,1307.4285,75.5859))
 				{
 					pData[playerid][pGetJob] = 8;
 					Info(playerid, "Anda telah berhasil mendaftarkan job smuggler. /accept job untuk konfirmasi.");
@@ -1179,7 +1179,7 @@ CMD:getjob(playerid, params[])
 					pData[playerid][pGetJob2] = 1;
 					Info(playerid, "Anda telah berhasil mendaftarkan job Taxi. /accept job untuk konfirmasi.");
 				}
-				else if(pData[playerid][pJob2] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, 1627.54, -1785.21, 13.52))
+				else if(pData[playerid][pJob2] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, 2171.0276,-2238.5984,13.3178))
 				{
 					pData[playerid][pGetJob2] = 2;
 					Info(playerid, "Anda telah berhasil mendaftarkan job mechanic. /accept job untuk konfirmasi.");
@@ -1209,7 +1209,7 @@ CMD:getjob(playerid, params[])
 					pData[playerid][pGetJob2] = 7;
 					Info(playerid, "Anda telah berhasil mendaftarkan job farmer. /accept job untuk konfirmasi.");
 				}
-				else if(pData[playerid][pJob2] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, 988.890563, -1349.136962, 13.545228))
+				else if(pData[playerid][pJob2] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, -3805.5723,1307.4285,75.5859))
 				{
 					pData[playerid][pGetJob2] = 8;
 					Info(playerid, "Anda telah berhasil mendaftarkan job smuggler. /accept job untuk konfirmasi.");
@@ -1230,7 +1230,7 @@ CMD:getjob(playerid, params[])
 			pData[playerid][pGetJob] = 1;
 			Info(playerid, "Anda telah berhasil mendaftarkan job Taxi. /accept job untuk konfirmasi.");
 		}
-		else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, 1627.54, -1785.21, 13.52))
+		else if(pData[playerid][pJob] == 0 && GetPlayerState(playerid) == 1 && IsPlayerInRangeOfPoint(playerid, 3.0, 2171.0276,-2238.5984,13.3178))
 		{
 			pData[playerid][pGetJob] = 2;
 			Info(playerid, "Anda telah berhasil mendaftarkan job mechanic. /accept job untuk konfirmasi.");
@@ -2620,9 +2620,9 @@ CMD:dice(playerid, params[])
 {
 	new Float:pPos[3];
 
-	new dice = 1 + random(6);
+	new dice = 1 + random(30);
 
-	if(dice > 6 ) return dice = 6;
+	if(dice > 30 ) return dice = 30;
 
 	GetPlayerPos(playerid, pPos[0], pPos[1], pPos[2]);
 
@@ -2630,7 +2630,7 @@ CMD:dice(playerid, params[])
 	{
 	    if(IsPlayerInRangeOfPoint(i, 8.0, pPos[0], pPos[1], pPos[2]))
 	    {
-	        SendClientMessageEx(i, -1, "** %s rolls a dice which lands on the number %d.", ReturnName(playerid), dice);
+	        SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s rolls a dice which lands on the number %d.", ReturnName(playerid), dice);
 	    }
 	}
 
@@ -2969,7 +2969,6 @@ CMD:s(playerid, params[])
 	new flyingtext[128];
 	format(flyingtext, sizeof(flyingtext), "%s!", params);
     SetPlayerChatBubble(playerid, flyingtext, COLOR_WHITE, 10.0, 10000);
-    ApplyAnimation(playerid, "ON_LOOKERS", "shout_01", 4.0, 0, 0, 0, 0, 0, 1);
 	printf("[SHOUTS] %s(%d) : %s", pData[playerid][pName], playerid, params);
     return 1;
 }

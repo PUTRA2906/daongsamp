@@ -215,6 +215,8 @@ ResetVariables(playerid)
 	pData[playerid][CuttingTreeID] = -1;
 	pData[playerid][CarryingLumber] = false;
 	pData[playerid][EditingTreeID] = -1;
+	pData[playerid][HarvestBerryID] = -1;
+	pData[playerid][EditingBerryID] = -1;
 	pData[playerid][pNewsGuest] = INVALID_PLAYER_ID;
 	pData[playerid][pFindEms] = INVALID_PLAYER_ID;
 	pData[playerid][pCall] = INVALID_PLAYER_ID;

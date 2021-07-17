@@ -2,7 +2,7 @@
 #define TEXT_GAMEMODE	"IL:RP v1.5.8D"
 #define SHOT_SERVER_NAME	"IL:RP"
 #define TEXT_WEBURL		"Comingsoon"
-#define TEXT_LANGUAGE	"Indo/Eng"
+#define TEXT_LANGUAGE	"Indonesia/English"
 
 // MySQL configuration
 #define		MYSQL_HOST 			"127.0.0.1"

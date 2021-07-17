@@ -86,7 +86,7 @@ function LoadBerry()
 			new label[64];
 			format(label, sizeof(label), "Berry (%d)\n", tid);
 			BerryData[tid][berryLabel] = CreateDynamic3DTextLabel(label, COLOR_GREEN, BerryData[tid][berryX], BerryData[tid][berryY], BerryData[tid][berryZ] + 1.5, 5.0);
-			BerryData[tid][berryObjID] = CreateDynamicObject(14469, BerryData[tid][berryX], BerryData[tid][berryY], BerryData[tid][berryZ], BerryData[tid][berryRX], BerryData[tid][berryRY], BerryData[tid][berryRZ]);
+			BerryData[tid][berryObjID] = CreateDynamicObject(14400, BerryData[tid][berryX], BerryData[tid][berryY], BerryData[tid][berryZ], BerryData[tid][berryRX], BerryData[tid][berryRY], BerryData[tid][berryRZ]);
 			Iter_Add(Berrys, tid);
 
 			BerryData[tid][berryGettingHarvest] = false;
@@ -158,7 +158,7 @@ CMD:createberry(playerid, params[])
 	new label[96];
 	format(label, sizeof(label), "berry (%d)\n", tid);
 	BerryData[tid][berryLabel] = CreateDynamic3DTextLabel(label, COLOR_GREEN, BerryData[tid][berryX], BerryData[tid][berryY], BerryData[tid][berryZ] + 1.5, 5.0);
-	BerryData[tid][berryObjID] = CreateDynamicObject(14469, BerryData[tid][berryX], BerryData[tid][berryY], BerryData[tid][berryZ], BerryData[tid][berryRX], BerryData[tid][berryRY], BerryData[tid][berryRZ]);
+	BerryData[tid][berryObjID] = CreateDynamicObject(14400, BerryData[tid][berryX], BerryData[tid][berryY], BerryData[tid][berryZ], BerryData[tid][berryRX], BerryData[tid][berryRY], BerryData[tid][berryRZ]);
 	Iter_Add(Berrys, tid);
 
 	mysql_format(g_SQL, query, sizeof(query), "INSERT INTO berry SET id='%d', posx='%f', posy='%f', posz='%f', posrx='%f', posry='%f', posrz='%f'", tid, BerryData[tid][berryX], BerryData[tid][berryY], BerryData[tid][berryZ], BerryData[tid][berryRX], BerryData[tid][berryRY], BerryData[tid][berryRZ]);
@@ -238,40 +238,38 @@ CMD:gotoberry(playerid, params[])
 
 CMD:berry(playerid, params[])
 {
-	if(pData[playerid][pJob] == 7 || pData[playerid][pJob2] == 7)
+    if(pData[playerid][pJob] == 7 || pData[playerid][pJob2] == 7)
 	{
 		if(IsPlayerInAnyVehicle(playerid)) return Error(playerid, "Anda harus keluar dari kendaraan.");
 		if(isnull(params)) return Usage(playerid, "/berry [pickup/take/sell]");
 
 		if(!strcmp(params, "pickup", true))
 		{
+		    new tid = GetClosestBerry(playerid);
 			if(pData[playerid][HarvestBerryID] == -1)
+			if(tid != -1)
 			{
-				new tid = GetClosestBerry(playerid);
-
-				if(tid != -1)
+				if(!Berry_BeingEdited(tid) && !BerryData[tid][berryGettingHarvest] && BerryData[tid][berrySeconds] < 1)
 				{
-					if(!Berry_BeingEdited(tid) && !BerryData[tid][berryGettingHarvest] && BerryData[tid][berrySeconds] < 1)
-					{
-						SetPlayerLookAt(playerid, BerryData[tid][berryX], BerryData[tid][berryY]);
+					SetPlayerLookAt(playerid, BerryData[tid][berryX], BerryData[tid][berryY]);
+					if(GetPlayerWeapon(playerid) != WEAPON_KNIFE) return Error(playerid, "You need holding a knife(pisau)!");
 
-						Streamer_SetIntData(STREAMER_TYPE_3D_TEXT_LABEL, BerryData[tid][berryLabel], E_STREAMER_COLOR, 0xE74C3CFF);
-						pData[playerid][pActivity] = SetTimerEx("HarvestBerry", 1000, true, "i", playerid);
-						pData[playerid][HarvestBerryID] = tid;
-						PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Harvest...");
-						PlayerTextDrawShow(playerid, ActiveTD[playerid]);
-						ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
-						SetPlayerArmedWeapon(playerid, WEAPON_KNIFE);
-						TogglePlayerControllable(playerid, 0);
-						ApplyAnimation(playerid, "BOMBER","BOM_Plant_Loop", 4.1, 1, 0, 0, 1, 0, 1);
+					Streamer_SetIntData(STREAMER_TYPE_3D_TEXT_LABEL, BerryData[tid][berryLabel], E_STREAMER_COLOR, 0xE74C3CFF);
+					pData[playerid][pActivity] = SetTimerEx("HarvestBerry", 1000, true, "i", playerid);
+					pData[playerid][HarvestBerryID] = tid;
+					PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Harvest...");
+					PlayerTextDrawShow(playerid, ActiveTD[playerid]);
+					ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
+					TogglePlayerControllable(playerid, 0);
+					SetPlayerArmedWeapon(playerid, WEAPON_KNIFE);
+					ApplyAnimation(playerid, "BOMBER","BOM_Plant_Loop", 4.1, 1, 0, 0, 1, 0, 1);
 
-						BerryData[tid][berryGettingHarvest] = true;
+					BerryData[tid][berryGettingHarvest] = true;
 
-					}
-					else return Error(playerid, "This berry is not ready.");
 				}
-				else return Error(playerid, "Invalid berry id");
+				else return Error(playerid, "This berry is not ready.");
 			}
+			else return Error(playerid, "Invalid berry id");
 		}
 		else if(!strcmp(params, "take", true))
 		{
@@ -293,13 +291,13 @@ CMD:berry(playerid, params[])
 			if(pData[playerid][pBerry] < 0)
 				return Error(playerid, "Kamu tidak mempunyai berry di inventory mu!.");
 			pData[playerid][pBerry] -= 1;
-			GivePlayerMoneyEx(playerid, 350);
-			Server_MinMoney(350);
-			Info(playerid, "Sold a Berry for "GREEN_E"$3.50.");
+			GivePlayerMoneyEx(playerid, 500);
+			Server_MinMoney(500);
+			Info(playerid, "Sold a Berry for "GREEN_E"$5.00.");
 			// done
 		}
 	}
-	else return Error(playerid, "anda bukan pekerja farmers!");
+    else return Error(playerid, "anda bukan pekerja farmers!");
 	return 1;
 }
 

@@ -1,15 +1,15 @@
 //======== Bus ===========
-#define forpoint1 1465.7505,1044.9149,10.8203
-#define forpoint2 1284.6956,1317.4347,10.8203
-#define forpoint3 1468.4348,1056.0305,10.8203
+#define forpoint1 2745.33,-2431.58,13.64
+#define forpoint2 2400.02,-2565.49,13.21
+#define forpoint3 2752.89,-2392.60,13.64
 
 new ForCar[4];
 
 AddForVehicle()
 {
-	ForCar[0] = AddStaticVehicleEx(530, 1467.2090, 1051.4791, 10.5846, 268.7731, -1, -1, VEHICLE_RESPAWN);
-	ForCar[1] = AddStaticVehicleEx(530, 1467.3741, 1059.5197, 10.5834 ,267.3926, -1, -1, VEHICLE_RESPAWN);
-	ForCar[2] = AddStaticVehicleEx(530, 1467.3051, 1055.5734, 10.5837, 269.4866, -1, -1, VEHICLE_RESPAWN);
+	ForCar[0] = AddStaticVehicleEx(530, 2736.760009, -2385.711669, 13.395622, 177.134399, -1, -1, VEHICLE_RESPAWN);
+	ForCar[1] = AddStaticVehicleEx(530, 2739.122802, -2385.960693, 13.396159, 177.051635, -1, -1, VEHICLE_RESPAWN);
+	ForCar[2] = AddStaticVehicleEx(530, 2741.045410, -2386.254638, 13.394916, 178.051330, -1, -1, VEHICLE_RESPAWN);
 }
 
 IsAForVeh(carid)

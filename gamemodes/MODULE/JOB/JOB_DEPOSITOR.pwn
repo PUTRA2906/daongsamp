@@ -53,8 +53,8 @@ CMD:loadbankmoney(playerid, params[])
 		if(IsPlayerInRangeOfPoint(playerid, 5.0, 1426.2611,-961.3810,36.3510))
 		if(VehDepositor[vehicleid] > 5) return Error(playerid, "Bank Money is full in this vehicle.");
 		{
-		if(GetPVarInt(playerid, "Depositor") > gettime())
-					return Error(playerid, "Delays Load BankMoney, please wait.");
+ 			if(GetPVarInt(playerid, "Depositor") > gettime())
+				return Error(playerid, "Delays Load BankMoney, please wait.");
 					
         pData[playerid][pActivity] = SetTimerEx("Depositor", 30, true, "i", playerid);
         
@@ -107,11 +107,12 @@ CMD:atmdeposit(playerid, params[])
 	{
 		if(id > -1)
 		{
-		    if(pData[playerid][pDepositor] < 1) return Error(playerid, "Kamu Tidak Mempunyai Uang Bank untuk Deposit Atm");
+		    if(pData[playerid][pDepositor] < 0)
+				return Error(playerid, "Kamu tidak mempunyai BankMoney di tas mu!.");
 			pData[playerid][pDepositor] -= 1;
 			pData[playerid][pJobTime] += 380;
 			Server_AddMoney(656000);
-			AddPlayerSalary(playerid, "Jobs(Depositor)", 5000);
+			AddPlayerSalary(playerid, "Jobs(Depositor)", 8000);
 			Info(playerid, "Kamu Telah Mendepositkan Uang Bank Sebesar "GREEN_E"$6,560.00.");
 		}
 	}

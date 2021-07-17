@@ -8,9 +8,9 @@ CreateJoinMechPoint()
 {
 	//JOBS
 	new strings[128];
-	CreateDynamicPickup(1239, 23, 1627.54, -1785.21, 13.52, -1);
+	CreateDynamicPickup(1239, 23, 2171.0276,-2238.5984,13.3178, -1);
 	format(strings, sizeof(strings), "[MECH JOBS]\n{ffffff}Jadilah Pekerja Mekanik disini\n{7fff00}/getjob /accept job");
-	CreateDynamic3DTextLabel(strings, COLOR_YELLOW, 1627.54, -1785.21, 13.52, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // Taxi
+	CreateDynamic3DTextLabel(strings, COLOR_YELLOW, 2171.0276,-2238.5984,13.3178, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // Taxi
 }
 
 // Private Vehicle Components

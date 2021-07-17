@@ -18,11 +18,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			mysql_format(g_SQL, query, sizeof(query), "SELECT * FROM `players` WHERE `username` = '%e' LIMIT 1", pData[playerid][pName]);
 			mysql_tquery(g_SQL, query, "AssignPlayerData", "d", playerid);
 			printf("[LOGS] %s(%d) Succesfuly Login With Password(%s)", pData[playerid][pName], playerid, inputtext);
-			SendClientMessageEx(playerid, COLOR_RIKO, "[!]"WHITE_E" Welcome {FF0000}%s {FFFFFF}To Server Indoluck Roleplay!", pData[playerid][pName]);
-			SendClientMessageEx(playerid, COLOR_RIKO, "[!]"WHITE_E" Dear {FF0000}%s{FFFFFF},Happy Roleplaying dikota Indoluck Roleplay!", pData[playerid][pName]);
-			SendClientMessage(playerid, COLOR_RIKO, "[!]"WHITE_E" Jangan Lupa Ikuti Rules Server!");
-			SendClientMessageEx(playerid, COLOR_RIKO, "[!]"WHITE_E" Player Saat ini {ff0000}%d {ffffff}Yuk Ramaikan lagi!", online);
-			SendClientMessageEx(playerid, COLOR_RIKO, "[!]"WHITE_E" Server memerlukan waktu "YELLOW_E"%d miliseconds "WHITE_E"untuk memuat data char anda", count);
+			SendClientMessageEx(playerid, COLOR_RED, "[!]"WHITE_E" Welcome {FF0000}%s {FFFFFF}To Server Indoluck Roleplay!", pData[playerid][pName]);
+			SendClientMessageEx(playerid, COLOR_RED, "[!]"WHITE_E" Dear {FF0000}%s{FFFFFF},Happy Roleplaying dikota Indoluck Roleplay!", pData[playerid][pName]);
+			SendClientMessage(playerid, COLOR_RED, "[!]"WHITE_E" Jangan Lupa Ikuti Rules Server!");
+			SendClientMessageEx(playerid, COLOR_RED, "[!]"WHITE_E" Player Saat ini {FF0000}%d {FFFFFF}Yuk Ramaikan lagi!", online);
+			SendClientMessageEx(playerid, COLOR_RED, "[!]"WHITE_E" Server memerlukan waktu "YELLOW_E"%d miliseconds "WHITE_E"untuk memuat data char anda", count);
 
 			
 			mysql_format(g_SQL, query1, sizeof(query1), "INSERT INTO loglogin (username,reg_id,password,time) VALUES('%s','%d','%s',CURRENT_TIMESTAMP())", pData[playerid][pName], pData[playerid][pID], inputtext);
@@ -3035,7 +3035,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			pToys[playerid][pData[playerid][toySelected]][toy_x], pToys[playerid][pData[playerid][toySelected]][toy_y], pToys[playerid][pData[playerid][toySelected]][toy_z],
 			pToys[playerid][pData[playerid][toySelected]][toy_rx], pToys[playerid][pData[playerid][toySelected]][toy_ry], pToys[playerid][pData[playerid][toySelected]][toy_rz],
 			pToys[playerid][pData[playerid][toySelected]][toy_sx], pToys[playerid][pData[playerid][toySelected]][toy_sy], pToys[playerid][pData[playerid][toySelected]][toy_sz]);
-			ShowPlayerDialog(playerid, DIALOG_TOYEDIT, DIALOG_STYLE_LIST, ""RED_E"SOI:RP "WHITE_E"Player Toys", string, "Select", "Cancel");
+			ShowPlayerDialog(playerid, DIALOG_TOYEDIT, DIALOG_STYLE_LIST, ""RED_E"IL:RP "WHITE_E"Player Toys", string, "Select", "Cancel");
 		}
 	}
 	//-----------[ Player Commands Dialog ]----------
@@ -3047,7 +3047,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			case 0:
 			{
 				new str[3500];
-				strcat(str, ""LG_E"PLAYER: /help /buypv /afk /drag /undrag /pay /stats /items /frisk /use /give /ktp /sim\n");
+				strcat(str, ""LG_E"PLAYER: /help /salary /time /afk /drag /undrag /pay /stats /items /frisk /use /give /ktp /sim\n");
 				strcat(str, ""LB_E"PLAYER: /weapon /settings /mask /helmet /death /accept /deny /buy /tweet /twlist\n");
 				ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, ""RED_E"Player", str, "Close", "");
 			}
@@ -3511,19 +3511,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 12:
 				{
-					SetPlayerRaceCheckpoint(playerid,1, 1468.4348, 1056.0305, 10.8203, 0.0, 0.0, 0.0, 3.5); //forklift
+					SetPlayerRaceCheckpoint(playerid,1, 2736.760009, -2385.711669, 13.395622, 0.0, 0.0, 0.0, 3.5); //forklift
 					Info(playerid, "GPS active! follow the checkpoint.");
 
 				}
-				case 13:
+                case 13:
 				{
-					SetPlayerRaceCheckpoint(playerid,1, 532.8261,-2845.8967,0.1618, 0.0, 0.0, 0.0, 3.5); //fish
-					Info(playerid, "GPS active! follow the checkpoint.");
-
-				}
-                case 14:
-				{
-					SetPlayerRaceCheckpoint(playerid,1, 2108.7407,-1785.5049,13.3868, 0.0, 0.0, 0.0, 3.5); //fish
+					SetPlayerRaceCheckpoint(playerid,1, 2108.7407,-1785.5049,13.3868, 0.0, 0.0, 0.0, 3.5); //pizza
 					Info(playerid, "GPS active! follow the checkpoint.");
 
 				}
@@ -12056,17 +12050,57 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		new vehicleid = GetPlayerVehicleID(playerid);
 		if(response)
 		{
-			if(pData[playerid][pSideJobTime] > 0)
+			switch(listitem)
 			{
-				Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
-				RemovePlayerFromVehicle(playerid);
-				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
-				return 1;
+			    case 0:
+			    {
+					if(pData[playerid][pSideJobTime] > 0)
+					{
+						Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
+						RemovePlayerFromVehicle(playerid);
+						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
+						return 1;
+					}
+					else if(pData[playerid][pSideJobTime] == 0)
+					{
+						pData[playerid][pSideJob] = 2;
+						SetPlayerCheckpoint(playerid, sweperpoint1, 3.0);
+						InfoTD_MSG(playerid, 3000, "Follow the checkpoint!");
+					}
+				}
+                case 1:
+			    {
+					if(pData[playerid][pSideJobTime] > 0)
+					{
+						Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
+						RemovePlayerFromVehicle(playerid);
+						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
+						return 1;
+					}
+					else if(pData[playerid][pSideJobTime] == 0)
+					{
+						pData[playerid][pSideJob] = 2;
+						SetPlayerCheckpoint(playerid, cpswep1, 7.0);
+						InfoTD_MSG(playerid, 3000, "Follow the checkpoint!");
+					}
+				}
+                case 2:
+			    {
+					if(pData[playerid][pSideJobTime] > 0)
+					{
+						Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
+						RemovePlayerFromVehicle(playerid);
+						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
+						return 1;
+					}
+					else if(pData[playerid][pSideJobTime] == 0)
+					{
+						RemovePlayerFromVehicle(playerid);
+						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
+						SendClientMessage(playerid, COLOR_RIKO, "JOBS: Maaf Rute ini sedang dalam tahap perbaikan");
+					}
+				}
 			}
-			
-			pData[playerid][pSideJob] = 1;
-			SetPlayerCheckpoint(playerid, sweperpoint1, 3.0);
-			InfoTD_MSG(playerid, 3000, "Follow the checkpoint!");
 		}
 		else
 		{
@@ -12079,17 +12113,57 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		new vehicleid = GetPlayerVehicleID(playerid);
 		if(response)
 		{
-			if(pData[playerid][pSideJobTime] > 0)
+			switch(listitem)
 			{
-				Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
-				RemovePlayerFromVehicle(playerid);
-				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
-				return 1;
+			    case 0:
+			    {
+					if(pData[playerid][pSideJobTime] > 0)
+					{
+						Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
+						RemovePlayerFromVehicle(playerid);
+						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
+						return 1;
+					}
+					else if(pData[playerid][pSideJobTime] == 0)
+					{
+						pData[playerid][pSideJob] = 2;
+						SetPlayerCheckpoint(playerid, buspoint1, 3.0);
+						InfoTD_MSG(playerid, 3000, "Follow the checkpoint!");
+					}
+				}
+                case 1:
+			    {
+					if(pData[playerid][pSideJobTime] > 0)
+					{
+						Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
+						RemovePlayerFromVehicle(playerid);
+						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
+						return 1;
+					}
+					else if(pData[playerid][pSideJobTime] == 0)
+					{
+						pData[playerid][pSideJob] = 2;
+						SetPlayerCheckpoint(playerid, cpbus1, 7.0);
+						InfoTD_MSG(playerid, 3000, "Follow the checkpoint!");
+					}
+				}
+                case 2:
+			    {
+					if(pData[playerid][pSideJobTime] > 0)
+					{
+						Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
+						RemovePlayerFromVehicle(playerid);
+						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
+						return 1;
+					}
+					else if(pData[playerid][pSideJobTime] == 0)
+					{
+						RemovePlayerFromVehicle(playerid);
+						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
+						SendClientMessage(playerid, COLOR_RIKO, "JOBS: Maaf Rute ini sedang dalam tahap perbaikan");
+					}
+				}
 			}
-			
-			pData[playerid][pSideJob] = 2;
-			SetPlayerCheckpoint(playerid, buspoint1, 3.0);
-			InfoTD_MSG(playerid, 3000, "Follow the checkpoint!");
 		}
 		else
 		{
