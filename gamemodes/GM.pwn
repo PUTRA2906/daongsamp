@@ -7094,7 +7094,7 @@ public OnPlayerEnterCheckpoint(playerid)
 				pData[playerid][pSideJobTime] = 800;
 				DisablePlayerRaceCheckpoint(playerid);
 				AddPlayerSalary(playerid, "Sidejob(Bus Route B)", bus_price);
-				SendClientMessage(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Bus)", FormatMoney(bus_price));
+				SendClientMessage(playerid, COLOR_LOGS, "JOB: {FFFFFF}You get $%s From Sidejobs(Bus)", FormatMoney(bus_price));
 				RemovePlayerFromVehicle(playerid);
 				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
 			}
