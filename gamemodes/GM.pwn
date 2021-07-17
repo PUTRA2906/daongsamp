@@ -6798,70 +6798,7 @@ public OnPlayerEnterCheckpoint(playerid)
 				pData[playerid][pSideJob] = 0;
 				pData[playerid][pSideJobTime] = 300;
 				DisablePlayerCheckpoint(playerid);
-				AddPlayerSalary(playerid, "Sidejob(Sweeper Route A)", swp_price);
-				SendClientMessage(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Sweeper)", FormatMoney(swp_price));
-				RemovePlayerFromVehicle(playerid);
-				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
-			}
-		}
-	}
-    if(pData[playerid][pSideJob] == 1)
-	{
-		new vehicleid = GetPlayerVehicleID(playerid);
-		if(GetVehicleModel(vehicleid) == 574)
-		{
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep1))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpswep2, 0.0, 0.0, 0.0, 7.0);
-				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep2))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpswep3, 0.0, 0.0, 0.0, 7.0);
-				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep3))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpswep4, 0.0, 0.0, 0.0, 7.0);
-				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep4))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpswep5, 0.0, 0.0, 0.0, 7.0);
-			    GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep5))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpswep6, 0.0, 0.0, 0.0, 7.0);
-				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep6))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpswep7, 0.0, 0.0, 0.0, 7.0);
-				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep7))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpswep8, 0.0, 0.0, 0.0, 7.0);
-				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep8))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpswep9, 0.0, 0.0, 0.0, 7.0);
-				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep9))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpswep10, 0.0, 0.0, 0.0, 7.0);
-				GameTextForPlayer(playerid, "~g~Clean!", 1000, 3);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpswep10))
-			{
-				new swp_price = Random(10000, 19000);
-				pData[playerid][pSideJob] = 0;
-				pData[playerid][pSideJobTime] = 300;
-				DisablePlayerRaceCheckpoint(playerid);
-				AddPlayerSalary(playerid, "Sidejob(Sweeper Route B)", swp_price);
+				AddPlayerSalary(playerid, "Sidejob(Sweeper)", swp_price);
 				SendClientMessage(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Sweeper)", FormatMoney(swp_price));
 				RemovePlayerFromVehicle(playerid);
 				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
@@ -6983,118 +6920,8 @@ public OnPlayerEnterCheckpoint(playerid)
 				pData[playerid][pSideJob] = 0;
 				pData[playerid][pSideJobTime] = 800;
 				DisablePlayerCheckpoint(playerid);
-				AddPlayerSalary(playerid, "Sidejob(Bus Route A)", bus_price);
+				AddPlayerSalary(playerid, "Sidejob(Bus)", bus_price);
 				SendClientMessage(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Bus)", FormatMoney(bus_price));
-				RemovePlayerFromVehicle(playerid);
-				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
-			}
-		}
-	}
-    if(pData[playerid][pSideJob] == 2)
-	{
-		new vehicleid = GetPlayerVehicleID(playerid);
-		if(GetVehicleModel(vehicleid) == 431)
-		{
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus1))
-			{
-				SetPlayerRaceCheckpoint(playerid, cpbus2, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus2))
-			{
-				SetPlayerRaceCheckpoint(playerid, cpbus3, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus3))
-			{	
-				SetPlayerRaceCheckpoint(playerid, cpbus4, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus4))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus5, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus5))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus6, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus6))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus7, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus7))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus8, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus8))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus9, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus9))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus10, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus10))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus11, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus11))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus12, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus12))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus13, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus13))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus14, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus14))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus15, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus15))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus16, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus16))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus17, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus17))
-			{
-				SetPlayerRaceCheckpoint(playerid, cpbus18, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus18))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus19, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus19))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus20, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus20))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus21, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus21))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus22, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus22))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus23, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus23))
-			{
-				SetPlayerRaceCheckpoint(playerid, 1, cpbus24, 0.0, 0.0, 0.0, 7.0);
-			}
-			if (IsPlayerInRangeOfPoint(playerid, 7.0, cpbus24))
-			{
-				new bus_price = Random(10000, 20000);
-				pData[playerid][pSideJob] = 0;
-				pData[playerid][pSideJobTime] = 800;
-				DisablePlayerRaceCheckpoint(playerid);
-				AddPlayerSalary(playerid, "Sidejob(Bus Route B)", bus_price);
-				SendClientMessage(playerid, COLOR_LOGS, "JOB: {FFFFFF}You get $%s From Sidejobs(Bus)", FormatMoney(bus_price));
 				RemovePlayerFromVehicle(playerid);
 				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
 			}
@@ -8009,7 +7836,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		}
 		if(IsASweeperVeh(vehicleid))
 		{
-			ShowPlayerDialog(playerid, DIALOG_SWEEPER, DIALOG_STYLE_LIST, "Side Job - Sweeper", "1.Route A\tPershing Square\n2.Route B\tIdlewood\n3.Route C\tMaintenance", "Start Job", "Close");
+			ShowPlayerDialog(playerid, DIALOG_SWEEPER, DIALOG_STYLE_LIST, "Side Job - Sweeper", "Anda Ingin Bekerja Sweeper?", "Start Job", "Close");
 		}
 		if(IsAPizzaVeh(vehicleid))
 		{

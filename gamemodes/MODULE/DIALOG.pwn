@@ -12052,11 +12052,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		new vehicleid = GetPlayerVehicleID(playerid);
 		if(response)
 		{
-			switch(listitem)
 			{
-			    case 0:
-			    {
-					if(pData[playerid][pSideJobTime] > 0)
+				if(pData[playerid][pSideJobTime] > 0)
 					{
 						Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
 						RemovePlayerFromVehicle(playerid);
@@ -12068,38 +12065,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						pData[playerid][pSideJob] = 2;
 						SetPlayerCheckpoint(playerid, sweperpoint1, 3.0);
 						InfoTD_MSG(playerid, 3000, "Follow the checkpoint!");
-					}
-				}
-                case 1:
-			    {
-					if(pData[playerid][pSideJobTime] > 0)
-					{
-						Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
-						RemovePlayerFromVehicle(playerid);
-						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
-						return 1;
-					}
-					else if(pData[playerid][pSideJobTime] == 0)
-					{
-						pData[playerid][pSideJob] = 2;
-						SetPlayerRaceCheckpoint(playerid, 1, cpswep1, 0.0, 0.0, 0.0, 7.0);
-						InfoTD_MSG(playerid, 3000, "Follow the checkpoint!");
-					}
-				}
-                case 2:
-			    {
-					if(pData[playerid][pSideJobTime] > 0)
-					{
-						Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
-						RemovePlayerFromVehicle(playerid);
-						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
-						return 1;
-					}
-					else if(pData[playerid][pSideJobTime] == 0)
-					{
-						RemovePlayerFromVehicle(playerid);
-						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
-						SendClientMessage(playerid, COLOR_JOB, "JOBS: "WHITE_E"Sorry This Route is Under Construction");
 					}
 				}
 			}
