@@ -384,7 +384,7 @@ CMD:plant(playerid, params[])
 		new pay = potato + wheat + orange;
 		
 		if(total < 1) return Error(playerid, "You dont have plant!");
-		GivePlayerMoneyEx(playerid, pay);
+		AddPlayerSalary(playerid, "Farmers(Jobs)", pay);
 		Food += total;
 		Server_MinMoney(pay);
 		
@@ -468,7 +468,7 @@ CMD:cook(playerid, params[])
 	if(pData[playerid][pInHouse] == -1)
 		return Error(playerid, "You must inside a house!");
 		
-	if(isnull(params)) return Usage(playerid, "/cook [snack/sprunk/burger]");
+	if(isnull(params)) return Usage(playerid, "/cook [snack/sprunk/burger/pizza]");
 	
 	if(!strcmp(params, "snack", true))
 	{
@@ -510,6 +510,21 @@ CMD:cook(playerid, params[])
 				
 		TogglePlayerControllable(playerid, 0);
 		Info(playerid, "Anda sedang memasak makanan dengan 5 food!");
+		ApplyAnimation(playerid, "BD_FIRE", "wash_up", 4.1, 0, 0, 0, 0, 0, 1);
+		pData[playerid][pCooking] = SetTimerEx("CookingFood", 1000, true, "id", playerid, 3);
+		PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Cooking...");
+		PlayerTextDrawShow(playerid, ActiveTD[playerid]);
+		ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
+	}
+	else if(!strcmp(params, "pizza", true))
+	{
+		if(pData[playerid][pFrozenPizza] < 1)
+			return Error(playerid, "Kamu tidak mempunyai Frozen pizza!");
+			
+		pData[playerid][pFrozenPizza] -= 10;
+				
+		TogglePlayerControllable(playerid, 0);
+		Info(playerid, "Anda sedang menghangatkan pizza!");
 		ApplyAnimation(playerid, "BD_FIRE", "wash_up", 4.1, 0, 0, 0, 0, 0, 1);
 		pData[playerid][pCooking] = SetTimerEx("CookingFood", 1000, true, "id", playerid, 3);
 		PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Cooking...");
@@ -569,6 +584,21 @@ function CookingFood(playerid, type)
 				HidePlayerProgressBar(playerid, pData[playerid][activitybar]);
 				PlayerTextDrawHide(playerid, ActiveTD[playerid]);
 				pData[playerid][pEnergy] -= 2;
+				ClearAnimations(playerid);
+				SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
+			}
+			else if(type == 4)
+			{
+				pData[playerid][pHunger] += 30;
+				
+				Info(playerid, "Anda telah berhasil menghangatkan pizza yang dingin.");
+				TogglePlayerControllable(playerid, 1);
+				InfoTD_MSG(playerid, 8000, "Cooking done!");
+				KillTimer(pData[playerid][pCooking]);
+				pData[playerid][pActivityTime] = 0;
+				HidePlayerProgressBar(playerid, pData[playerid][activitybar]);
+				PlayerTextDrawHide(playerid, ActiveTD[playerid]);
+				pData[playerid][pEnergy] -= 5;
 				ClearAnimations(playerid);
 				SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
 			}

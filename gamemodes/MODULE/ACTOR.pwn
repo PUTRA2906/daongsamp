@@ -136,7 +136,7 @@ CMD:createactor(playerid, params[])
 	        GetPlayerPos(playerid, ActorsInfo[idx][aPosX], ActorsInfo[idx][aPosY], ActorsInfo[idx][aPosZ]);
 			GetPlayerFacingAngle(playerid, ActorsInfo[idx][aPosR]);
 			GetPlayerPos(playerid, X,Y,Z);
-			SetPlayerPos(playerid, X,Y,Z+5);
+			SetPlayerPos(playerid, X+5,Y,Z);
   			ActorsInfo[idx][aSkin] = skin;
 			format(ActorsInfo[idx][aName], 80, "%s", name);
 			CreateActors(idx);
@@ -155,13 +155,13 @@ CMD:usedactor(playerid, params[])
 {
 	new string[128];
 	if(pData[playerid][pAdmin] < 4) return SEM(playerid, "ERROR: You don't have the privilege to use this command!");
-	SendClientMessage(playerid, COLOR_RIKO, "[Used Actors]:");
+	SendClientMessage(playerid, COLOR_LBLUE, "[Used Actors]:");
 	for(new idx=0; idx<MAX_ACTOR; idx++)
 	{
 	    if(ActorsInfo[idx][aId])
 	    {
 			format(string, sizeof(string), "ID: %d | Skin: %d | VW: %d | Int: %d", idx, ActorsInfo[idx][aSkin], ActorsInfo[idx][aVW], ActorsInfo[idx][aInt]);
-			SendClientMessage(playerid, COLOR_RIKO, string);
+			SendClientMessage(playerid, COLOR_LBLUE, string);
 	    }
 	}
 	return 1;
@@ -192,7 +192,7 @@ CMD:actorname(playerid, params[])
 	if(sscanf(params, "ds[128]", actorid, actorname)) return Usage(playerid, "/actorname [actorid] [name]");
 
 	format(ActorsInfo[actorid][aName], 80, "%s", actorname);
-	SendClientMessageEx(playerid, COLOR_RIKO, "ACTORS: "WHITE_E"You have changed the name of the actors!");
+	SendClientMessageEx(playerid, COLOR_LBLUE, "ACTORS: "WHITE_E"You have changed the name of the actors!");
 	if(IsValidActor(ActorsInfo[actorid][aId])) DestroyActor(ActorsInfo[actorid][aId]);
 	if(IsValidDynamic3DTextLabel(ActorsInfo[actorid][aTId])) DestroyDynamic3DTextLabel(ActorsInfo[actorid][aTId]);
 	CreateActors(actorid);
@@ -263,7 +263,7 @@ CMD:actoredit(playerid, params[])
 				GetPlayerFacingAngle(playerid, ActorsInfo[actorid][aPosR]);
 				ActorsInfo[actorid][aVW] = GetPlayerVirtualWorld(playerid);
 				ActorsInfo[actorid][aInt] = GetPlayerInterior(playerid);
-				SendClientMessageEx(playerid, COLOR_RIKO, "ACTORS: "WHITE_E"You have changed the exterior!");
+				SendClientMessageEx(playerid, COLOR_LBLUE, "ACTORS: "WHITE_E"You have changed the exterior!");
 				if(IsValidActor(ActorsInfo[actorid][aId])) DestroyActor(ActorsInfo[actorid][aId]);
 				if(IsValidDynamic3DTextLabel(ActorsInfo[actorid][aTId])) DestroyDynamic3DTextLabel(ActorsInfo[actorid][aTId]);
 				CreateActors(actorid);

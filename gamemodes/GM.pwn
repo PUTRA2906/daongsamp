@@ -1,14 +1,13 @@
 /*==========================================================================�        �===========================================================================================================
                                                                 YOU NEVER KNOW IF YOU NEVER TRY!
-                                                                 Indoluck Roleplay New Project
-                                                                       ilrp2021�copyright!
+                                                                 Fierro City Roleplay New Project
+                                                                       fcrp2021�copyright!
                                                                            #COMEBACK!
 ===========================================================================�        �===========================================================================================================
 
 											"CODING ITU BISA DI COPYPASTE TETAPI IDE TIDAK AKAN BISA." - Christian "Tianmetal" Malik.
-Gamemode Author   	: SOIRP/Advanced Roleplay/Indoluck
+Gamemode Author   	: SOIRP/Advanced Roleplay/Fierro
 Team Scripting      : Radeetz & Aldick
-Team Mapping        : Radeetz & Arief
 
 Special Thanks To	:
 					- Allah SWT (My God)
@@ -22,7 +21,7 @@ Special Thanks To	:
 #include <sampvoice>
 #undef MAX_PLAYERS
 #define MAX_PLAYERS	500
-#include <crashdetect.inc> 
+#include <crashdetect.inc>
 #include <gvar.inc>
 #include <a_mysql.inc>
 #include <a_actor.inc>
@@ -41,6 +40,7 @@ Special Thanks To	:
 #include <VehPara>
 #include <EVF2.inc>
 #include <YSI\y_timers>
+#include <YSI\y_iterate>
 #include <sscanf2.inc>
 #include <yom_buttons.inc>
 #include <geoiplite.inc>
@@ -53,8 +53,14 @@ Special Thanks To	:
 #include "MODULE\DEFINE.pwn"
 #include "MODULE\COLOR.pwn"
 #include "MODULE\TEXTDRAW.pwn"
-
+#define CONVERT_TIME_TO_SECONDS 	1
+#define CONVERT_TIME_TO_MINUTES 	2
+#define CONVERT_TIME_TO_HOURS 		3
+#define CONVERT_TIME_TO_DAYS 		4
+#define CONVERT_TIME_TO_MONTHS 		5
+#define CONVERT_TIME_TO_YEARS 		6
 //--- [ New Variable ] ----//
+new DmvVeh[1];
 //anti spam veh
 new VehicleLastEnterTime[MAX_PLAYERS],
     Warning[MAX_PLAYERS];
@@ -158,12 +164,6 @@ enum E_PLAYERS
 	pJob,
 	pJob2,
 	pExitJob,
-	pMineTime,
-	pBusTime,
-	pSweepTime,
-	pLumTime,
-	pTruckTime,
-	pProdTime,
 	pMedicine,
 	pMedkit,
 	pMask,
@@ -171,6 +171,7 @@ enum E_PLAYERS
 	pGymVip,
 	pFitnessTimer,
 	pFitnessType,
+	pSeatBelt,
 	pHelmet,
 	pSnack,
 	pSprunk,
@@ -182,6 +183,7 @@ enum E_PLAYERS
 	pMaterial,
 	pComponent,
 	pFood,
+	pFrozenPizza,
 	pSeed,
 	pPotato,
 	pWheat,
@@ -199,6 +201,8 @@ enum E_PLAYERS
 	pInFish,
 	pIDCard,
 	pIDCardTime,
+	pLicBiz,
+	pLicBizTime,
 	pSkck,
 	pSkckTime,
 	pPenebangs,
@@ -208,6 +212,7 @@ enum E_PLAYERS
 	pSpack,
 	pDriveLic,
 	pDriveLicTime,
+	pSekolahSim,
 	pBoatLic,
 	pBoatLicTime,
 	pFlyLic,
@@ -276,7 +281,6 @@ enum E_PLAYERS
 	pHBEMode,
 	pTDMode,
 	pHelmetOn,
-	pSeatBelt,
 	pReportTime,
 	pAskTime,
 	//Player Progress Bar
@@ -299,15 +303,15 @@ enum E_PLAYERS
 	pMechanic,
 	pActivity,
 	pActivityTime,
-	//Jobs Time
-	pLumberTime,
-	pMinerTime,
-	pProductionTime,
-	pTruckerTime,
-	pSmugglerTime,
+	//Delay sidejob
+	pSweeperTime,
+	pBusTime,
+	pForkliftTime,
+	pPizzaTime,
 	//Jobs
 	pSideJob,
 	pSideJobTime,
+	pJobTime,
 	pGetJob,
 	pGetJob2,
 	pTaxiDuty,
@@ -327,8 +331,12 @@ enum E_PLAYERS
 	pMechColor2,
 	//ATM
 	EditingATMID,
+	//Graffity
+	EditingGraffity,
 	// Vending
 	EditingVending,
+	//Vehicle Toys
+	EditingVtoys,
 	//Limit Speed
 	Float:pLimitSpeed,
 	LimitSpeedTimer,
@@ -356,6 +364,9 @@ enum E_PLAYERS
 	pHarvest,
 	pHarvestID,
 	pOffer,
+	//Smuggler
+	pSmugglerTimer,
+	pPacket,
 	//Bank
 	pTransfer,
 	pTransferRek,
@@ -388,10 +399,16 @@ new pData[MAX_PLAYERS][E_PLAYERS];
 new MySQL: g_SQL;
 new g_MysqlRaceCheck[MAX_PLAYERS];
 
+enum    AsuKoe
+{
+	SKM
+};
+new Global[AsuKoe];
+
 //DIALOG
 enum
 {
-    //DALER
+    //DEALER
 	DIALOG_BUYJOBCARSVEHICLE,
 	DIALOG_BUYDEALERCARS_CONFIRM,
 	DIALOG_BUYTRUCKVEHICLE,
@@ -439,6 +456,8 @@ enum
 	//---[ DIALOG BISNIS ]---
 	DIALOG_SELL_BISNISS,
 	DIALOG_SELL_BISNIS,
+	DIALOG_SEALED,
+	DIALOG_UNSEALED,
 	DIALOG_MY_BISNIS,
 	BISNIS_MENU,
 	BISNIS_INFO,
@@ -540,9 +559,12 @@ enum
 	DIALOG_GPS_DEALERSHIP,
 	DIALOG_FIND_DEALER,
 	DIALOG_FIND_BISNIS,
+	DIALOG_FIND_ATM,
+	DIALOG_FIND_TREES,
 	DIALOG_GPS_JOB,
 	DIALOG_PAY,
 	DIALOG_TAKEHAULING,
+	DIALOG_DYNAMICLIST,
 	//---[ DIALOG WEAPONS ]---
 	DIALOG_EDITBONE,
 	//---[ DIALOG FAMILY ]---
@@ -586,7 +608,7 @@ enum
 	DIALOG_WEAPONSAMD,
 	DIALOG_LOCKERSANEW,
 	DIALOG_WEAPONSANEW,
-	
+
 	DIALOG_LOCKERVIP,
 	//---[ DIALOG JOB ]---
 	//MECH
@@ -609,10 +631,11 @@ enum
 	//Trucker
 	DIALOG_HAULING,
 	DIALOG_RESTOCK,
-	
+	DIALOG_CONTAINER,
+
 	//ARMS Dealer
 	DIALOG_ARMS_GUN,
-	
+
 	//Farmer job
 	DIALOG_PLANT,
 	DIALOG_EDIT_PRICE,
@@ -643,12 +666,12 @@ enum
 	DIALOG_BANKSUKSES,
 	//ask
 	DIALOG_ASKS,
-	
+
 	//reports
 	DIALOG_REPORTS,
 	DIALOG_SALARY,
 	DIALOG_PAYCHECK,
-	
+
 	//Sidejob
 	DIALOG_TRASH,
 	DIALOG_PIZZA,
@@ -659,9 +682,9 @@ enum
 	//DIALOG_CHAULINGTR,
 	//DIALOG_BUYTRUCK_CONFIRM,
 	//DIALOG_HAULINGTR,
-	
+
 	DIALOG_PB,
-	
+
 	//gym
 	DIALOG_FSTYLE,
 	DIALOG_GMENU,
@@ -670,10 +693,10 @@ enum
 	//box
 	DIALOG_TDC,
 	DIALOG_TDC_PLACE,
-	
+
 	//event
 	DIALOG_TDM,
-	
+
 	//veh control
 	DIALOG_VC,
 	//startjob
@@ -710,14 +733,14 @@ enum
 	TRUNK_DEPOSITMATS,
 	//mech
 	DIALOG_MECH_LEVEL,
-	
+
 	//MDC
 	DIALOG_TRACK,
 	DIALOG_TRACK_PH,
-	
+
 	DIALOG_INFO_BIS,
 	DIALOG_INFO_HOUSE,
-	
+
 	//bb
 	DIALOG_BOOMBOX,
 	DIALOG_BOOMBOX1,
@@ -1046,7 +1069,7 @@ new up_days,
 	WorldTime = 10,
 	WorldWeather = 24;
 
-//Model Selection 
+//Model Selection
 new SpawnMale = mS_INVALID_LISTID,
 	SpawnFemale = mS_INVALID_LISTID,
 	MaleSkins = mS_INVALID_LISTID,
@@ -1155,7 +1178,7 @@ new LumberData[MAX_LUMBERS][E_LUMBER],
 
 new
 	LumberObjects[MAX_VEHICLES][LUMBER_LIMIT];
-	
+
 new
 	Float: LumberAttachOffsets[LUMBER_LIMIT][4] = {
 	    {-0.223, -1.089, -0.230, -90.399},
@@ -1225,8 +1248,8 @@ stock AutoBan(playernya)
    GetPlayerIp(playernya, PlayerIP, sizeof(PlayerIP));
    GetPlayerName(playernya, giveplayer, sizeof(giveplayer));
 
-   SendClientMessageToAllEx(0xFF5533FF, "BotCmd: Player %s Has Been Banned Permanently", giveplayer);
-   SendClientMessageToAllEx(0xFF5533FF, "Reason: Cheating ");
+   SendClientMessageToAllEx(COLOR_BAN, "BotCmd: Player %s Has Been Banned Permanently", giveplayer);
+   SendClientMessageToAllEx(COLOR_BAN, "Reason: Cheating ");
 
    mysql_format(g_SQL, query, sizeof(query), "INSERT INTO banneds(name, ip, admin, reason, ban_date, ban_expire) VALUES ('%s', '%s', 'Server Ban', 'Using Cheat!', %i, %d)", giveplayer, PlayerIP, gettime(), ban_time);
    mysql_tquery(g_SQL, query);
@@ -1300,7 +1323,7 @@ stock RefreshDGHbec(playerid)
 	PlayerTextDrawShow(playerid, DGHBEC[playerid]);
     return 1;
 }
-stock FixedKick(playerid) 
+stock FixedKick(playerid)
 {
     KillTimer(kick_gTimer[playerid]);
     kick_gTimer[playerid] = SetTimerEx("DelayedKick", 1000, false, "i", playerid);
@@ -1364,7 +1387,7 @@ function SpawnTimer(playerid)
 	SetWeapons(playerid);
 	if(pData[playerid][pJail] > 0)
 	{
-		JailPlayer(playerid); 
+		JailPlayer(playerid);
 	}
 	if(pData[playerid][pArrestTime] > 0)
 	{
@@ -1418,6 +1441,32 @@ function ForkliftTake(playerid)
 	}
 	return 1;
 }
+function ContainerTake(playerid)
+{
+    if(!IsValidTimer(pData[playerid][pActivity])) return 0;
+	{
+		if(pData[playerid][pActivityTime] >= 100)
+		{
+			InfoTD_MSG(playerid, 8000, "Done!");
+			KillTimer(pData[playerid][pActivity]);
+			pData[playerid][pActivityTime] = 0;
+			HidePlayerProgressBar(playerid, pData[playerid][activitybar]);
+			PlayerTextDrawHide(playerid, ActiveTD[playerid]);
+			pData[playerid][pEnergy] -= 5;
+			TogglePlayerControllable(playerid, 1);
+
+			SetPVarInt(playerid, "container", CreateDynamicObject(2935,0,0,0,0,0,0));
+			AttachDynamicObjectToVehicle(GetPVarInt(playerid, "container"), GetPlayerVehicleID(playerid), 0.000, -1.009, 1.090, 0.000, 0.000, 0.000);
+			return 1;
+		}
+		else if(pData[playerid][pActivityTime] < 100)
+		{
+			pData[playerid][pActivityTime] += 5;
+			SetPlayerProgressBarValue(playerid, pData[playerid][activitybar], pData[playerid][pActivityTime]);
+		}
+	}
+	return 1;
+}
 function FillElectric(playerid)
 {
 	if(!IsValidTimer(pData[playerid][pActivity])) return 0;
@@ -1455,7 +1504,31 @@ function ForkliftDown(playerid)
 			PlayerTextDrawHide(playerid, ActiveTD[playerid]);
 			pData[playerid][pEnergy] -= 3;
 			TogglePlayerControllable(playerid, 1);
-			DestroyObject(GetPVarInt(playerid, "box"));
+			DestroyDynamicObject(GetPVarInt(playerid, "box"));
+			return 1;
+		}
+		else if(pData[playerid][pActivityTime] < 100)
+		{
+			pData[playerid][pActivityTime] += 5;
+			SetPlayerProgressBarValue(playerid, pData[playerid][activitybar], pData[playerid][pActivityTime]);
+		}
+	}
+	return 1;
+}
+function ContainerDown(playerid)
+{
+    if(!IsValidTimer(pData[playerid][pActivity])) return 0;
+	{
+		if(pData[playerid][pActivityTime] >= 100)
+		{
+			InfoTD_MSG(playerid, 8000, "Done!");
+			KillTimer(pData[playerid][pActivity]);
+			pData[playerid][pActivityTime] = 0;
+			HidePlayerProgressBar(playerid, pData[playerid][activitybar]);
+			PlayerTextDrawHide(playerid, ActiveTD[playerid]);
+			pData[playerid][pEnergy] -= 5;
+			TogglePlayerControllable(playerid, 1);
+			DestroyDynamicObject(GetPVarInt(playerid, "container"));
 			return 1;
 		}
 		else if(pData[playerid][pActivityTime] < 100)
@@ -1469,18 +1542,22 @@ function ForkliftDown(playerid)
 ServerLabels()
 {
 	new strings[128];
+	CreateDynamicPickup(1239, 23, 1252.8046,-1286.8199,1061.1492, -1);
+	format(strings, sizeof(strings), "[TREATMENT]\n{FFFFFF}/treatment\nMenghilangkan Sakit atau Penglihatan Merah\nPrice: $250.00");
+	CreateDynamic3DTextLabel(strings, COLOR_LBLUE, 1252.8046,-1286.8199,1061.1492, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); //Treatement
+
 	CreateDynamicPickup(1239, 23, 2108.7407,-1785.5049,13.3868, -1);
 	format(strings, sizeof(strings), "[PIZZA JOB]\n{FFFFFF}/getpizza\nAmbil pizza lalu Antarkan Kesetiap Rumah\nGunakan Motor Pizza");
-	CreateDynamic3DTextLabel(strings, COLOR_LBLUE, 2108.7407,-1785.5049,13.3868, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // ID Card
-	
+	CreateDynamic3DTextLabel(strings, COLOR_LBLUE, 2108.7407,-1785.5049,13.3868, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); //Pizza
+
 	CreateDynamicPickup(1239, 23, 1642.3374,-2326.3716,13.5469, -1);
 	format(strings, sizeof(strings), "[STARTERPACK]\n{FFFFFF}/claimsp\n Get starterpack");
 	CreateDynamic3DTextLabel(strings, COLOR_LBLUE, 1642.3374,-2326.3716,13.5469, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // ID Card
-	
+
 	CreateDynamicPickup(1239, 23, 1370.6390,717.5485,-15.7573, -1);
 	format(strings, sizeof(strings), "[BPJS]\n{FFFFFF}/newbpjs\n mendapatkan BPJS");
 	CreateDynamic3DTextLabel(strings, COLOR_LBLUE, 1370.6390,717.5485,-15.7573, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // bpjs
-	
+
 	CreateDynamicPickup(1239, 23, 1345.3302,-1763.2202,13.5992, -1);
 	format(strings, sizeof(strings), "[Spray Tags]\n{FFFFFF}/buy");
 	CreateDynamic3DTextLabel(strings, COLOR_LBLUE, 1345.3302,-1763.2202,13.5992, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // tags
@@ -1492,47 +1569,47 @@ ServerLabels()
 	CreateDynamicPickup(1239, 23, 1392.77, -22.25, 1000.97, -1);
 	format(strings, sizeof(strings), "[City Hall]\n{FFFFFF}/newidcard - create new ID Card\n/newage - Change Birthday\n/sellhouse - sell your house\n/sellbisnis - sell your bisnis");
 	CreateDynamic3DTextLabel(strings, COLOR_LBLUE, 1392.77, -22.25, 1000.97, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // ID Card
-	
+
 	CreateDynamicPickup(1239, 23, -367.8806, 1635.2896, 999.2969, -1);
 	format(strings, sizeof(strings), "[Veh Insurance]\n{FFFFFF}/buyinsu - buy insurance\n/claimpv - claim insurance\n/sellpv - sell vehicle");
 	CreateDynamic3DTextLabel(strings, COLOR_LBLUE, -367.8806, 1635.2896, 999.2969, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // Veh insurance
-	
-	CreateDynamicPickup(1239, 23, 252.22, 117.43, 1003.21, -1);
-	format(strings, sizeof(strings), "[License]\n{FFFFFF}/newdrivelic - create new license");
-	CreateDynamic3DTextLabel(strings, COLOR_BLUE, 252.22, 117.43, 1003.21, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // Driving Lic
-	
+
+	CreateDynamicPickup(1239, 23, 1081.2939,-1696.7833,13.5469, -1);
+	format(strings, sizeof(strings), "[License]\n{FFFFFF}/newdrivelic - create new license driving");
+	CreateDynamic3DTextLabel(strings, COLOR_BLUE, 1081.2939,-1696.7833,13.5469, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // Driving Lic
+
 	CreateDynamicPickup(1239, 23, 240.80, 112.95, 1003.21, -1);
 	format(strings, sizeof(strings), "[Plate]\n{FFFFFF}/buyplate - create new plate");
 	CreateDynamic3DTextLabel(strings, COLOR_BLUE, 240.80, 112.95, 1003.21, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // Plate
-	
+
 	CreateDynamicPickup(1239, 23, 246.45, 118.53, 1003.21, -1);
 	format(strings, sizeof(strings), "[Ticket]\n{FFFFFF}/payticket - to pay ticket\n/paylimit - to payticket limitspeed");
 	CreateDynamic3DTextLabel(strings, COLOR_BLUE, 246.45, 118.53, 1003.21, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // Ticket
-	
+
 	CreateDynamicPickup(1239, 23, 224.11, 118.50, 999.10, -1);
 	format(strings, sizeof(strings), "[ARREST POINT]\n{FFFFFF}/arrest - arrest wanted player");
 	CreateDynamic3DTextLabel(strings, COLOR_BLUE, 224.11, 118.50, 999.10, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // arrest
-	
+
 	CreateDynamicPickup(1239, 23, 1142.38, -1330.74, 13.62, -1);
 	format(strings, sizeof(strings), "[Hospital]\n{FFFFFF}/dropinjured");
 	CreateDynamic3DTextLabel(strings, COLOR_PINK, 1142.38, -1330.74, 13.62, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // hospital
-	
+
 	CreateDynamicPickup(1239, 23, 2246.46, -1757.03, 1014.77, -1);
 	format(strings, sizeof(strings), "[BANK]\n{FFFFFF}/newrek - create new rekening");
 	CreateDynamic3DTextLabel(strings, COLOR_LOGS, 2246.46, -1757.03, 1014.77, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // bank
-	
+
 	CreateDynamicPickup(1239, 23, 2246.55, -1750.25, 1014.77, -1);
 	format(strings, sizeof(strings), "[BANK]\n{FFFFFF}/bank - access rekening");
 	CreateDynamic3DTextLabel(strings, COLOR_LOGS, 2246.55, -1750.25, 1014.77, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // bank
-	
+
 	CreateDynamicPickup(1239, 23, 2461.21, 2270.42, 91.67, -1);
 	format(strings, sizeof(strings), "[Ads]\n{FFFFFF}/ads - public ads");
 	CreateDynamic3DTextLabel(strings, COLOR_LOGS, 2461.21, 2270.42, 91.67, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // iklan
-	
+
 	CreateDynamicPickup(1239, 23, 1254.7303, -2059.5728, 59.5827, -1);
 	format(strings, sizeof(strings), "[Payphone]\n{FFFFFF}/cu - $5");
 	CreateDynamic3DTextLabel(strings, COLOR_LOGS, 1254.7303, -2059.5728,59.5827 , 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // cu
-	
+
 	CreateDynamicPickup(1239, 23, 1773.6583, -1015.3002, 23.9609, -1);
 	format(strings, sizeof(strings), "[Payphone]\n{FFFFFF}/cu - $5");
 	CreateDynamic3DTextLabel(strings, COLOR_LOGS, 1773.6583, -1015.3002, 23.9609 , 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // cu
@@ -1545,10 +1622,10 @@ ServerLabels()
 	//Dynamic CP
 	BoatDealer = CreateDynamicCP(131.4477,-1804.2656, 4.3699, 1.0, -1, -1, -1, 5.0);
 	CreateDynamic3DTextLabel("Buy Boat", COLOR_GREEN, 131.4477,-1804.2656, 4.3699, 5.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, -1);
-	
+
 	ShowRoomS = CreateDynamicCP(530.3839,-1292.3944,17.3201, 1.0, -1, -1, -1, 5.0);
 	CreateDynamic3DTextLabel("Buy Vehicle", COLOR_GREEN, 530.3839,-1292.3944,17.3201, 5.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, -1);
-	
+
 	ShowRoomCPRent = CreateDynamicCP(1259.1423, -1262.9587, 13.5234, 1.0, -1, -1, -1, 5.0);
 	CreateDynamic3DTextLabel("Rental Vehicle\n"YELLOW_E"/unrentpv", COLOR_LBLUE, 1259.1423, -1262.9587, 13.5234, 5.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, -1);
 }
@@ -1589,6 +1666,12 @@ public ClearPlayerAnim(playerid)
 {
 	ApplyAnimation(playerid, "CARRY", "crry_prtial", 4.0, 0, 0, 0, 0, 0, 1);
 }
+forward bool:startsWith(const source[], const find[]);
+
+bool:startsWith(const source[], const find[])
+{
+    return !strcmp(source, find, strlen(find), false);
+}
 public DCC_OnMessageCreate(DCC_Message:message)
 {
 	new realMsg[100], msg[128];
@@ -1601,6 +1684,8 @@ public DCC_OnMessageCreate(DCC_Message:message)
     DCC_IsUserBot(author, IsBot);
     if(channel == g_Discord_AndroVerifed && !IsBot)
     {
+		if( startsWith(realMsg, "!register"))
+		{
     	new player[200];
     	format(player,sizeof(player),"Whitelist/%s.txt",realMsg);
     	{
@@ -1615,10 +1700,22 @@ public DCC_OnMessageCreate(DCC_Message:message)
     			format(msg, sizeof(msg), "Akun ini Sudah **diverifikasi tadi!**");
     			DCC_SendChannelMessage(g_Discord_AndroVerifed, msg);
       		}
-   		}
-    }
-    if(channel == g_Discord_PcVerived && !IsBot)
+   		
+		
+	 }
+		}else
     {
+        // Mengirim pesan untuk memberi tahu pengguna agar menggunakan !register
+        format(msg, sizeof(msg), "Gunakan perintah !register untuk melakukan registrasi.");
+        DCC_SendChannelMessage(g_Discord_AndroVerifed, msg);
+    }
+
+    }
+	
+    if(channel == g_Discord_AndroVerifed && !IsBot)
+    {
+		 if( startsWith(realMsg, "!register"))
+		 {
     	new player[200];
     	format(player,sizeof(player),"pc/%s.txt",realMsg);
     	{
@@ -1633,11 +1730,18 @@ public DCC_OnMessageCreate(DCC_Message:message)
     			format(msg, sizeof(msg), "**Akun ini Sudah diverifikasi tadi!**");
     			DCC_SendChannelMessage(g_Discord_PcVerived, msg);
       		}
-   		}
+		}
+	 }else
+    {
+        // Mengirim pesan untuk memberi tahu pengguna agar menggunakan !register
+        format(msg, sizeof(msg), "Gunakan perintah !register untuk melakukan registrasi.");
+        DCC_SendChannelMessage(g_Discord_AndroVerifed, msg);
+    }
+		 
 	}
+	
 	if(channel == g_discord_botcmd && !IsBot) //!IsBot will block BOT's message in game
 	{
-        new msg[3087];
         if(!strcmp(realMsg, "/players", true))
         {
         	format(msg, sizeof(msg), ":white_check_mark: **Jumlah Pemain Online Saat Ini: %d**", online);
@@ -1654,7 +1758,7 @@ public DelayedKick(playerid)
     return 1;
 }
 
-//---------[ Ores miner Job Log ]-------	
+//---------[ Ores miner Job Log ]-------
 #define LOG_LIFETIME 100
 #define LOG_LIMIT 10
 #define MAX_LOG 100
@@ -1674,17 +1778,19 @@ new LogData[MAX_LOG][E_LOG];
 
 new
 	LogStorage[MAX_VEHICLES][2];
-	
+
 //------[ Trucker ]--------
 
 new VehProduct[MAX_VEHICLES];
 new VehGasOil[MAX_VEHICLES];
 
 //-----[ Include Modular ]-----
-main() 
+main()
 {
 	SetTimer("onlineTimer", 1000, true);
 	SetTimer("TDUpdates", 10000, true);
+	SetTimer_("OnMinuteTimer", 60000,0,-1);
+	SetTimer_("OnSecondTimer", 1000, 0, -1);
 	//SetTimer("AutoGmx", 28800000, true);
 	//SetTimer("reloadpacket", 10000, true);
 }
@@ -1709,6 +1815,7 @@ main()
 #include "MODULE\FAMILY.pwn"
 #include "MODULE\HOUSE.pwn"
 #include "MODULE\BISNIS.pwn"
+
 #include "MODULE\AUCTION.pwn"
 #include "MODULE\FARM.pwn"
 #include "MODULE\WORKSHOP.pwn"
@@ -1725,10 +1832,12 @@ main()
 #include "MODULE\JOB\JOB_FORKLIFT.pwn"
 //#include "MODULE\JOB\JOB_HAULING.pwn"
 #include "MODULE\JOB\JOB_BOX.pwn"
+#include "MODULE\JOB\JOB_COURIER.pwn"
 #include "MODULE\JOB\JOB_TRASHMASTER.pwn"
 #include "MODULE\VOUCHER.pwn"
 #include "MODULE\SALARY.pwn"
 #include "MODULE\ATM.pwn"
+#include "MODULE\DMV.pwn"
 #include "MODULE\VENDING.pwn"
 #include "MODULE\DEALER.pwn"
 #include "MODULE\ARMS_DEALER.pwn"
@@ -1762,7 +1871,7 @@ main()
 #include "MODULE\FUNCTION.pwn"
 #include "MODULE\ROBBERY.pwn"
 #include "MODULE\ANTIAIMBOT.pwn"
-#include "MODULE\SPEEDO.pwn"
+//#include "MODULE\SPEEDO.pwn"
 
 function AutoGmx()
 {
@@ -1793,12 +1902,12 @@ public EnterDoor(playerid)
 }
 
 new const RandomMessage[5][144] = {
-	""RED_E"<!> "WHITE_E"Butuh Uang untuk membeli kebutuhan?anda bisa dapatkan pekerjaan di cityhall dengan cmd /getjob",
-    ""RED_E"<!> "WHITE_E"Gunakan '/help' untuk melihat berbagai command server!",
+	""YELLOW_E"<!> "WHITE_E"Beli Gps di toko terdekat anda dan cari lah pekerjaan sesuai selera mu!.",
+    ""YELLOW_E"<!> "WHITE_E"Gunakan '/help' untuk melihat berbagai command server!",
     ""RED_E"<!> "WHITE_E"Menemukan Masalah? Gunakan '/report' untuk melaporkannya - Happy Roleplay",
-    ""RED_E"<!> "WHITE_E"Ingin Bertanya sesuatu? Gunakan '/ask'",
-    ""RED_E"<!> "WHITE_E" Dapat Kan Informasi Lengkap Dengan Join Discord Indoluck discord.gg/indoluck"
-    
+    ""LB_E"<!> "WHITE_E"Ingin Bertanya sesuatu? Gunakan '/ask'",
+    ""LB_E"<!> "WHITE_E" Dapat Kan Informasi Lengkap Dengan Join Discord https://discord.io/BremX Share GM"
+
 };
 
 ptask RandoMessages[180000](playerid) {
@@ -1864,7 +1973,7 @@ public OnGameModeInit()
 	CreateArmsPoint();
 	CreateJoinFarmerPoint();
 	CreateJoinSmugglerPoint();
-	CreateUnloadPacketPoint();
+	CreateJoinKurirPoint();
 	LoadTazerSAPD();
 	//server
 	ServerLabels();
@@ -1876,6 +1985,9 @@ public OnGameModeInit()
 	AddBusVehicle();
 	AddForVehicle();
 	AddTrashVehicle();
+	AddKurirVehicle();
+	//DMV Veh
+	AddDmvVehicle();
 	//map
 	ObjectMapping();
 	LoadObjects();
@@ -1900,78 +2012,87 @@ public OnGameModeInit()
 	//Timer
 	SetTimer("settime",1000,true);
 	//SetTimer("CheckPlayers",1000,true);
-	
+	//_____-txtAnimHelper___/
+	txtAnimHelper = TextDrawCreate(630.0, 420.0,
+	"~r~~k~~GROUP_CONTROL_BWD~ ~w~to stop the animation");
+	TextDrawUseBox(txtAnimHelper, 0);
+	TextDrawFont(txtAnimHelper, 2);
+	TextDrawSetShadow(txtAnimHelper,0);
+    TextDrawSetOutline(txtAnimHelper,1);
+    TextDrawBackgroundColor(txtAnimHelper,0x000000FF);
+    TextDrawColor(txtAnimHelper,0xFFFFFFFF);
+    TextDrawAlignment(txtAnimHelper,3);
 	// ____Ws Gerald____
-	tmpobjid = CreateDynamicObject(12929, 2092.584960, -1573.171630, 12.226040, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(920, 2092.220214, -1575.846923, -111097.765625, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(943, 2089.220214, -1567.846923, 13.234201, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(19817, 2092.162353, -1572.994140, 11.220484, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1075, 2089.621582, -1575.569702, -85.771438, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1084, 2088.712890, -1574.666137, 16.226448, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1084, 2090.314453, -1576.155517, -10986.768554, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1085, 2089.389160, -1577.509033, -87.764869, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1077, 2088.229248, -1576.319335, -9987.764648, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1083, 2088.229248, -1576.319335, -11098.764648, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1098, 2089.229248, -1576.319335, -85.764656, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1097, 2088.940673, -1577.002075, 15.231790, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1083, 2088.697998, -1576.428588, 16.232921, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1096, 2089.258789, -1575.997070, -9985.763671, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1085, 2089.225341, -1577.153076, -985.760620, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1084, 2088.728271, -1572.928344, 16.230133, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1263, 2095.988769, -1576.117675, 10.237686, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1039, 2096.776123, -1575.752441, -86.786956, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(2063, 2095.776123, -1579.752441, 13.213044, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(935, 2094.326660, -1575.476318, -986.777099, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1387, 2093.282714, -1575.079223, 17.226051, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1152, 2096.465820, -1573.407348, 15.212773, 0.000000, 0.000000, 450.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1155, 2096.351806, -1573.945678, 16.208110, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(2917, 2094.152587, -1573.015869, -999981.937500, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1390, 2095.343505, -1573.321655, 17.199781, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(19903, 2089.946289, -1573.225341, 8.836521, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(19899, 2089.299804, -1579.344970, 12.223817, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1841, 2088.871093, -1578.868896, 12.232415, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1014, 2092.724121, -1565.742553, -84.779945, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1001, 2090.169921, -1565.158203, 16.176244, 95.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1002, 2093.426757, -1565.536010, -84.822181, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1003, 2093.376220, -1565.421020, 16.167739, 90.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1023, 2092.496093, -1565.684448, -84.818511, 90.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(2714, 2092.636230, -1565.123168, -985.806396, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(19815, 2096.445068, -1576.849731, 14.180511, 0.000000, 0.000000, 270.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(14679, 2095.174316, -1574.077270, -86.785758, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(19899, 2091.355224, -1566.304443, -87.823013, 0.000000, 0.000000, -90.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(10281, 2093.140380, -1582.019042, 17.287075, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1508, 2097.784423, -1567.528808, -987.614257, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(10149, 2096.138183, -1567.072387, -985.626464, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(11102, 2096.808349, -1567.817382, 14.365263, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1728, 2095.423339, -1581.625610, 12.181084, 0.000000, 0.000000, 360.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1720, 2096.639160, -1569.293090, -987.817321, 0.000000, 0.000000, 270.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1722, 2095.887207, -1569.410278, 12.177585, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(2395, 2098.571777, -1596.558837, -987.487243, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(987, 2104.371826, -1595.550292, 12.530209, 0.000000, 0.000000, 240.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(987, 2086.733154, -1605.324707, 12.380502, 0.000000, 0.000000, 140.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(3749, 2092.746093, -1604.535888, 18.380950, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(2990, 2083.163818, -1575.718017, 14.457827, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(2909, 2084.290283, -1576.895751, -984.559082, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(3049, 2080.948974, -1582.124755, -984.523193, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(2990, 2080.352539, -1587.271484, 15.473415, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(987, 2096.684814, -1575.934448, 12.408655, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(987, 2108.008789, -1575.967041, 12.464554, 0.000000, 0.000000, -90.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(987, 2107.787353, -1582.233154, 12.533643, 0.000000, 0.000000, -90.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(639, 2081.469238, -1581.283569, 15.448493, 0.000000, 0.000000, 180.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(5299, 2084.709228, -1578.730346, 3.443974, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1281, 2084.301757, -1586.539916, 13.461508, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1281, 2083.843505, -1590.488159, 13.487107, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1281, 2099.350097, -1584.209228, 13.449150, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1281, 2099.178222, -1588.249267, 13.466442, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(1415, 2101.018310, -1593.958618, 12.498926, 0.000000, 0.000000, 270.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(7390, 2092.709472, -1612.020874, -87.624702, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(11500, 2079.338134, -1605.380249, 12.377853, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(10282, 2080.541259, -1611.679321, -85.620651, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(10282, 2092.455566, -1570.852661, 13.257238, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(10281, 2079.801757, -1606.715209, 19.380554, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(10281, 2077.801757, -1611.715209, -1000065.625000, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(10281, 2079.572021, -1604.584228, 19.534896, 0.000000, 0.000000, 180.000000, -1, -1, -1, 300.00, 300.00); 
-	tmpobjid = CreateDynamicObject(7392, 2102.009521, -1593.561279, -99976.671875, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+	tmpobjid = CreateDynamicObject(12929, 2092.584960, -1573.171630, 12.226040, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(920, 2092.220214, -1575.846923, -111097.765625, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(943, 2089.220214, -1567.846923, 13.234201, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(19817, 2092.162353, -1572.994140, 11.220484, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1075, 2089.621582, -1575.569702, -85.771438, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1084, 2088.712890, -1574.666137, 16.226448, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1084, 2090.314453, -1576.155517, -10986.768554, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1085, 2089.389160, -1577.509033, -87.764869, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1077, 2088.229248, -1576.319335, -9987.764648, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1083, 2088.229248, -1576.319335, -11098.764648, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1098, 2089.229248, -1576.319335, -85.764656, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1097, 2088.940673, -1577.002075, 15.231790, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1083, 2088.697998, -1576.428588, 16.232921, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1096, 2089.258789, -1575.997070, -9985.763671, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1085, 2089.225341, -1577.153076, -985.760620, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1084, 2088.728271, -1572.928344, 16.230133, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1263, 2095.988769, -1576.117675, 10.237686, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1039, 2096.776123, -1575.752441, -86.786956, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(2063, 2095.776123, -1579.752441, 13.213044, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(935, 2094.326660, -1575.476318, -986.777099, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1387, 2093.282714, -1575.079223, 17.226051, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1152, 2096.465820, -1573.407348, 15.212773, 0.000000, 0.000000, 450.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1155, 2096.351806, -1573.945678, 16.208110, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(2917, 2094.152587, -1573.015869, -999981.937500, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1390, 2095.343505, -1573.321655, 17.199781, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(19903, 2089.946289, -1573.225341, 8.836521, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(19899, 2089.299804, -1579.344970, 12.223817, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1841, 2088.871093, -1578.868896, 12.232415, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1014, 2092.724121, -1565.742553, -84.779945, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1001, 2090.169921, -1565.158203, 16.176244, 95.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1002, 2093.426757, -1565.536010, -84.822181, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1003, 2093.376220, -1565.421020, 16.167739, 90.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1023, 2092.496093, -1565.684448, -84.818511, 90.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(2714, 2092.636230, -1565.123168, -985.806396, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(19815, 2096.445068, -1576.849731, 14.180511, 0.000000, 0.000000, 270.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(14679, 2095.174316, -1574.077270, -86.785758, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(19899, 2091.355224, -1566.304443, -87.823013, 0.000000, 0.000000, -90.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(10281, 2093.140380, -1582.019042, 17.287075, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1508, 2097.784423, -1567.528808, -987.614257, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(10149, 2096.138183, -1567.072387, -985.626464, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(11102, 2096.808349, -1567.817382, 14.365263, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1728, 2095.423339, -1581.625610, 12.181084, 0.000000, 0.000000, 360.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1720, 2096.639160, -1569.293090, -987.817321, 0.000000, 0.000000, 270.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1722, 2095.887207, -1569.410278, 12.177585, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(2395, 2098.571777, -1596.558837, -987.487243, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(987, 2104.371826, -1595.550292, 12.530209, 0.000000, 0.000000, 240.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(987, 2086.733154, -1605.324707, 12.380502, 0.000000, 0.000000, 140.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(3749, 2092.746093, -1604.535888, 18.380950, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(2990, 2083.163818, -1575.718017, 14.457827, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(2909, 2084.290283, -1576.895751, -984.559082, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(3049, 2080.948974, -1582.124755, -984.523193, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(2990, 2080.352539, -1587.271484, 15.473415, 0.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(987, 2096.684814, -1575.934448, 12.408655, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(987, 2108.008789, -1575.967041, 12.464554, 0.000000, 0.000000, -90.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(987, 2107.787353, -1582.233154, 12.533643, 0.000000, 0.000000, -90.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(639, 2081.469238, -1581.283569, 15.448493, 0.000000, 0.000000, 180.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(5299, 2084.709228, -1578.730346, 3.443974, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1281, 2084.301757, -1586.539916, 13.461508, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1281, 2083.843505, -1590.488159, 13.487107, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1281, 2099.350097, -1584.209228, 13.449150, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1281, 2099.178222, -1588.249267, 13.466442, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(1415, 2101.018310, -1593.958618, 12.498926, 0.000000, 0.000000, 270.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(7390, 2092.709472, -1612.020874, -87.624702, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(11500, 2079.338134, -1605.380249, 12.377853, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(10282, 2080.541259, -1611.679321, -85.620651, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(10282, 2092.455566, -1570.852661, 13.257238, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(10281, 2079.801757, -1606.715209, 19.380554, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(10281, 2077.801757, -1611.715209, -1000065.625000, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(10281, 2079.572021, -1604.584228, 19.534896, 0.000000, 0.000000, 180.000000, -1, -1, -1, 300.00, 300.00);
+	tmpobjid = CreateDynamicObject(7392, 2102.009521, -1593.561279, -99976.671875, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
 
 	//---- [ Other ]----//
 	CreateDynamicObject(987, 831.75732, -519.75250, 15.43560,   0.00000, -2.00000, 90.00000);
@@ -2525,1105 +2646,1105 @@ public OnGameModeInit()
 
 	//int
 	new streetgang;
-	streetgang = CreateDynamicObjectEx(19377, 883.938720, 1913.583984, -90.078689, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 883.938720, 1913.583984, -90.078689, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2755, "ab_dojowall", "mp_apt1_roomfloor", 0x00000000);
 	SetDynamicObjectMaterial(streetgang, 1, 14789, "ab_sfgymmain", "ab_wood02", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 883.938537, 1923.212768, -90.078697, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 883.938537, 1923.212768, -90.078697, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2755, "ab_dojowall", "mp_apt1_roomfloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(14411, 876.425048, 1918.392944, -93.183601, 0.000000, 0.000000, 270.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(14411, 876.425048, 1918.392944, -93.183601, 0.000000, 0.000000, 270.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 10806, "airfence_sfse", "ws_oldpainted", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 872.116088, 1929.994384, -85.084701, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 872.116088, 1929.994384, -85.084701, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 870.527038, 1895.874511, -90.350799, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 870.527038, 1895.874511, -90.350799, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 915, "airconext", "CJ_plating", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 877.767272, 1920.379516, -88.508590, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 877.767272, 1920.379516, -88.508590, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 10351, "beach_sfs", "rocktb128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 878.195800, 1920.386596, -88.508590, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 878.195800, 1920.386596, -88.508590, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 10351, "beach_sfs", "rocktb128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 877.770019, 1915.878051, -88.508590, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 877.770019, 1915.878051, -88.508590, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 10351, "beach_sfs", "rocktb128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 878.196960, 1915.875854, -88.508590, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 878.196960, 1915.875854, -88.508590, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 10351, "beach_sfs", "rocktb128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 878.606872, 1910.585327, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 878.606872, 1910.585327, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14577, "casinovault01", "cof_wood1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 878.607666, 1925.694213, -89.893028, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 878.607666, 1925.694213, -89.893028, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14577, "casinovault01", "cof_wood1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 883.508605, 1908.991210, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 883.508605, 1908.991210, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14577, "casinovault01", "cof_wood1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 883.511474, 1927.801757, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 883.511474, 1927.801757, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14577, "casinovault01", "cof_wood1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 888.230224, 1913.897583, -94.476509, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 888.230224, 1913.897583, -94.476509, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3998, "civic04_lan", "twintconc_LAn", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 888.233825, 1923.527221, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 888.233825, 1923.527221, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14577, "casinovault01", "cof_wood1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 861.943786, 1923.103027, -90.891799, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 861.943786, 1923.103027, -90.891799, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14756, "smallsfhs", "AH_flroortiledirt1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 861.943725, 1913.468383, -90.891799, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 861.943725, 1913.468383, -90.891799, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14756, "smallsfhs", "AH_flroortiledirt1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 877.358337, 1910.565795, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 877.358337, 1910.565795, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 18056, "mp_diner1", "mp_CJ_CARDBOARD128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 878.197326, 1917.876464, -85.511001, 0.000000, 90.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 878.197326, 1917.876464, -85.511001, 0.000000, 90.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 10351, "beach_sfs", "rocktb128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 878.196472, 1922.856567, -85.521003, 0.000000, 90.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 878.196472, 1922.856567, -85.521003, 0.000000, 90.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 10351, "beach_sfs", "rocktb128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 877.771911, 1917.867187, -85.521003, 0.000000, 90.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 877.771911, 1917.867187, -85.521003, 0.000000, 90.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 10351, "beach_sfs", "rocktb128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 877.772766, 1922.848632, -85.521003, 0.000000, 90.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 877.772766, 1922.848632, -85.521003, 0.000000, 90.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 10351, "beach_sfs", "rocktb128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 877.356384, 1925.694335, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 877.356384, 1925.694335, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 18056, "mp_diner1", "mp_CJ_CARDBOARD128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19360, 870.232055, 1908.741455, -85.278297, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19360, 870.232055, 1908.741455, -85.278297, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 18056, "mp_diner1", "mp_CJ_CARDBOARD128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 876.650390, 1908.740844, -86.473014, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 876.650390, 1908.740844, -86.473014, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 18056, "mp_diner1", "mp_CJ_CARDBOARD128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 863.812927, 1908.742187, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 863.812927, 1908.742187, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 18056, "mp_diner1", "mp_CJ_CARDBOARD128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 872.488952, 1927.632324, -79.788597, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 872.488952, 1927.632324, -79.788597, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14735, "newcrak", "carp21S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19360, 870.198730, 1927.833007, -85.280296, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19360, 870.198730, 1927.833007, -85.280296, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 18056, "mp_diner1", "mp_CJ_CARDBOARD128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 863.783325, 1927.831787, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 863.783325, 1927.831787, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 18056, "mp_diner1", "mp_CJ_CARDBOARD128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 872.444458, 1923.093627, -90.891799, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 872.444458, 1923.093627, -90.891799, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14756, "smallsfhs", "AH_flroortiledirt1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 861.616882, 1929.995727, -85.084701, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 861.616882, 1929.995727, -85.084701, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 876.619567, 1927.832885, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 876.619567, 1927.832885, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 18056, "mp_diner1", "mp_CJ_CARDBOARD128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19360, 856.767211, 1918.123168, -85.280097, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19360, 856.767211, 1918.123168, -85.280097, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 18056, "mp_diner1", "mp_CJ_CARDBOARD128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 854.157592, 1927.830932, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 854.157592, 1927.830932, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 18056, "mp_diner1", "mp_CJ_CARDBOARD128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 856.765441, 1924.546264, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 856.765441, 1924.546264, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 18056, "mp_diner1", "mp_CJ_CARDBOARD128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 856.769470, 1911.703247, -95.261192, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 856.769470, 1911.703247, -95.261192, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13007, "sw_bankint", "bank_wall1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 854.185241, 1908.744750, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 854.185241, 1908.744750, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 18056, "mp_diner1", "mp_CJ_CARDBOARD128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 854.817382, 1920.367431, -85.084663, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 854.817382, 1920.367431, -85.084663, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 854.816833, 1910.804199, -85.082702, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 854.816833, 1910.804199, -85.082702, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 861.969909, 1906.630981, -85.084701, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 861.969909, 1906.630981, -85.084701, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 872.467346, 1906.629150, -85.084701, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 872.467346, 1906.629150, -85.084701, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 862.857116, 1927.654174, -79.788597, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 862.857116, 1927.654174, -79.788597, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14735, "newcrak", "carp21S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 872.479553, 1908.849365, -79.788597, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 872.479553, 1908.849365, -79.788597, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14735, "newcrak", "carp21S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 862.852050, 1908.848144, -79.788597, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 862.852050, 1908.848144, -79.788597, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14735, "newcrak", "carp21S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 853.219421, 1908.848266, -79.788597, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 853.219421, 1908.848266, -79.788597, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14735, "newcrak", "carp21S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 853.225524, 1927.655395, -79.788597, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 853.225524, 1927.655395, -79.788597, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14735, "newcrak", "carp21S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 856.848571, 1922.810180, -79.788597, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 856.848571, 1922.810180, -79.788597, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14735, "newcrak", "carp21S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 856.849548, 1913.177978, -79.788597, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 856.849548, 1913.177978, -79.788597, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14735, "newcrak", "carp21S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 877.322998, 1922.735229, -79.788597, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 877.322998, 1922.735229, -79.788597, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14735, "newcrak", "carp21S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 883.880371, 1927.698120, -85.084701, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 883.880371, 1927.698120, -85.084701, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3979, "civic01_lan", "sl_laglasswall1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18980, 877.492553, 1916.270141, -84.732452, 0.000000, 90.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18980, 877.492553, 1916.270141, -84.732452, 0.000000, 90.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 10351, "beach_sfs", "rocktb128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 877.323608, 1913.102050, -79.788597, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 877.323608, 1913.102050, -79.788597, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14735, "newcrak", "carp21S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19443, 875.580627, 1911.348754, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 875.580627, 1911.348754, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19443, 872.085327, 1911.348510, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 872.085327, 1911.348510, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19443, 868.586608, 1911.348876, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 868.586608, 1911.348876, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19443, 865.088439, 1911.348754, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 865.088439, 1911.348754, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19443, 861.591979, 1911.349121, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 861.591979, 1911.349121, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19443, 859.967407, 1913.126586, -84.361503, 90.000000, 0.006300, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 859.967407, 1913.126586, -84.361503, 90.000000, 0.006300, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19443, 859.966796, 1916.624511, -84.361503, 90.000000, 0.006300, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 859.966796, 1916.624511, -84.361503, 90.000000, 0.006300, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19443, 859.966003, 1920.121337, -84.361503, 90.000000, 0.006300, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 859.966003, 1920.121337, -84.361503, 90.000000, 0.006300, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19443, 859.965515, 1923.546264, -84.361503, 90.000000, 0.006300, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 859.965515, 1923.546264, -84.361503, 90.000000, 0.006300, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19443, 861.773315, 1925.289916, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 861.773315, 1925.289916, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19443, 865.273620, 1925.291259, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 865.273620, 1925.291259, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19443, 868.767578, 1925.292236, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 868.767578, 1925.292236, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19443, 872.259216, 1925.293212, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 872.259216, 1925.293212, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19443, 875.754150, 1925.293212, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 875.754150, 1925.293212, -84.361503, 90.000000, 0.006300, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19378, 872.078247, 1913.761718, -79.585372, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19378, 872.078247, 1913.761718, -79.585372, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16639, "a51_labs", "ws_trainstationwin1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19378, 872.077209, 1923.396118, -79.585372, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19378, 872.077209, 1923.396118, -79.585372, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16639, "a51_labs", "ws_trainstationwin1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19378, 861.581176, 1923.391967, -79.585372, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19378, 861.581176, 1923.391967, -79.585372, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16639, "a51_labs", "ws_trainstationwin1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19378, 861.579895, 1913.760131, -79.585372, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19378, 861.579895, 1913.760131, -79.585372, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16639, "a51_labs", "ws_trainstationwin1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 856.354370, 1920.227783, -89.420646, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 856.354370, 1920.227783, -89.420646, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3676, "lawnxref", "lasthoose6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 856.355712, 1916.022338, -89.420646, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 856.355712, 1916.022338, -89.420646, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3676, "lawnxref", "lasthoose6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 856.354370, 1918.179687, -91.299797, 90.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 856.354370, 1918.179687, -91.299797, 90.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14415, "carter_block_2", "walp29S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 872.331115, 1908.326904, -89.420646, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 872.331115, 1908.326904, -89.420646, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3676, "lawnxref", "lasthoose6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 868.133300, 1908.329223, -89.420646, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 868.133300, 1908.329223, -89.420646, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3676, "lawnxref", "lasthoose6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 868.101562, 1928.243774, -89.420646, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 868.101562, 1928.243774, -89.420646, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3676, "lawnxref", "lasthoose6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 870.461914, 1928.244506, -86.532600, 90.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 870.461914, 1928.244506, -86.532600, 90.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3676, "lawnxref", "lasthoose6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 872.301879, 1928.245361, -89.420646, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 872.301879, 1928.245361, -89.420646, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3676, "lawnxref", "lasthoose6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 856.354370, 1918.179687, -86.530601, 90.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 856.354370, 1918.179687, -86.530601, 90.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3676, "lawnxref", "lasthoose6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 870.461914, 1928.244506, -91.299797, 90.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 870.461914, 1928.244506, -91.299797, 90.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14415, "carter_block_2", "walp29S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 870.134826, 1908.334472, -91.299797, 90.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 870.134826, 1908.334472, -91.299797, 90.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14415, "carter_block_2", "walp29S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 850.782287, 1918.157470, -90.891799, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 850.782287, 1918.157470, -90.891799, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13007, "sw_bankint", "woodfloor1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 855.941345, 1924.546020, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 855.941345, 1924.546020, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 5040, "shopliquor_las", "lasjmliq1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 855.942993, 1911.703247, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 855.942993, 1911.703247, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 5040, "shopliquor_las", "lasjmliq1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19360, 855.941284, 1918.124633, -83.804100, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19360, 855.941284, 1918.124633, -83.804100, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14709, "lamidint2", "mp_apt1_roomwall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 851.084472, 1922.981567, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 851.084472, 1922.981567, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 5040, "shopliquor_las", "lasjmliq1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 843.128784, 1922.984985, -90.622993, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 843.128784, 1922.984985, -90.622993, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_gs_wall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 851.047973, 1913.256591, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 851.047973, 1913.256591, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 5040, "shopliquor_las", "lasjmliq1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 841.418273, 1913.256591, -80.306388, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 841.418273, 1913.256591, -80.306388, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14709, "lamidint2", "mp_apt1_roomwall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 836.585815, 1918.095214, -93.805557, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 836.585815, 1918.095214, -93.805557, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 5040, "shopliquor_las", "lasjmliq1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 870.471008, 1939.123413, -94.395202, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 870.471008, 1939.123413, -94.395202, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2755, "ab_dojowall", "mp_apt1_roomfloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 883.808349, 1908.670043, -85.084701, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 883.808349, 1908.670043, -85.084701, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3979, "civic01_lan", "sl_laglasswall1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 883.004333, 1918.103759, -84.963699, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 883.004333, 1918.103759, -84.963699, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3979, "civic01_lan", "sl_laglasswall2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 883.404907, 1913.426269, -79.926200, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 883.404907, 1913.426269, -79.926200, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3998, "civic04_lan", "twintconc_LAn", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 883.387084, 1922.825439, -79.926200, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 883.387084, 1922.825439, -79.926200, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3998, "civic04_lan", "twintconc_LAn", 0x00000000);
-	streetgang = CreateDynamicObjectEx(14411, 870.112976, 1905.357788, -94.016853, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(14411, 870.112976, 1905.357788, -94.016853, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 10806, "airfence_sfse", "ws_oldpainted", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 872.250915, 1932.624877, -89.992996, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 872.250915, 1932.624877, -89.992996, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 4550, "skyscr1_lan2", "sl_librarycolmn2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 868.082092, 1932.573486, -89.992996, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 868.082092, 1932.573486, -89.992996, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 4550, "skyscr1_lan2", "sl_librarycolmn2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 872.658020, 1936.959472, -91.814651, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 872.658020, 1936.959472, -91.814651, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14415, "carter_block_2", "walp29S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 867.674072, 1936.960571, -91.814651, 180.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 867.674072, 1936.960571, -91.814651, 180.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14415, "carter_block_2", "walp29S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 869.474182, 1932.507568, -86.808578, -34.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 869.474182, 1932.507568, -86.808578, -34.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3979, "civic01_lan", "sl_laglasswall1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 872.056579, 1928.656982, -81.311630, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 872.056579, 1928.656982, -81.311630, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 4550, "skyscr1_lan2", "sl_librarycolmn2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 870.466430, 1947.658447, -85.019203, 70.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 870.466430, 1947.658447, -85.019203, 70.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3979, "civic01_lan", "sl_laglasswall1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 870.377075, 1954.475952, -86.135757, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 870.377075, 1954.475952, -86.135757, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16639, "a51_labs", "ws_trainstationwin1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 876.976440, 1937.372924, -92.572990, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 876.976440, 1937.372924, -92.572990, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14533, "pleas_dome", "club_zeb_SFW2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 863.356262, 1937.371948, -92.592948, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 863.356262, 1937.371948, -92.592948, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14533, "pleas_dome", "club_zeb_SFW2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 875.794189, 1941.295043, -92.572959, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 875.794189, 1941.295043, -92.572959, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14533, "pleas_dome", "club_zeb_SFW2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 865.140930, 1941.294799, -92.582977, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 865.140930, 1941.294799, -92.582977, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14533, "pleas_dome", "club_zeb_SFW2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 870.578674, 1936.957885, -89.080497, 0.000000, 90.000000, -180.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 870.578674, 1936.957885, -89.080497, 0.000000, 90.000000, -180.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14415, "carter_block_2", "walp29S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19370, 875.692016, 1950.232421, -94.360702, 0.000000, 90.000000, 50.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19370, 875.692016, 1950.232421, -94.360702, 0.000000, 90.000000, 50.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19370, 876.890930, 1952.115966, -94.362701, 0.000000, 90.000000, 70.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19370, 876.890930, 1952.115966, -94.362701, 0.000000, 90.000000, 70.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19370, 877.444885, 1954.501953, -94.360702, 0.000000, 90.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19370, 877.444885, 1954.501953, -94.360702, 0.000000, 90.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19370, 877.172729, 1956.861206, -94.362701, 0.000000, 90.000000, 110.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19370, 877.172729, 1956.861206, -94.362701, 0.000000, 90.000000, 110.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19370, 875.778808, 1959.354492, -94.360702, 0.000000, 90.000000, 130.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19370, 875.778808, 1959.354492, -94.360702, 0.000000, 90.000000, 130.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19370, 873.850952, 1960.975708, -94.362701, 0.000000, 90.000000, 150.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19370, 873.850952, 1960.975708, -94.362701, 0.000000, 90.000000, 150.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19370, 866.746276, 1960.786010, -94.360702, 0.000000, 90.000000, 210.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19370, 866.746276, 1960.786010, -94.360702, 0.000000, 90.000000, 210.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19370, 864.959838, 1959.166503, -94.362701, 0.000000, 90.000000, 230.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19370, 864.959838, 1959.166503, -94.362701, 0.000000, 90.000000, 230.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19370, 863.778625, 1956.889404, -94.360702, 0.000000, 90.000000, 250.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19370, 863.778625, 1956.889404, -94.360702, 0.000000, 90.000000, 250.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19370, 863.478881, 1954.286499, -94.362701, 0.000000, 90.000000, 270.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19370, 863.478881, 1954.286499, -94.362701, 0.000000, 90.000000, 270.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19370, 864.225524, 1951.725830, -94.360702, 0.000000, 90.000000, 290.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19370, 864.225524, 1951.725830, -94.360702, 0.000000, 90.000000, 290.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19370, 865.705566, 1949.746948, -94.362701, 0.000000, 90.000000, 310.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19370, 865.705566, 1949.746948, -94.362701, 0.000000, 90.000000, 310.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19370, 867.637817, 1948.438354, -94.360702, 0.000000, 90.000000, 330.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19370, 867.637817, 1948.438354, -94.360702, 0.000000, 90.000000, 330.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19370, 869.885009, 1947.877197, -94.362701, 0.000000, 90.000000, 350.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19370, 869.885009, 1947.877197, -94.362701, 0.000000, 90.000000, 350.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19370, 871.969482, 1948.042968, -94.360702, 0.000000, 90.000000, 370.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19370, 871.969482, 1948.042968, -94.360702, 0.000000, 90.000000, 370.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19370, 874.029785, 1948.953735, -94.362701, 0.000000, 90.000000, 390.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19370, 874.029785, 1948.953735, -94.362701, 0.000000, 90.000000, 390.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "scratchedmetal", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 865.139892, 1944.064819, -89.992996, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 865.139892, 1944.064819, -89.992996, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 4550, "skyscr1_lan2", "sl_librarycolmn2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 862.222717, 1952.645385, -89.992996, 0.000000, 0.000000, 37.554321, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 862.222717, 1952.645385, -89.992996, 0.000000, 0.000000, 37.554321, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 6866, "vgncnstrct1", "Circus_gls_05", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 862.370544, 1956.755371, -89.992996, 0.000000, 0.000000, 358.902587, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 862.370544, 1956.755371, -89.992996, 0.000000, 0.000000, 358.902587, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 6866, "vgncnstrct1", "Circus_gls_05", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 864.130310, 1960.204467, -89.992996, 0.000000, 0.000000, 332.902679, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 864.130310, 1960.204467, -89.992996, 0.000000, 0.000000, 332.902679, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 6866, "vgncnstrct1", "Circus_gls_05", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 866.477478, 1962.040161, -89.992996, 0.000000, 0.000000, 314.474731, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 866.477478, 1962.040161, -89.992996, 0.000000, 0.000000, 314.474731, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 6866, "vgncnstrct1", "Circus_gls_05", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 872.341125, 1954.408691, -96.067947, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 872.341125, 1954.408691, -96.067947, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3922, "bistro", "Marble", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 862.011108, 1959.064086, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 862.011108, 1959.064086, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 6866, "vgncnstrct1", "Circus_gls_05", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 878.867919, 1959.069213, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 878.867919, 1959.069213, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 6866, "vgncnstrct1", "Circus_gls_05", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 878.714050, 1952.622070, -89.992996, 0.000000, 0.000000, -37.554298, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 878.714050, 1952.622070, -89.992996, 0.000000, 0.000000, -37.554298, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 6866, "vgncnstrct1", "Circus_gls_05", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 875.804382, 1944.042846, -89.992996, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 875.804382, 1944.042846, -89.992996, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 4550, "skyscr1_lan2", "sl_librarycolmn2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 878.724182, 1957.400390, -89.992996, 0.000000, 0.000000, -358.902587, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 878.724182, 1957.400390, -89.992996, 0.000000, 0.000000, -358.902587, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 6866, "vgncnstrct1", "Circus_gls_05", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 877.123840, 1959.497070, -89.992996, 0.000000, 0.000000, -332.902709, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 877.123840, 1959.497070, -89.992996, 0.000000, 0.000000, -332.902709, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 6866, "vgncnstrct1", "Circus_gls_05", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 870.458923, 1959.187011, -91.285873, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 870.458923, 1959.187011, -91.285873, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3922, "bistro", "Marble", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19381, 870.350830, 1959.102905, -82.429916, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19381, 870.350830, 1959.102905, -82.429916, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 1414, "break_street1", "CJ_TV_SCREEN", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 870.470520, 1944.951660, -94.397201, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 870.470520, 1944.951660, -94.397201, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2755, "ab_dojowall", "mp_apt1_roomfloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 880.874633, 1954.467773, -86.135757, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 880.874633, 1954.467773, -86.135757, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16639, "a51_labs", "ws_trainstationwin1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 859.885314, 1954.476806, -86.135757, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 859.885314, 1954.476806, -86.135757, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16639, "a51_labs", "ws_trainstationwin1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 870.382202, 1944.840820, -86.135757, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 870.382202, 1944.840820, -86.135757, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16639, "a51_labs", "ws_trainstationwin1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 880.867797, 1944.832763, -86.135757, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 880.867797, 1944.832763, -86.135757, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16639, "a51_labs", "ws_trainstationwin1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 870.467773, 1941.275756, -89.487998, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 870.467773, 1941.275756, -89.487998, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3979, "civic01_lan", "sl_laglasswall1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 870.134826, 1908.328613, -86.530601, 90.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 870.134826, 1908.328613, -86.530601, 90.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3676, "lawnxref", "lasthoose6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18809, 870.432922, 1954.866088, -119.140869, 0.000000, 0.000000, 10.338688, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18809, 870.432922, 1954.866088, -119.140869, 0.000000, 0.000000, 10.338688, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3922, "bistro", "Marble", 0x00000000);
-	streetgang = CreateDynamicObjectEx(14411, 870.234436, 1931.825317, -94.016868, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(14411, 870.234436, 1931.825317, -94.016868, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 10806, "airfence_sfse", "ws_oldpainted", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 868.106018, 1903.885253, -89.992996, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 868.106018, 1903.885253, -89.992996, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_stonefloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 872.248291, 1903.961059, -89.992996, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 872.248291, 1903.961059, -89.992996, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_stonefloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 872.444396, 1913.465820, -90.891799, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 872.444396, 1913.465820, -90.891799, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14756, "smallsfhs", "AH_flroortiledirt1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 868.105224, 1894.255615, -89.992996, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 868.105224, 1894.255615, -89.992996, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_stonefloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 879.694702, 1888.511352, -92.276298, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 879.694702, 1888.511352, -92.276298, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "sl_metalwalk", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 876.976562, 1899.232910, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 876.976562, 1899.232910, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_stonefloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 872.989807, 1891.868164, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 872.989807, 1891.868164, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_stonefloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 882.621887, 1891.868041, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 882.621887, 1891.868041, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_stonefloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 879.166809, 1899.234619, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 879.166809, 1899.234619, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_stonefloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 885.025451, 1894.908447, -89.992996, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 885.025451, 1894.908447, -89.992996, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_stonefloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1649, 836.624633, 1920.291625, -86.935699, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1649, 836.624633, 1920.291625, -86.935699, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 15046, "svcunthoose", "csGarageTrolley01psd", 0xFA000000);
-	streetgang = CreateDynamicObjectEx(19377, 831.377014, 1918.122314, -88.642196, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 831.377014, 1918.122314, -88.642196, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13007, "sw_bankint", "woodfloor1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 850.662536, 1918.098876, -85.184646, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 850.662536, 1918.098876, -85.184646, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3979, "civic01_lan", "sl_laglasswall2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 840.160095, 1918.099121, -85.184646, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 840.160095, 1918.099121, -85.184646, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3979, "civic01_lan", "sl_laglasswall2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 840.281127, 1918.160522, -90.891799, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 840.281127, 1918.160522, -90.891799, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13007, "sw_bankint", "woodfloor1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1649, 836.628540, 1920.291748, -86.935699, 0.000000, 0.000000, 270.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1649, 836.628540, 1920.291748, -86.935699, 0.000000, 0.000000, 270.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 15046, "svcunthoose", "csGarageTrolley01psd", 0xB4000000);
-	streetgang = CreateDynamicObjectEx(1649, 836.624206, 1915.916137, -86.935699, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1649, 836.624206, 1915.916137, -86.935699, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 15046, "svcunthoose", "csGarageTrolley01psd", 0xFA000000);
-	streetgang = CreateDynamicObjectEx(14411, 835.439208, 1924.827148, -91.784126, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(14411, 835.439208, 1924.827148, -91.784126, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14476, "carlslounge", "AH_cheapredcarpet", 0x00000000);
 	SetDynamicObjectMaterial(streetgang, 1, 9507, "boxybld2_sfw", "boxybox_sf3z", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18980, 836.318176, 1922.762817, -90.807792, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18980, 836.318176, 1922.762817, -90.807792, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3676, "lawnxref", "lasthoose6", 0x00000000);
 	SetDynamicObjectMaterial(streetgang, 1, 18835, "mickytextures", "wood051", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18980, 836.319030, 1913.590698, -90.807792, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18980, 836.319030, 1913.590698, -90.807792, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3676, "lawnxref", "lasthoose6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1649, 836.628723, 1915.854614, -86.935699, 0.000000, 0.000000, 270.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1649, 836.628723, 1915.854614, -86.935699, 0.000000, 0.000000, 270.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 15046, "svcunthoose", "csGarageTrolley01psd", 0xB4000000);
-	streetgang = CreateDynamicObjectEx(18980, 836.317749, 1910.377929, -84.857200, 0.000000, 90.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18980, 836.317749, 1910.377929, -84.857200, 0.000000, 90.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3676, "lawnxref", "lasthoose6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 839.483276, 1927.794677, -90.891799, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 839.483276, 1927.794677, -90.891799, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13007, "sw_bankint", "woodfloor1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1499, 838.317810, 1922.977539, -90.805702, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1499, 838.317810, 1922.977539, -90.805702, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 10101, "2notherbuildsfe", "Bow_Abpave_Gen", 0x00000000);
 	SetDynamicObjectMaterial(streetgang, 1, 14650, "ab_trukstpc", "sa_wood08_128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 838.842041, 1927.780395, -87.122962, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 838.842041, 1927.780395, -87.122962, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_gs_wall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 834.068847, 1925.260131, -90.622978, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 834.068847, 1925.260131, -90.622978, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_gs_wall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 841.549255, 1922.988647, -83.051498, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 841.549255, 1922.988647, -83.051498, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_gs_wall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 831.681762, 1927.585327, -90.622993, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 831.681762, 1927.585327, -90.622993, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_gs_wall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 826.952392, 1922.855957, -90.632972, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 826.952392, 1922.855957, -90.632972, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_gs_wall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 831.216064, 1922.857788, -93.802803, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 831.216064, 1922.857788, -93.802803, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 9507, "boxybld2_sfw", "hospital3_sfw", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 831.196716, 1913.293334, -90.662971, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 831.196716, 1913.293334, -90.662971, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_gs_wall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 826.335876, 1918.029418, -90.642974, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 826.335876, 1918.029418, -90.642974, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_gs_wall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 829.659240, 1918.100097, -85.184646, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 829.659240, 1918.100097, -85.184646, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3979, "civic01_lan", "sl_laglasswall2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 834.330078, 1927.732788, -85.184646, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 834.330078, 1927.732788, -85.184646, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3979, "civic01_lan", "sl_laglasswall2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 843.126831, 1922.982910, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 843.126831, 1922.982910, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 5040, "shopliquor_las", "lasjmliq1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 841.551391, 1922.984863, -80.303298, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 841.551391, 1922.984863, -80.303298, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14709, "lamidint2", "mp_apt1_roomwall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1569, 888.144409, 1919.679931, -89.990798, 0.000000, 0.000000, 270.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1569, 888.144409, 1919.679931, -89.990798, 0.000000, 0.000000, 270.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 8391, "ballys01", "vgncorpdoor1_512", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18075, 846.980895, 1918.067871, -85.259300, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18075, 846.980895, 1918.067871, -85.259300, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 19595, "lsappartments1", "ceilingtiles3-128x128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(2370, 882.979370, 1913.127563, -90.194206, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(2370, 882.979370, 1913.127563, -90.194206, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14652, "ab_trukstpa", "CJ_WOOD6", 0x00000000);
 	SetDynamicObjectMaterial(streetgang, 1, 14652, "ab_trukstpa", "CJ_WOOD6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(2370, 883.468017, 1922.822021, -90.194206, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(2370, 883.468017, 1922.822021, -90.194206, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14581, "ab_mafiasuitea", "cof_wood2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(631, 879.211853, 1927.179687, -89.090171, 0.000000, 0.000000, 56.893260, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(631, 879.211853, 1927.179687, -89.090171, 0.000000, 0.000000, 56.893260, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 17958, "burnsalpha", "plantb256", 0xFFCCFF33);
-	streetgang = CreateDynamicObjectEx(631, 879.104736, 1909.546264, -89.090171, 0.000000, 0.000000, 56.893260, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(631, 879.104736, 1909.546264, -89.090171, 0.000000, 0.000000, 56.893260, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 17958, "burnsalpha", "plantb256", 0xFFCCFF33);
-	streetgang = CreateDynamicObjectEx(19443, 876.708679, 1919.769409, -90.888496, 0.000000, 90.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 876.708679, 1919.769409, -90.888496, 0.000000, 90.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14415, "carter_block_2", "walp29S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19458, 883.493713, 1918.130493, -90.076599, 0.000000, 90.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19458, 883.493713, 1918.130493, -90.076599, 0.000000, 90.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14415, "carter_block_2", "walp29S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19443, 887.696655, 1917.461547, -90.062301, 0.000000, 90.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 887.696655, 1917.461547, -90.062301, 0.000000, 90.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14415, "carter_block_2", "walp29S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(638, 879.117919, 1914.015136, -89.385971, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(638, 879.117919, 1914.015136, -89.385971, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13691, "bevcunto2_lahills", "adeta", 0x00000000);
-	streetgang = CreateDynamicObjectEx(638, 879.135009, 1922.234619, -89.385971, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(638, 879.135009, 1922.234619, -89.385971, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13691, "bevcunto2_lahills", "adeta", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19172, 888.147155, 1923.530883, -87.271766, 0.000000, 0.000000, 270.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19172, 888.147155, 1923.530883, -87.271766, 0.000000, 0.000000, 270.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14489, "carlspics", "AH_picture3", 0x00000000);
-	streetgang = CreateDynamicObjectEx(2262, 887.664245, 1921.426391, -86.801803, 0.000000, 0.000000, 270.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(2262, 887.664245, 1921.426391, -86.801803, 0.000000, 0.000000, 270.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14489, "carlspics", "AH_picture2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(2266, 887.630432, 1911.380493, -88.248008, 0.000000, 0.000000, 270.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(2266, 887.630432, 1911.380493, -88.248008, 0.000000, 0.000000, 270.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14489, "carlspics", "AH_picture4", 0x00000000);
-	streetgang = CreateDynamicObjectEx(631, 887.647399, 1921.109863, -89.090171, 0.000000, 0.000000, 56.893260, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(631, 887.647399, 1921.109863, -89.090171, 0.000000, 0.000000, 56.893260, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 4830, "airport2", "kbplanter_plants1", 0xFFCCFF33);
-	streetgang = CreateDynamicObjectEx(631, 887.751342, 1915.322265, -89.090171, 0.000000, 0.000000, 56.893260, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(631, 887.751342, 1915.322265, -89.090171, 0.000000, 0.000000, 56.893260, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 4830, "airport2", "kbplanter_plants1", 0xFFCCFF33);
-	streetgang = CreateDynamicObjectEx(19089, 864.200073, 1918.067504, -76.544853, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19089, 864.200073, 1918.067504, -76.544853, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19089, 870.590270, 1918.035278, -76.544853, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19089, 870.590270, 1918.035278, -76.544853, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19929, 866.466918, 1940.129028, -93.959800, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19929, 866.466918, 1940.129028, -93.959800, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14581, "ab_mafiasuitea", "ab_wood01", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19929, 866.466857, 1937.269531, -94.765823, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19929, 866.466857, 1937.269531, -94.765823, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 4835, "airoads_las", "aarprt8LAS", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19929, 866.464904, 1937.269165, -93.959800, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19929, 866.464904, 1937.269165, -93.959800, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14581, "ab_mafiasuitea", "ab_wood01", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19929, 866.468383, 1940.130737, -94.765800, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19929, 866.468383, 1940.130737, -94.765800, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 4835, "airoads_las", "aarprt8LAS", 0x00000000);
-	streetgang = CreateDynamicObjectEx(14793, 870.623107, 1953.542358, -86.314201, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(14793, 870.623107, 1953.542358, -86.314201, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14634, "blindinglite", "ws_volumetriclight", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18809, 870.432922, 1954.866088, -119.150901, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18809, 870.432922, 1954.866088, -119.150901, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3922, "bistro", "Marble", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1762, 826.999328, 1917.626342, -88.554702, 0.000000, 0.000000, 90.916130, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1762, 826.999328, 1917.626342, -88.554702, 0.000000, 0.000000, 90.916130, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2755, "ab_dojowall", "mp_apt1_roomfloor", 0x00000000);
 	SetDynamicObjectMaterial(streetgang, 1, 1730, "cj_furniture", "CJ-COUCHL2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(631, 836.023437, 1921.642089, -87.661300, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(631, 836.023437, 1921.642089, -87.661300, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, -1, "none", "none", 0xFFCCFF33);
-	streetgang = CreateDynamicObjectEx(631, 836.057067, 1914.610229, -87.661300, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(631, 836.057067, 1914.610229, -87.661300, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, -1, "none", "none", 0xFFCCFF33);
-	streetgang = CreateDynamicObjectEx(19376, 827.340515, 1909.616577, -90.662933, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 827.340515, 1909.616577, -90.662933, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_gs_wall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 822.496765, 1914.342285, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 822.496765, 1914.342285, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 9507, "boxybld2_sfw", "hospital3_sfw", 0x00000000);
-	streetgang = CreateDynamicObjectEx(631, 827.840942, 1913.820922, -87.661300, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(631, 827.840942, 1913.820922, -87.661300, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 1597, "centralresac1", "fuzzyplant256", 0xFFCCFF33);
-	streetgang = CreateDynamicObjectEx(638, 855.366577, 1914.898559, -90.196998, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(638, 855.366577, 1914.898559, -90.196998, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 4835, "airoads_las", "aarprt8LAS", 0x00000000);
-	streetgang = CreateDynamicObjectEx(638, 855.430725, 1921.339599, -90.196998, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(638, 855.430725, 1921.339599, -90.196998, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 4835, "airoads_las", "aarprt8LAS", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1704, 851.926025, 1916.222534, -90.804702, 0.000000, 0.000000, 177.552810, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1704, 851.926025, 1916.222534, -90.804702, 0.000000, 0.000000, 177.552810, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14789, "ab_sfgymmain", "ab_wood02", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1704, 851.094543, 1920.005249, -90.804702, 0.000000, 0.000000, 2.201900, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1704, 851.094543, 1920.005249, -90.804702, 0.000000, 0.000000, 2.201900, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14789, "ab_sfgymmain", "ab_wood02", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1704, 849.742858, 1916.184692, -90.804702, 0.000000, 0.000000, 177.302627, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1704, 849.742858, 1916.184692, -90.804702, 0.000000, 0.000000, 177.302627, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14789, "ab_sfgymmain", "ab_wood02", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1704, 847.604125, 1916.287475, -90.804702, 0.000000, 0.000000, 181.268264, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1704, 847.604125, 1916.287475, -90.804702, 0.000000, 0.000000, 181.268264, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14789, "ab_sfgymmain", "ab_wood02", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1704, 845.403259, 1916.239990, -90.804702, 0.000000, 0.000000, 178.953765, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1704, 845.403259, 1916.239990, -90.804702, 0.000000, 0.000000, 178.953765, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14789, "ab_sfgymmain", "ab_wood02", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1704, 843.163879, 1916.270874, -90.804702, 0.000000, 0.000000, 182.697372, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1704, 843.163879, 1916.270874, -90.804702, 0.000000, 0.000000, 182.697372, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14789, "ab_sfgymmain", "ab_wood02", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1704, 841.023376, 1916.303344, -90.804702, 0.000000, 0.000000, 182.201919, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1704, 841.023376, 1916.303344, -90.804702, 0.000000, 0.000000, 182.201919, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14789, "ab_sfgymmain", "ab_wood02", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1704, 838.378417, 1917.702270, -90.804702, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1704, 838.378417, 1917.702270, -90.804702, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14789, "ab_sfgymmain", "ab_wood02", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1704, 848.762817, 1920.002197, -90.804702, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1704, 848.762817, 1920.002197, -90.804702, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14789, "ab_sfgymmain", "ab_wood02", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1704, 846.728515, 1920.065551, -90.804702, 0.000000, 0.000000, 2.323920, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1704, 846.728515, 1920.065551, -90.804702, 0.000000, 0.000000, 2.323920, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14789, "ab_sfgymmain", "ab_wood02", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1704, 844.535827, 1920.031005, -90.804702, 0.000000, 0.000000, 358.038513, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1704, 844.535827, 1920.031005, -90.804702, 0.000000, 0.000000, 358.038513, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14789, "ab_sfgymmain", "ab_wood02", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1704, 842.260742, 1920.030395, -90.804702, 0.000000, 0.000000, 2.081089, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1704, 842.260742, 1920.030395, -90.804702, 0.000000, 0.000000, 2.081089, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14789, "ab_sfgymmain", "ab_wood02", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1704, 840.102783, 1920.002563, -90.804702, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1704, 840.102783, 1920.002563, -90.804702, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14789, "ab_sfgymmain", "ab_wood02", 0x00000000);
-	streetgang = CreateDynamicObjectEx(9093, 846.699096, 1913.332641, -87.774543, 0.000000, 0.000000, 270.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(9093, 846.699096, 1913.332641, -87.774543, 0.000000, 0.000000, 270.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2266, "picture_frame", "CJ_PAINTING30", 0x00000000);
-	streetgang = CreateDynamicObjectEx(9093, 846.643676, 1922.902343, -87.774497, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(9093, 846.643676, 1922.902343, -87.774497, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14489, "carlspics", "AH_landscap1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(14793, 863.237243, 1918.238403, -79.884498, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(14793, 863.237243, 1918.238403, -79.884498, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14634, "blindinglite", "ws_volumetriclight", 0x00000000);
-	streetgang = CreateDynamicObjectEx(14793, 831.018310, 1917.947143, -85.359497, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(14793, 831.018310, 1917.947143, -85.359497, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14634, "blindinglite", "ws_volumetriclight", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 883.731201, 1894.907714, -94.984649, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 883.731201, 1894.907714, -94.984649, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13724, "docg01_lahills", "marbletile8b", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 874.486206, 1888.520141, -97.425827, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 874.486206, 1888.520141, -97.425827, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "sl_metalwalk", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 884.858825, 1888.510986, -97.425827, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 884.858825, 1888.510986, -97.425827, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16640, "a51", "sl_metalwalk", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 879.740844, 1891.870727, -97.072570, 90.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 879.740844, 1891.870727, -97.072570, 90.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 16093, "a51_ext", "BLOCK2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19360, 870.746337, 1907.915039, -85.278297, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19360, 870.746337, 1907.915039, -85.278297, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_stonefloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19360, 867.540466, 1907.915161, -85.278297, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19360, 867.540466, 1907.915161, -85.278297, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_stonefloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(925, 878.017272, 1898.195312, -93.869766, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(925, 878.017272, 1898.195312, -93.869766, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3095, "a51jdrx", "sam_camo", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 873.231750, 1894.910156, -94.984649, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 873.231750, 1894.910156, -94.984649, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13724, "docg01_lahills", "marbletile8b", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 870.176757, 1904.611083, -87.636306, 34.500000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 870.176757, 1904.611083, -87.636306, 34.500000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 915, "airconext", "CJ_plating", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 881.024902, 1895.873535, -90.350799, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 881.024902, 1895.873535, -90.350799, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 915, "airconext", "CJ_plating", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 883.895874, 1903.963989, -94.007499, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 883.895874, 1903.963989, -94.007499, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_stonefloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 889.755187, 1899.636718, -94.007499, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 889.755187, 1899.636718, -94.007499, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_stonefloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 885.070312, 1900.910034, -94.007553, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 885.070312, 1900.910034, -94.007553, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_stonefloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 895.079467, 1904.090209, -95.076286, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 895.079467, 1904.090209, -95.076286, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14584, "ab_abbatoir01", "ab_tiles", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 873.233642, 1904.543945, -94.984649, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 873.233642, 1904.543945, -94.984649, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13724, "docg01_lahills", "marbletile8b", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19360, 885.581604, 1899.236450, -91.095397, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19360, 885.581604, 1899.236450, -91.095397, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_stonefloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 889.799133, 1905.640625, -94.007499, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 889.799133, 1905.640625, -94.007499, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_stonefloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 893.492309, 1904.311523, -94.007499, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 893.492309, 1904.311523, -94.007499, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14387, "dr_gsnew", "mp_stonefloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 895.822570, 1905.199096, -93.297500, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 895.822570, 1905.199096, -93.297500, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 17504, "eastlstr_lae2", "compfence4_LAe", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19406, 891.642761, 1908.858764, -96.503112, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19406, 891.642761, 1908.858764, -96.503112, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 12850, "cunte_block1", "ws_redbrickold", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 889.589294, 1909.226562, -95.857498, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 889.589294, 1909.226562, -95.857498, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 915, "airconext", "cj_sheet2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(18762, 893.685180, 1909.242309, -95.857498, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(18762, 893.685180, 1909.242309, -95.857498, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 915, "airconext", "cj_sheet2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19428, 891.758911, 1909.690673, -95.526397, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19428, 891.758911, 1909.690673, -95.526397, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3355, "cxref_savhus", "des_brick1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19428, 891.758850, 1909.690673, -97.168403, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19428, 891.758850, 1909.690673, -97.168403, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3355, "cxref_savhus", "des_brick1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19428, 891.756713, 1911.294067, -95.526397, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19428, 891.756713, 1911.294067, -95.526397, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3355, "cxref_savhus", "des_brick1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19428, 891.759338, 1911.294433, -97.168403, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19428, 891.759338, 1911.294433, -97.168403, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3355, "cxref_savhus", "des_brick1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19428, 892.680297, 1910.694458, -96.358352, 90.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19428, 892.680297, 1910.694458, -96.358352, 90.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3355, "cxref_savhus", "des_brick1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19428, 890.651672, 1910.674438, -96.358352, 90.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19428, 890.651672, 1910.674438, -96.358352, 90.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3355, "cxref_savhus", "des_brick1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19428, 891.487182, 1912.108276, -96.358398, 90.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19428, 891.487182, 1912.108276, -96.358398, 90.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3355, "cxref_savhus", "des_brick1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 836.594421, 1917.479003, -95.235076, 0.000000, 0.000000, 179.999954, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 836.594421, 1917.479003, -95.235076, 0.000000, 0.000000, 179.999954, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14709, "lamidint2", "mp_apt1_roomwall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 831.196716, 1913.303344, -80.212989, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 831.196716, 1913.303344, -80.212989, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2755, "ab_dojowall", "mp_apt1_roomfloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 835.366760, 1925.253540, -80.212989, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 835.366760, 1925.253540, -80.212989, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2755, "ab_dojowall", "mp_apt1_roomfloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 826.966979, 1922.853149, -80.212989, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 826.966979, 1922.853149, -80.212989, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2755, "ab_dojowall", "mp_apt1_roomfloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 826.352844, 1919.150634, -80.212989, 0.000000, 0.000000, 0.000007, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 826.352844, 1919.150634, -80.212989, 0.000000, 0.000000, 0.000007, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2755, "ab_dojowall", "mp_apt1_roomfloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 831.722656, 1927.580566, -80.212989, 0.000000, 0.000000, 0.000007, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 831.722656, 1927.580566, -80.212989, 0.000000, 0.000000, 0.000007, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2755, "ab_dojowall", "mp_apt1_roomfloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 888.480102, 1904.086181, -92.663566, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 888.480102, 1904.086181, -92.663566, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14584, "ab_abbatoir01", "ab_tiles", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 885.578125, 1904.088378, -92.076698, 0.000000, 55.000000, 180.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 885.578125, 1904.088378, -92.076698, 0.000000, 55.000000, 180.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14584, "ab_abbatoir01", "ab_tiles", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 890.248107, 1904.130004, -98.110687, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 890.248107, 1904.130004, -98.110687, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13724, "docg01_lahills", "marbletile8b", 0x00000000);
-	streetgang = CreateDynamicObjectEx(638, 876.807617, 1925.221435, -90.100852, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(638, 876.807617, 1925.221435, -90.100852, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 6282, "beafron2_law2", "boardwalk2_la", 0x00000000);
-	streetgang = CreateDynamicObjectEx(631, 876.638427, 1927.138549, -89.898628, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(631, 876.638427, 1927.138549, -89.898628, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 17958, "burnsalpha", "plantb256", 0xFFCCFF33);
-	streetgang = CreateDynamicObjectEx(638, 874.770080, 1927.231933, -90.100799, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(638, 874.770080, 1927.231933, -90.100799, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 6282, "beafron2_law2", "boardwalk2_la", 0x00000000);
-	streetgang = CreateDynamicObjectEx(631, 876.790832, 1909.391235, -89.898628, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(631, 876.790832, 1909.391235, -89.898628, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 17958, "burnsalpha", "plantb256", 0xFFCCFF33);
-	streetgang = CreateDynamicObjectEx(638, 876.775390, 1911.393554, -90.100852, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(638, 876.775390, 1911.393554, -90.100852, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 6282, "beafron2_law2", "boardwalk2_la", 0x00000000);
-	streetgang = CreateDynamicObjectEx(638, 874.755859, 1909.302490, -90.100799, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(638, 874.755859, 1909.302490, -90.100799, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 6282, "beafron2_law2", "boardwalk2_la", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19443, 887.688232, 1918.942138, -90.060302, 0.000000, 90.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 887.688232, 1918.942138, -90.060302, 0.000000, 90.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14415, "carter_block_2", "walp29S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19443, 876.710021, 1916.568359, -90.890502, 0.000000, 90.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19443, 876.710021, 1916.568359, -90.890502, 0.000000, 90.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14415, "carter_block_2", "walp29S", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1761, 857.404113, 1910.803466, -90.807800, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1761, 857.404113, 1910.803466, -90.807800, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2755, "ab_dojowall", "mp_apt1_roomfloor", 0x00000000);
 	SetDynamicObjectMaterial(streetgang, 1, 1730, "cj_furniture", "CJ-COUCHL2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(1761, 857.426513, 1923.807006, -90.807800, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(1761, 857.426513, 1923.807006, -90.807800, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2755, "ab_dojowall", "mp_apt1_roomfloor", 0x00000000);
 	SetDynamicObjectMaterial(streetgang, 1, 1730, "cj_furniture", "CJ-COUCHL2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 888.233947, 1913.894775, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 888.233947, 1913.894775, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14577, "casinovault01", "cof_wood1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 888.231933, 1923.527221, -94.476501, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 888.231933, 1923.527221, -94.476501, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3998, "civic04_lan", "twintconc_LAn", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 883.508850, 1908.993164, -94.476501, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 883.508850, 1908.993164, -94.476501, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3998, "civic04_lan", "twintconc_LAn", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 878.608703, 1910.560791, -94.476501, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 878.608703, 1910.560791, -94.476501, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3998, "civic04_lan", "twintconc_LAn", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 878.609619, 1925.693603, -80.262283, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 878.609619, 1925.693603, -80.262283, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3998, "civic04_lan", "twintconc_LAn", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 883.511047, 1927.799804, -94.476501, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 883.511047, 1927.799804, -94.476501, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3998, "civic04_lan", "twintconc_LAn", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 878.609619, 1925.693603, -94.476501, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 878.609619, 1925.693603, -94.476501, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3998, "civic04_lan", "twintconc_LAn", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 883.512817, 1927.800292, -80.262298, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 883.512817, 1927.800292, -80.262298, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3998, "civic04_lan", "twintconc_LAn", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 888.231872, 1923.527221, -80.262298, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 888.231872, 1923.527221, -80.262298, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3998, "civic04_lan", "twintconc_LAn", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 888.230224, 1913.897583, -80.262298, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 888.230224, 1913.897583, -80.262298, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3998, "civic04_lan", "twintconc_LAn", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 883.508911, 1908.993164, -80.262298, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 883.508911, 1908.993164, -80.262298, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3998, "civic04_lan", "twintconc_LAn", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 878.608703, 1910.560791, -80.262298, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 878.608703, 1910.560791, -80.262298, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3998, "civic04_lan", "twintconc_LAn", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 856.768432, 1911.704467, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 856.768432, 1911.704467, -89.993026, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 18056, "mp_diner1", "mp_CJ_CARDBOARD128", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 856.767333, 1924.545898, -95.261199, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 856.767333, 1924.545898, -95.261199, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13007, "sw_bankint", "bank_wall1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 863.783813, 1927.829833, -95.261199, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 863.783813, 1927.829833, -95.261199, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13007, "sw_bankint", "bank_wall1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 854.158081, 1927.828979, -95.261199, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 854.158081, 1927.828979, -95.261199, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13007, "sw_bankint", "bank_wall1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 876.621032, 1927.830444, -95.261199, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 876.621032, 1927.830444, -95.261199, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13007, "sw_bankint", "bank_wall1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 877.354431, 1925.693969, -95.261199, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 877.354431, 1925.693969, -95.261199, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13007, "sw_bankint", "bank_wall1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 877.356323, 1910.566162, -95.261199, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 877.356323, 1910.566162, -95.261199, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13007, "sw_bankint", "bank_wall1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 876.649536, 1908.742675, -95.261199, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 876.649536, 1908.742675, -95.261199, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13007, "sw_bankint", "bank_wall1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 841.418273, 1913.254638, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 841.418273, 1913.254638, -89.992996, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 5040, "shopliquor_las", "lasjmliq1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 851.047180, 1913.258422, -80.306396, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 851.047180, 1913.258422, -80.306396, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14709, "lamidint2", "mp_apt1_roomwall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 855.941101, 1911.703857, -80.306396, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 855.941101, 1911.703857, -80.306396, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14709, "lamidint2", "mp_apt1_roomwall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 855.939270, 1924.546020, -80.306396, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 855.939270, 1924.546020, -80.306396, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14709, "lamidint2", "mp_apt1_roomwall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19360, 855.943298, 1918.124755, -85.280097, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19360, 855.943298, 1918.124755, -85.280097, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 5040, "shopliquor_las", "lasjmliq1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 851.083618, 1922.979736, -80.306396, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 851.083618, 1922.979736, -80.306396, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14709, "lamidint2", "mp_apt1_roomwall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 843.127807, 1922.981201, -80.306396, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 843.127807, 1922.981201, -80.306396, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14709, "lamidint2", "mp_apt1_roomwall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 841.549316, 1922.986694, -83.051498, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 841.549316, 1922.986694, -83.051498, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 5040, "shopliquor_las", "lasjmliq1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 841.418945, 1913.256469, -95.235076, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 841.418945, 1913.256469, -95.235076, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14709, "lamidint2", "mp_apt1_roomwall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 851.047180, 1913.258422, -95.235099, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 851.047180, 1913.258422, -95.235099, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14709, "lamidint2", "mp_apt1_roomwall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 855.941101, 1911.703857, -95.235099, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 855.941101, 1911.703857, -95.235099, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14709, "lamidint2", "mp_apt1_roomwall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 855.939270, 1924.546020, -95.235099, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 855.939270, 1924.546020, -95.235099, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14709, "lamidint2", "mp_apt1_roomwall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 851.083618, 1922.979736, -95.235099, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 851.083618, 1922.979736, -95.235099, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14709, "lamidint2", "mp_apt1_roomwall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 843.127807, 1922.981201, -95.235099, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 843.127807, 1922.981201, -95.235099, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14709, "lamidint2", "mp_apt1_roomwall", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 861.831420, 1954.409545, -96.067947, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 861.831420, 1954.409545, -96.067947, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3922, "bistro", "Marble", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 860.979125, 1959.187011, -99.645812, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 860.979125, 1959.187011, -99.645812, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3922, "bistro", "Marble", 0x00000000);
-	streetgang = CreateDynamicObjectEx(14793, 892.099914, 1967.751342, -89.775711, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(14793, 892.099914, 1967.751342, -89.775711, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14634, "blindinglite", "ws_volumetriclight", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 879.988464, 1959.187011, -99.645812, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 879.988464, 1959.187011, -99.645812, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3922, "bistro", "Marble", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 869.239440, 1944.689208, -96.067947, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 869.239440, 1944.689208, -96.067947, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3922, "bistro", "Marble", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 879.639343, 1944.687377, -96.067947, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 879.639343, 1944.687377, -96.067947, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3922, "bistro", "Marble", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19377, 869.475830, 1933.523071, -85.104705, 0.000000, 90.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19377, 869.475830, 1933.523071, -85.104705, 0.000000, 90.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 3979, "civic01_lan", "sl_laglasswall1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 838.822814, 1927.800781, -80.212989, 0.000000, 0.000000, 0.000007, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 838.822814, 1927.800781, -80.212989, 0.000000, 0.000000, 0.000007, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2755, "ab_dojowall", "mp_apt1_roomfloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 827.343444, 1909.620483, -80.212989, 0.000000, 0.000000, 0.000007, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 827.343444, 1909.620483, -80.212989, 0.000000, 0.000000, 0.000007, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2755, "ab_dojowall", "mp_apt1_roomfloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 822.606262, 1914.352905, -80.212989, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 822.606262, 1914.352905, -80.212989, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2755, "ab_dojowall", "mp_apt1_roomfloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 840.817077, 1923.003417, -80.212989, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 840.817077, 1923.003417, -80.212989, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2755, "ab_dojowall", "mp_apt1_roomfloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19329, 890.385375, 1902.603027, -97.241989, -89.999984, 97.599945, 1.700000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19329, 890.385375, 1902.603027, -97.241989, -89.999984, 97.599945, 1.700000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14612, "ab_abattoir_box", "ab_bloodfloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19406, 891.642761, 1909.008911, -96.503112, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19406, 891.642761, 1909.008911, -96.503112, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 12850, "cunte_block1", "ws_redbrickold", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19329, 892.524658, 1906.039306, -98.011024, 89.699996, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19329, 892.524658, 1906.039306, -98.011024, 89.699996, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14612, "ab_abattoir_box", "ab_bloodfloor", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 863.809814, 1908.742675, -95.261199, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 863.809814, 1908.742675, -95.261199, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13007, "sw_bankint", "bank_wall1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 854.259582, 1908.752685, -95.261199, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 854.259582, 1908.752685, -95.261199, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 13007, "sw_bankint", "bank_wall1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(14793, 874.147583, 1918.238403, -79.884498, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(14793, 874.147583, 1918.238403, -79.884498, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14634, "blindinglite", "ws_volumetriclight", 0x00000000);
-	streetgang = CreateDynamicObjectEx(9093, 877.221862, 1918.211303, -82.184547, 0.000000, 0.000000, 0.000014, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(9093, 877.221862, 1918.211303, -82.184547, 0.000000, 0.000000, 0.000014, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 5719, "sunrise10_lawn", "eld_box_law", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 872.523498, 1927.621582, -74.892982, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 872.523498, 1927.621582, -74.892982, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 862.943664, 1927.621582, -74.892982, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 862.943664, 1927.621582, -74.892982, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 853.364074, 1927.621582, -74.892982, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 853.364074, 1927.621582, -74.892982, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 856.864379, 1922.797485, -74.892982, 0.000000, 0.000000, 179.899993, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 856.864379, 1922.797485, -74.892982, 0.000000, 0.000000, 179.899993, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 856.857666, 1913.218017, -74.892982, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 856.857666, 1913.218017, -74.892982, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 861.583496, 1908.852172, -74.892982, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 861.583496, 1908.852172, -74.892982, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 871.113342, 1908.852172, -74.892982, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 871.113342, 1908.852172, -74.892982, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 880.723144, 1908.852172, -74.892982, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 880.723144, 1908.852172, -74.892982, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 877.304443, 1922.761718, -74.892982, 0.000000, 0.000000, 179.899993, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 877.304443, 1922.761718, -74.892982, 0.000000, 0.000000, 179.899993, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19376, 877.287963, 1913.182250, -74.892982, 0.000000, 0.000000, 179.899993, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19376, 877.287963, 1913.182250, -74.892982, 0.000000, 0.000000, 179.899993, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 14789, "ab_sfgymmain", "gym_floor6", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19172, 856.857604, 1913.134277, -88.195861, 0.000000, 0.000000, 89.999946, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19172, 856.857604, 1913.134277, -88.195861, 0.000000, 0.000000, 89.999946, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2266, "picture_frame", "CJ_PAINTING11", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19172, 856.857604, 1923.024780, -88.195861, 0.000000, 0.000000, 89.999946, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19172, 856.857604, 1923.024780, -88.195861, 0.000000, 0.000000, 89.999946, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 0, 2266, "picture_frame", "CJ_PAINTING28", 0x00000000);
-	streetgang = CreateDynamicObjectEx(2266, 858.822753, 1927.228515, -89.415863, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(2266, 858.822753, 1927.228515, -89.415863, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14489, "carlspics", "AH_picture2", 0x00000000);
-	streetgang = CreateDynamicObjectEx(2266, 859.652893, 1927.228515, -88.645866, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(2266, 859.652893, 1927.228515, -88.645866, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 7088, "casinoshops1", "GB_nastybar19", 0x00000000);
-	streetgang = CreateDynamicObjectEx(2266, 859.842895, 1909.341918, -89.135856, 0.000000, 0.000000, 179.199981, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(2266, 859.842895, 1909.341918, -89.135856, 0.000000, 0.000000, 179.199981, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14489, "carlspics", "AH_landscap1", 0x00000000);
-	streetgang = CreateDynamicObjectEx(2266, 858.852661, 1909.355224, -88.265869, 0.000000, 0.000000, 179.199981, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(2266, 858.852661, 1909.355224, -88.265869, 0.000000, 0.000000, 179.199981, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14489, "carlspics", "AH_picture3", 0x00000000);
-	streetgang = CreateDynamicObjectEx(2266, 831.892944, 1913.887329, -86.866279, 0.000000, 0.000000, -179.999969, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(2266, 831.892944, 1913.887329, -86.866279, 0.000000, 0.000000, -179.999969, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14489, "carlspics", "AH_picture3", 0x00000000);
-	streetgang = CreateDynamicObjectEx(19329, 831.903076, 1913.405273, -86.756271, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19329, 831.903076, 1913.405273, -86.756271, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14489, "carlspics", "AH_picture3", 0x00000000);
 	SetDynamicObjectMaterialText(streetgang, 0, "{000000} KOVA", 130, "Ariel", 40, 1, 0x00000000, 0x00000000, 1);
-	streetgang = CreateDynamicObjectEx(19329, 831.913085, 1913.405273, -86.676292, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19329, 831.913085, 1913.405273, -86.676292, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	SetDynamicObjectMaterial(streetgang, 1, 14489, "carlspics", "AH_picture3", 0x00000000);
 	SetDynamicObjectMaterialText(streetgang, 0, "{000000} created by", 130, "Ariel", 20, 1, 0x00000000, 0x00000000, 1);
-	streetgang = CreateDynamicObjectEx(19329, 858.853454, 1908.880859, -88.140342, 0.000000, 0.000000, -0.699999, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19329, 858.853454, 1908.880859, -88.140342, 0.000000, 0.000000, -0.699999, 150.00, 150.00);
 	SetDynamicObjectMaterialText(streetgang, 0, "{000000} KOVA", 130, "Ariel", 40, 1, 0x00000000, 0x00000000, 1);
-	streetgang = CreateDynamicObjectEx(19329, 858.853454, 1908.880859, -88.050338, 0.000000, 0.000000, -0.699999, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19329, 858.853454, 1908.880859, -88.050338, 0.000000, 0.000000, -0.699999, 150.00, 150.00);
 	SetDynamicObjectMaterialText(streetgang, 0, "{000000} created by", 130, "Ariel", 20, 1, 0x00000000, 0x00000000, 1);
-	streetgang = CreateDynamicObjectEx(19777, 883.061462, 1913.095458, -89.231330, 0.000000, 0.000000, -45.600013, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(19777, 883.061462, 1913.095458, -89.231330, 0.000000, 0.000000, -45.600013, 150.00, 150.00);
 	SetDynamicObjectMaterialText(streetgang, 0, "{ffffff} by KOVA", 140, "Ariel", 80, 1, 0x00000000, 0x00000000, 1);
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	streetgang = CreateDynamicObjectEx(4206, 872.586181, 1958.017211, -94.904640, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19370, 871.646789, 1961.746704, -94.360702, 0.000000, 90.000000, 170.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19370, 868.946838, 1961.702758, -94.362701, 0.000000, 90.000000, 190.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19604, 870.414672, 1959.056396, -89.923736, -90.000000, 90.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19377, 859.972839, 1944.843383, -86.135757, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19373, 866.572753, 1947.374755, -96.020698, 0.000000, 0.000000, 60.077301, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19373, 869.515747, 1946.382934, -96.020698, 0.000000, 0.000000, 82.636909, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19373, 872.490905, 1946.565795, -96.020698, 0.000000, 0.000000, 283.673767, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19373, 875.163146, 1947.851562, -96.020698, 0.000000, 0.000000, 306.488311, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19373, 869.473999, 1945.946166, -96.020698, 0.000000, 0.000000, 82.636909, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19373, 872.593322, 1946.120605, -96.020698, 0.000000, 0.000000, 283.673767, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19373, 875.411254, 1947.439453, -96.020698, 0.000000, 0.000000, 306.488311, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19373, 866.527770, 1946.942749, -96.020698, 0.000000, 0.000000, 60.077301, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19373, 872.560058, 1946.272827, -96.020698, 0.000000, 0.000000, 283.673767, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19373, 875.334350, 1947.569580, -96.020698, 0.000000, 0.000000, 306.488311, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19373, 875.251342, 1947.706298, -96.020698, 0.000000, 0.000000, 306.488311, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19373, 872.522521, 1946.429077, -96.020698, 0.000000, 0.000000, 283.673767, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19373, 869.482299, 1946.116577, -96.020698, 0.000000, 0.000000, 82.636909, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19373, 866.609130, 1947.091796, -96.020698, 0.000000, 0.000000, 60.077301, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19373, 869.518432, 1946.272827, -96.020698, 0.000000, 0.000000, 82.636909, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19373, 866.582458, 1947.260620, -96.020698, 0.000000, 0.000000, 60.077301, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19377, 860.685302, 1902.469970, -90.891799, 0.000000, 90.000000, -0.009100, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1569, 888.148193, 1916.680664, -89.990798, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2290, 884.343750, 1911.428466, -89.992599, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2292, 885.833801, 1923.784057, -89.992599, 0.000000, 0.000000, 270.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18075, 883.574768, 1929.447265, -85.172996, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18075, 883.512268, 1906.758300, -85.172996, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(14455, 880.262512, 1909.340332, -88.360603, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(14455, 885.985839, 1909.347167, -88.360603, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2292, 885.842468, 1922.800659, -89.992599, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2292, 881.684570, 1922.687133, -89.994598, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2292, 881.670532, 1923.641845, -89.992599, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(14455, 884.552490, 1927.466674, -88.360603, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(14455, 890.294494, 1927.467895, -88.360603, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2290, 882.775634, 1925.450317, -89.992599, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2292, 881.307983, 1913.844970, -89.992599, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2292, 881.320617, 1912.920288, -89.994598, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2292, 885.283630, 1913.859619, -89.992599, 0.000000, 0.000000, 270.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2292, 885.299011, 1912.955322, -89.992599, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2245, 883.300537, 1913.454589, -89.109397, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2245, 883.802124, 1923.168823, -89.109397, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(14562, 866.280761, 1960.322998, -93.090980, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(14562, 874.633544, 1960.336791, -93.091003, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19172, 888.138122, 1913.359619, -87.271766, 0.000000, 0.000000, 270.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2262, 887.634643, 1925.631347, -88.429199, 0.000000, 0.000000, 270.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2266, 887.639526, 1915.321777, -86.678596, 0.000000, 0.000000, 270.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1897, 864.216552, 1918.064697, -83.992500, 90.000000, 90.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1897, 864.220336, 1918.037353, -83.992500, 90.000000, 90.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1897, 864.195007, 1918.038330, -83.992500, 90.000000, 90.000000, 270.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1897, 864.278869, 1918.090209, -83.992500, 90.000000, 90.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1897, 870.585205, 1918.006103, -83.992500, 90.000000, 90.000000, 270.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1897, 870.610534, 1918.005126, -83.992500, 90.000000, 90.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1897, 870.606750, 1918.032470, -83.992500, 90.000000, 90.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1897, 870.681701, 1918.052124, -83.992500, 90.000000, 90.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19089, 870.590270, 1918.035278, -76.544853, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1897, 870.585205, 1918.006103, -83.992500, 90.000000, 90.000000, 270.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1897, 870.610534, 1918.005126, -83.992500, 90.000000, 90.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1897, 870.606750, 1918.032470, -83.992500, 90.000000, 90.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1897, 870.681701, 1918.052124, -83.992500, 90.000000, 90.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2076, 864.188171, 1916.944335, -84.651512, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2076, 863.178771, 1918.077148, -84.651512, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2076, 864.193359, 1919.114135, -84.651512, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2073, 864.192016, 1918.058593, -84.167068, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2076, 870.585571, 1919.081054, -84.651512, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2076, 869.589843, 1918.036621, -84.651512, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2076, 870.583557, 1916.924804, -84.651512, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2076, 871.671447, 1918.040283, -84.651512, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2073, 870.579528, 1918.023803, -84.167068, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1744, 865.096313, 1938.063842, -92.839202, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1744, 865.075927, 1940.000610, -92.233177, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1744, 865.095825, 1939.998535, -92.839202, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1744, 865.096313, 1938.063842, 1940.000610, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1744, 865.076293, 1938.062866, -92.233200, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2350, 867.445983, 1940.890258, -93.940101, 0.000000, 0.000000, 348.269592, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2350, 867.344726, 1938.163085, -93.940101, 0.000000, 0.000000, 20.175800, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2350, 867.354614, 1939.471679, -93.940101, 0.000000, 0.000000, 31248.269531, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2290, 875.189941, 1943.084350, -94.307403, 0.000000, 0.000000, 270.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2290, 875.203002, 1940.136962, -94.307403, 0.000000, 0.000000, 270.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2311, 873.579162, 1941.390014, -94.307998, 0.000000, 0.000000, 89.089958, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2311, 873.591186, 1938.331054, -94.307998, 0.000000, 0.000000, 90.504013, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19824, 873.450927, 1942.950927, -93.804191, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19820, 873.637939, 1942.114624, -93.804313, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1509, 873.783447, 1939.338256, -93.602653, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1509, 873.829284, 1938.276123, -93.602653, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1509, 866.527954, 1939.724731, -92.836662, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19824, 865.414184, 1937.978271, -91.894989, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19823, 865.411010, 1938.184692, -91.894798, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1517, 865.364013, 1940.200073, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19821, 865.478942, 1939.397094, -91.896911, 0.000000, 0.000000, 54.283119, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19822, 865.335510, 1940.380615, -92.500411, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1512, 865.425720, 1940.068969, -91.693557, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1544, 865.342224, 1940.860107, -92.499977, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1544, 873.780639, 1941.702758, -93.803359, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1512, 865.444030, 1940.694335, -92.298561, 0.000000, 0.000000, 350.906280, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1544, 865.507812, 1940.817382, -92.499977, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1544, 865.494995, 1940.936767, -92.499977, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1544, 865.365051, 1941.023681, -92.499977, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1544, 865.378601, 1941.084838, -91.890937, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1544, 865.274780, 1941.114624, -92.499977, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1544, 865.361450, 1941.244506, -92.499977, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19822, 865.509887, 1941.286132, -92.500411, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19822, 865.516052, 1940.365722, -91.894386, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1517, 865.325012, 1939.942626, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1517, 865.514892, 1940.068847, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1517, 865.464721, 1939.932250, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1517, 865.435974, 1939.814086, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19822, 865.322143, 1939.637695, -92.500411, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19822, 865.481750, 1939.476684, -92.500411, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19824, 865.340393, 1939.198730, -92.499992, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19824, 865.520446, 1939.078247, -92.499992, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19824, 865.321838, 1938.916625, -92.499992, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19824, 865.502197, 1938.878051, -92.499992, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19824, 865.323669, 1938.716430, -92.499992, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19823, 865.475341, 1938.699951, -92.499801, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19823, 865.329040, 1939.405883, -92.499801, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19823, 865.553466, 1939.257568, -92.499801, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19823, 865.304260, 1938.492065, -92.499801, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1517, 865.450744, 1938.465087, -91.696029, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1517, 865.538635, 1938.288940, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1517, 865.483093, 1937.745849, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1517, 865.341308, 1937.779663, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19824, 865.414184, 1937.978271, -92.499992, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19823, 865.411010, 1938.184692, -92.499801, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1517, 865.450744, 1938.465087, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19822, 865.516052, 1940.365722, -92.500411, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1544, 865.497863, 1941.098022, -92.499977, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1544, 865.473388, 1940.954467, -91.890937, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1544, 865.340820, 1940.879394, -91.890937, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1544, 865.510742, 1940.797607, -91.890937, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19822, 865.398071, 1941.258300, -91.894386, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1512, 865.417053, 1940.570800, -92.298561, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19821, 865.335388, 1939.594848, -91.896911, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19821, 865.471557, 1939.817626, -91.896911, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19821, 865.396972, 1940.656616, -91.896911, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19821, 865.343139, 1939.135375, -91.896911, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1512, 865.327575, 1940.230346, -91.693557, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1512, 865.455261, 1939.248779, -91.693557, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1512, 865.331726, 1938.970092, -91.693557, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1512, 865.389465, 1938.789672, -91.693557, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19823, 865.503784, 1938.291015, -91.894798, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19823, 865.317199, 1938.378417, -91.894798, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19823, 865.300476, 1938.617675, -91.894798, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19824, 865.335205, 1937.672607, -91.894989, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19824, 865.503723, 1937.844360, -91.894989, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1544, 873.627990, 1939.919799, -93.803359, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18075, 870.271850, 1941.620483, -89.583297, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 867.082397, 1911.112792, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 865.210754, 1911.132446, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 863.438110, 1911.122192, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 861.804504, 1911.093505, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 860.131225, 1911.108276, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 868.920654, 1911.179809, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 870.681091, 1911.185058, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 872.400878, 1911.153808, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 874.262695, 1911.135131, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 876.224731, 1911.115600, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 859.669860, 1912.366455, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 859.709167, 1914.345458, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 859.760437, 1916.148071, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 859.764953, 1918.049072, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 859.788513, 1919.628906, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 859.822998, 1921.608276, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 859.875793, 1923.641723, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 876.095031, 1925.469726, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 873.954711, 1925.463256, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 871.834716, 1925.422851, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 869.735534, 1925.413818, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 867.251281, 1925.391723, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 864.757690, 1925.344970, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 862.369140, 1925.385009, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 860.291809, 1925.354003, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 864.197692, 1917.277099, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 864.196472, 1917.717529, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 864.207885, 1918.397705, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 864.211242, 1918.837890, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 863.895874, 1918.047973, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 863.439575, 1918.059570, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 864.490539, 1918.057739, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 864.884643, 1918.048706, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 869.895935, 1918.013061, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 870.337951, 1918.010498, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 870.599304, 1917.771850, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 870.578308, 1918.323852, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 870.920837, 1918.018676, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 871.395202, 1918.014282, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 870.580627, 1917.269531, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 870.591064, 1918.776489, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 869.963745, 1949.749145, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 871.846313, 1949.899169, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 873.418762, 1950.617553, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 874.587707, 1951.754394, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 875.360900, 1953.190673, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 875.591186, 1955.079711, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 875.317871, 1956.541137, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 874.456298, 1958.068969, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 868.323608, 1950.169555, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 866.703552, 1951.230590, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 865.645874, 1952.860107, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 865.264709, 1954.867309, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 865.633300, 1956.858276, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 866.563415, 1958.300781, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2184, 829.638610, 1918.608276, -88.556800, 0.000000, 0.000000, 112.564208, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2184, 828.909118, 1915.765380, -88.556800, 0.000000, 0.000000, 69.625183, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1754, 833.321350, 1914.055175, -88.555900, 0.000000, 0.000000, 195.992752, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1754, 830.485412, 1914.051879, -88.555900, 0.000000, 0.000000, 160.614334, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2082, 831.412414, 1913.363891, -88.554512, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2059, 829.294067, 1919.254760, -87.750503, 0.000000, 0.000000, 270.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19786, 829.536132, 1922.875488, -86.534263, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2344, 831.731872, 1914.104370, -88.053001, 0.000000, 0.000000, 113.967498, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1742, 826.331054, 1921.764282, -88.554702, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1742, 826.329162, 1920.325805, -88.554702, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2332, 826.851379, 1914.134887, -86.338180, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2332, 826.851379, 1914.134887, -88.153213, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2332, 826.851379, 1914.134887, -87.244178, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1569, 856.900390, 1923.151733, -84.999702, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1569, 856.927001, 1911.741455, -84.999702, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1569, 856.947448, 1917.587890, -84.999702, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1569, 862.054565, 1927.543701, -84.999702, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1569, 873.323791, 1927.565673, -84.999702, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1569, 873.040161, 1908.891235, -84.999702, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1569, 861.894836, 1908.914184, -84.999702, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19920, 828.989624, 1917.689331, -87.769599, 0.000000, 0.000000, 343.484710, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19172, 826.422546, 1918.032226, -86.599166, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2266, 826.941711, 1916.003417, -86.712722, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2357, 850.236694, 1918.149047, -90.403869, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2357, 845.977844, 1918.148071, -90.403869, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2357, 841.722534, 1918.146972, -90.403869, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18075, 883.529541, 1920.151000, -85.069992, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2076, 865.320251, 1918.069213, -84.651512, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19303, 884.061645, 1893.293457, -93.585418, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(3014, 884.331604, 1892.423461, -94.797981, 0.000000, 0.000000, 2.952558, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19303, 882.314147, 1893.293579, -93.585403, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2680, 883.182800, 1893.407714, -93.742500, -30.000000, 0.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19303, 880.565979, 1893.295043, -93.585403, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19303, 878.819213, 1893.294555, -93.585403, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19303, 877.070190, 1893.292236, -93.585403, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19303, 875.322998, 1893.292480, -93.585403, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2680, 879.703735, 1893.385375, -93.742500, -30.000000, 0.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2680, 876.207092, 1893.410278, -93.742500, -30.000000, 0.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2040, 883.302795, 1892.266113, -94.796600, 0.000000, 0.000000, 20.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2359, 884.282226, 1894.400390, -94.692001, 0.000000, 0.000000, 18.146400, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2359, 878.830322, 1892.695190, -91.984397, 0.000000, 0.000000, 128.146392, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2040, 883.019531, 1892.280639, -94.796577, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2040, 882.759155, 1892.359741, -94.796577, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2040, 883.304199, 1892.802734, -94.796600, 0.000000, 0.000000, 10.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2040, 883.651977, 1892.288330, -94.796577, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2040, 882.451721, 1892.697387, -94.796600, 0.000000, 0.000000, 2310.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(3014, 880.913452, 1892.442993, -94.797981, 0.000000, 0.000000, 351.004821, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(3014, 883.751342, 1892.932617, -94.797981, 0.000000, 0.000000, 351.004821, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2358, 880.174133, 1892.238281, -94.795196, 0.000000, 0.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2358, 880.006713, 1892.752319, -94.795196, 0.000000, 0.000000, 192.167190, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2358, 879.336730, 1892.331054, -94.795196, 0.000000, 0.000000, 172.585006, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2358, 879.135559, 1892.918212, -94.795196, 0.000000, 0.000000, 172.585006, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2040, 878.827270, 1892.325195, -94.796600, 0.000000, 0.000000, 2310.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2040, 878.573608, 1892.913330, -94.796600, 0.000000, 0.000000, 2312120.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2985, 876.092041, 1892.684204, -94.896400, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2358, 875.075256, 1892.310668, -94.795196, 0.000000, 0.000000, 172.585006, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2358, 875.273376, 1892.843627, -94.795196, 0.000000, 0.000000, 179.699157, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(358, 883.480651, 1891.990844, -93.747673, 0.000000, 0.000000, 6.609360, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(358, 883.480651, 1891.990844, -93.041656, 0.000000, 0.000000, 6.609360, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(358, 883.480651, 1891.990844, -93.344673, 0.000000, 0.000000, 6.609360, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(358, 882.344970, 1891.933471, -92.940658, 0.000000, 0.000000, 6.609360, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(358, 882.344970, 1891.933471, -93.242652, 0.000000, 0.000000, 6.609360, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(357, 882.392028, 1891.950683, -93.654411, 0.000000, 0.000000, 7.258399, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(357, 881.354187, 1891.978637, -94.056396, 0.000000, 5.000000, 7.258399, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(357, 881.354187, 1891.978637, -93.554412, 0.000000, 5.000000, 7.258399, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(356, 879.975097, 1891.964599, -93.963943, 0.000000, 0.000000, 4.166958, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(356, 880.489562, 1891.943115, -93.051856, 0.000000, 0.000000, 4.166958, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(356, 880.489562, 1891.943115, -92.748847, 0.000000, 0.000000, 4.166958, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(356, 879.856811, 1891.935791, -93.561950, 0.000000, 0.000000, 4.166958, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(355, 878.230346, 1891.962890, -93.771057, 0.000000, 0.000000, 4.286859, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(355, 879.005249, 1891.971435, -92.961013, 0.000000, 0.000000, 4.286859, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(355, 878.964904, 1892.002563, -93.263999, 0.000000, 0.000000, 184.286895, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(355, 877.823364, 1892.004516, -93.364997, 0.000000, 0.000000, 184.799072, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(372, 877.851501, 1891.960449, -94.249458, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(372, 881.882995, 1891.951416, -94.569976, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(372, 881.244689, 1891.966064, -93.134376, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(353, 877.461975, 1892.021728, -93.835113, 0.000000, 0.000000, 187.143539, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(353, 877.461975, 1892.021728, -94.236099, 0.000000, 0.000000, 187.143539, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(941, 884.311401, 1895.735961, -94.491661, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(923, 873.681884, 1898.495849, -94.090263, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(923, 873.347045, 1892.479736, -94.191261, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1271, 875.117858, 1898.388793, -94.600730, 0.000000, 0.000000, 19.877969, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1271, 876.172546, 1898.425659, -94.600700, 0.000000, 0.000000, 129.878005, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1271, 875.284545, 1897.367553, -94.600730, 0.000000, 0.000000, 351.940856, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1271, 871.975708, 1892.894653, -94.600730, 0.000000, 0.000000, 351.940856, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(11729, 883.568298, 1898.799560, -94.896469, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(11729, 882.891235, 1898.800659, -94.896469, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(14411, 886.773620, 1901.068115, -98.090896, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(3092, 891.685852, 1910.355468, -96.893997, 90.000000, 90.000000, 224.699783, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1805, 892.696166, 1903.925415, -97.830596, 0.000000, 88.000000, 331.300292, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(941, 890.355712, 1902.336669, -97.719886, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2907, 890.174133, 1901.981933, -97.147300, 0.000000, 0.000000, 335.996002, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2905, 890.656921, 1902.023681, -97.245437, 0.000000, 0.000000, 9.406450, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2908, 890.059631, 1902.704956, -97.189498, 0.000000, 0.000000, 261.832977, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2906, 890.539306, 1903.256225, -97.205596, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19583, 890.817504, 1903.322875, -97.237899, 0.000000, 0.000000, 344.007141, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(341, 889.879699, 1900.975585, -97.803497, 0.000000, 30.000000, 26.372840, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19924, 890.147216, 1902.610473, -95.013778, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19590, 890.304504, 1902.777587, -97.221298, 0.000000, 90.000000, 192.838867, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(3092, 892.484680, 1904.737182, -97.928298, 180.000000, 90.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2907, 891.932922, 1909.912231, -97.004302, 0.000000, 0.000000, 335.996002, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2905, 891.069824, 1909.505981, -97.027397, 0.000000, 0.000000, 17.048099, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2906, 892.284729, 1909.474243, -97.042701, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1463, 891.546691, 1911.464477, -97.211593, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1463, 892.306762, 1910.453979, -97.175605, 0.000000, 0.000000, 69.300003, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18694, 891.512023, 1911.340942, -101.443695, 91.499977, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19632, 901.447875, 1909.789062, -97.263168, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1463, 891.123535, 1909.961547, -97.275611, 0.000000, 0.000000, 147.700042, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1463, 892.927917, 1907.830688, -97.715599, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2805, 892.948608, 1906.119995, -96.915496, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2805, 892.322814, 1906.123046, -96.915496, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1370, 893.029907, 1900.156127, -97.519996, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2060, 890.221496, 1908.139038, -97.775199, 0.000000, 0.000000, 101.132202, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2060, 890.221496, 1908.139038, -97.934196, 0.000000, 0.000000, 84.351898, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1897, 893.273620, 1906.115478, -96.136802, 270.000000, 90.000000, 180.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2671, 891.352294, 1906.766479, -98.010803, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(3675, 891.619445, 1912.182739, -88.904693, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2359, 884.024169, 1892.755126, -91.984397, 0.000000, 0.000000, 18.146400, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2358, 884.573852, 1897.593383, -94.795196, 0.000000, 0.000000, 282.838928, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1544, 890.758117, 1903.568237, -97.256896, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1893, 872.465332, 1895.286010, -90.444297, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1893, 877.485168, 1895.181396, -90.444297, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1893, 881.643371, 1894.997192, -90.444297, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(1893, 892.099121, 1901.948852, -94.867103, 0.000000, 0.000000, 90.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2082, 856.929748, 1909.006469, -90.804656, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2082, 856.964721, 1926.548461, -90.804656, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2251, 857.326354, 1909.542480, -89.461402, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2251, 857.359375, 1927.052856, -89.461402, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18676, 865.653503, 1954.438110, -95.980865, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18676, 865.653503, 1954.438110, -95.980865, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18676, 867.390075, 1951.026611, -95.980865, 0.000000, 0.000000, 43.199996, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18676, 867.390075, 1951.026611, -95.980865, 0.000000, 0.000000, 43.199996, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18676, 872.795471, 1950.744140, -95.980865, 0.000000, 0.000000, 135.999954, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18676, 872.795471, 1950.744140, -95.980865, 0.000000, 0.000000, 135.999954, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18676, 875.194763, 1953.604736, -95.980865, 0.000000, 0.000000, 164.699981, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18676, 875.194763, 1953.604736, -95.980865, 0.000000, 0.000000, 164.699981, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 867.359130, 1959.069580, -93.105117, 90.800003, 174.900009, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 867.359130, 1959.055175, -92.025215, 90.800003, 174.900009, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 867.359130, 1959.039916, -90.925300, 90.800003, 174.900009, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 867.359130, 1959.023803, -89.705383, 90.800003, 174.900009, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 867.359130, 1959.003784, -88.285552, 90.800003, 174.900009, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 873.550231, 1959.073974, -88.284637, 90.800003, 174.900009, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 873.603576, 1959.066040, -93.135231, 90.800003, 174.900009, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 873.545715, 1959.077148, -92.064971, 90.800003, 174.900009, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 873.547546, 1959.083007, -90.974723, 90.800003, 174.900009, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2707, 873.548400, 1959.075073, -89.654670, 90.800003, 174.900009, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18676, 866.509094, 1957.755859, -95.970878, 0.000000, 0.000000, -22.899990, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18676, 866.509094, 1957.755859, -95.970878, 0.000000, 0.000000, -22.899990, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18676, 874.660339, 1957.331665, -95.970848, 0.000000, 0.000000, -159.999954, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18676, 874.660339, 1957.331665, -95.970848, 0.000000, 0.000000, -159.999954, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2232, 875.842041, 1947.651611, -90.719268, 0.000000, 0.000000, -88.500030, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2232, 865.115722, 1947.378417, -90.719268, 0.000000, 0.000000, 90.599922, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19152, 879.953491, 1962.379882, -91.200660, 0.000000, 0.000000, -32.099994, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19150, 870.650390, 1957.571533, -85.254829, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19152, 860.222473, 1961.486694, -90.560722, 0.000000, 0.000000, 35.800003, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19149, 870.016418, 1954.829956, -79.951271, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19152, 861.515380, 1952.832885, -92.418624, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19152, 879.675598, 1955.763061, -92.418624, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19294, 870.386474, 1960.429565, -70.595695, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19148, 871.652893, 1968.259643, -76.624084, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19156, 878.267883, 1961.580078, -88.756233, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19156, 863.397888, 1961.580078, -88.756233, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19152, 871.045471, 1957.105834, -81.776359, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19152, 867.612609, 1952.628417, -101.203414, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(18748, 891.606689, 1909.242675, -98.484703, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(337, 889.995605, 1907.334106, -97.238685, 177.999877, -8.399998, 170.199996, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2261, 857.349182, 1910.436035, -89.185867, 0.000000, 0.000000, 90.000022, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2261, 857.349182, 1925.565795, -89.185867, 0.000000, 0.000000, 90.000022, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19295, 869.754150, 1917.670776, -70.165901, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19295, 834.356933, 1922.335449, -95.926383, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19295, 849.796936, 1918.435424, -72.306396, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19295, 846.757446, 1918.497070, -109.406349, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(19295, 897.164184, 1917.670776, -91.675865, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2074, 891.567016, 1907.003173, -95.386337, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
-	streetgang = CreateDynamicObjectEx(2074, 891.567016, 1907.003173, -95.386337, 0.000000, 0.000000, 0.000000, 150.00, 150.00); 
+	streetgang = CreateDynamicObjectEx(4206, 872.586181, 1958.017211, -94.904640, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19370, 871.646789, 1961.746704, -94.360702, 0.000000, 90.000000, 170.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19370, 868.946838, 1961.702758, -94.362701, 0.000000, 90.000000, 190.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19604, 870.414672, 1959.056396, -89.923736, -90.000000, 90.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19377, 859.972839, 1944.843383, -86.135757, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19373, 866.572753, 1947.374755, -96.020698, 0.000000, 0.000000, 60.077301, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19373, 869.515747, 1946.382934, -96.020698, 0.000000, 0.000000, 82.636909, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19373, 872.490905, 1946.565795, -96.020698, 0.000000, 0.000000, 283.673767, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19373, 875.163146, 1947.851562, -96.020698, 0.000000, 0.000000, 306.488311, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19373, 869.473999, 1945.946166, -96.020698, 0.000000, 0.000000, 82.636909, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19373, 872.593322, 1946.120605, -96.020698, 0.000000, 0.000000, 283.673767, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19373, 875.411254, 1947.439453, -96.020698, 0.000000, 0.000000, 306.488311, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19373, 866.527770, 1946.942749, -96.020698, 0.000000, 0.000000, 60.077301, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19373, 872.560058, 1946.272827, -96.020698, 0.000000, 0.000000, 283.673767, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19373, 875.334350, 1947.569580, -96.020698, 0.000000, 0.000000, 306.488311, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19373, 875.251342, 1947.706298, -96.020698, 0.000000, 0.000000, 306.488311, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19373, 872.522521, 1946.429077, -96.020698, 0.000000, 0.000000, 283.673767, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19373, 869.482299, 1946.116577, -96.020698, 0.000000, 0.000000, 82.636909, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19373, 866.609130, 1947.091796, -96.020698, 0.000000, 0.000000, 60.077301, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19373, 869.518432, 1946.272827, -96.020698, 0.000000, 0.000000, 82.636909, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19373, 866.582458, 1947.260620, -96.020698, 0.000000, 0.000000, 60.077301, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19377, 860.685302, 1902.469970, -90.891799, 0.000000, 90.000000, -0.009100, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1569, 888.148193, 1916.680664, -89.990798, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2290, 884.343750, 1911.428466, -89.992599, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2292, 885.833801, 1923.784057, -89.992599, 0.000000, 0.000000, 270.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18075, 883.574768, 1929.447265, -85.172996, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18075, 883.512268, 1906.758300, -85.172996, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(14455, 880.262512, 1909.340332, -88.360603, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(14455, 885.985839, 1909.347167, -88.360603, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2292, 885.842468, 1922.800659, -89.992599, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2292, 881.684570, 1922.687133, -89.994598, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2292, 881.670532, 1923.641845, -89.992599, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(14455, 884.552490, 1927.466674, -88.360603, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(14455, 890.294494, 1927.467895, -88.360603, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2290, 882.775634, 1925.450317, -89.992599, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2292, 881.307983, 1913.844970, -89.992599, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2292, 881.320617, 1912.920288, -89.994598, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2292, 885.283630, 1913.859619, -89.992599, 0.000000, 0.000000, 270.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2292, 885.299011, 1912.955322, -89.992599, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2245, 883.300537, 1913.454589, -89.109397, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2245, 883.802124, 1923.168823, -89.109397, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(14562, 866.280761, 1960.322998, -93.090980, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(14562, 874.633544, 1960.336791, -93.091003, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19172, 888.138122, 1913.359619, -87.271766, 0.000000, 0.000000, 270.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2262, 887.634643, 1925.631347, -88.429199, 0.000000, 0.000000, 270.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2266, 887.639526, 1915.321777, -86.678596, 0.000000, 0.000000, 270.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1897, 864.216552, 1918.064697, -83.992500, 90.000000, 90.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1897, 864.220336, 1918.037353, -83.992500, 90.000000, 90.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1897, 864.195007, 1918.038330, -83.992500, 90.000000, 90.000000, 270.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1897, 864.278869, 1918.090209, -83.992500, 90.000000, 90.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1897, 870.585205, 1918.006103, -83.992500, 90.000000, 90.000000, 270.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1897, 870.610534, 1918.005126, -83.992500, 90.000000, 90.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1897, 870.606750, 1918.032470, -83.992500, 90.000000, 90.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1897, 870.681701, 1918.052124, -83.992500, 90.000000, 90.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19089, 870.590270, 1918.035278, -76.544853, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1897, 870.585205, 1918.006103, -83.992500, 90.000000, 90.000000, 270.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1897, 870.610534, 1918.005126, -83.992500, 90.000000, 90.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1897, 870.606750, 1918.032470, -83.992500, 90.000000, 90.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1897, 870.681701, 1918.052124, -83.992500, 90.000000, 90.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2076, 864.188171, 1916.944335, -84.651512, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2076, 863.178771, 1918.077148, -84.651512, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2076, 864.193359, 1919.114135, -84.651512, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2073, 864.192016, 1918.058593, -84.167068, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2076, 870.585571, 1919.081054, -84.651512, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2076, 869.589843, 1918.036621, -84.651512, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2076, 870.583557, 1916.924804, -84.651512, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2076, 871.671447, 1918.040283, -84.651512, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2073, 870.579528, 1918.023803, -84.167068, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1744, 865.096313, 1938.063842, -92.839202, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1744, 865.075927, 1940.000610, -92.233177, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1744, 865.095825, 1939.998535, -92.839202, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1744, 865.096313, 1938.063842, 1940.000610, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1744, 865.076293, 1938.062866, -92.233200, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2350, 867.445983, 1940.890258, -93.940101, 0.000000, 0.000000, 348.269592, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2350, 867.344726, 1938.163085, -93.940101, 0.000000, 0.000000, 20.175800, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2350, 867.354614, 1939.471679, -93.940101, 0.000000, 0.000000, 31248.269531, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2290, 875.189941, 1943.084350, -94.307403, 0.000000, 0.000000, 270.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2290, 875.203002, 1940.136962, -94.307403, 0.000000, 0.000000, 270.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2311, 873.579162, 1941.390014, -94.307998, 0.000000, 0.000000, 89.089958, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2311, 873.591186, 1938.331054, -94.307998, 0.000000, 0.000000, 90.504013, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19824, 873.450927, 1942.950927, -93.804191, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19820, 873.637939, 1942.114624, -93.804313, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1509, 873.783447, 1939.338256, -93.602653, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1509, 873.829284, 1938.276123, -93.602653, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1509, 866.527954, 1939.724731, -92.836662, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19824, 865.414184, 1937.978271, -91.894989, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19823, 865.411010, 1938.184692, -91.894798, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1517, 865.364013, 1940.200073, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19821, 865.478942, 1939.397094, -91.896911, 0.000000, 0.000000, 54.283119, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19822, 865.335510, 1940.380615, -92.500411, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1512, 865.425720, 1940.068969, -91.693557, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1544, 865.342224, 1940.860107, -92.499977, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1544, 873.780639, 1941.702758, -93.803359, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1512, 865.444030, 1940.694335, -92.298561, 0.000000, 0.000000, 350.906280, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1544, 865.507812, 1940.817382, -92.499977, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1544, 865.494995, 1940.936767, -92.499977, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1544, 865.365051, 1941.023681, -92.499977, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1544, 865.378601, 1941.084838, -91.890937, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1544, 865.274780, 1941.114624, -92.499977, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1544, 865.361450, 1941.244506, -92.499977, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19822, 865.509887, 1941.286132, -92.500411, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19822, 865.516052, 1940.365722, -91.894386, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1517, 865.325012, 1939.942626, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1517, 865.514892, 1940.068847, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1517, 865.464721, 1939.932250, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1517, 865.435974, 1939.814086, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19822, 865.322143, 1939.637695, -92.500411, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19822, 865.481750, 1939.476684, -92.500411, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19824, 865.340393, 1939.198730, -92.499992, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19824, 865.520446, 1939.078247, -92.499992, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19824, 865.321838, 1938.916625, -92.499992, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19824, 865.502197, 1938.878051, -92.499992, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19824, 865.323669, 1938.716430, -92.499992, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19823, 865.475341, 1938.699951, -92.499801, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19823, 865.329040, 1939.405883, -92.499801, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19823, 865.553466, 1939.257568, -92.499801, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19823, 865.304260, 1938.492065, -92.499801, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1517, 865.450744, 1938.465087, -91.696029, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1517, 865.538635, 1938.288940, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1517, 865.483093, 1937.745849, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1517, 865.341308, 1937.779663, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19824, 865.414184, 1937.978271, -92.499992, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19823, 865.411010, 1938.184692, -92.499801, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1517, 865.450744, 1938.465087, -92.299018, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19822, 865.516052, 1940.365722, -92.500411, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1544, 865.497863, 1941.098022, -92.499977, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1544, 865.473388, 1940.954467, -91.890937, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1544, 865.340820, 1940.879394, -91.890937, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1544, 865.510742, 1940.797607, -91.890937, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19822, 865.398071, 1941.258300, -91.894386, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1512, 865.417053, 1940.570800, -92.298561, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19821, 865.335388, 1939.594848, -91.896911, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19821, 865.471557, 1939.817626, -91.896911, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19821, 865.396972, 1940.656616, -91.896911, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19821, 865.343139, 1939.135375, -91.896911, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1512, 865.327575, 1940.230346, -91.693557, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1512, 865.455261, 1939.248779, -91.693557, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1512, 865.331726, 1938.970092, -91.693557, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1512, 865.389465, 1938.789672, -91.693557, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19823, 865.503784, 1938.291015, -91.894798, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19823, 865.317199, 1938.378417, -91.894798, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19823, 865.300476, 1938.617675, -91.894798, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19824, 865.335205, 1937.672607, -91.894989, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19824, 865.503723, 1937.844360, -91.894989, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1544, 873.627990, 1939.919799, -93.803359, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18075, 870.271850, 1941.620483, -89.583297, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 867.082397, 1911.112792, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 865.210754, 1911.132446, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 863.438110, 1911.122192, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 861.804504, 1911.093505, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 860.131225, 1911.108276, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 868.920654, 1911.179809, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 870.681091, 1911.185058, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 872.400878, 1911.153808, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 874.262695, 1911.135131, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 876.224731, 1911.115600, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 859.669860, 1912.366455, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 859.709167, 1914.345458, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 859.760437, 1916.148071, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 859.764953, 1918.049072, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 859.788513, 1919.628906, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 859.822998, 1921.608276, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 859.875793, 1923.641723, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 876.095031, 1925.469726, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 873.954711, 1925.463256, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 871.834716, 1925.422851, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 869.735534, 1925.413818, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 867.251281, 1925.391723, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 864.757690, 1925.344970, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 862.369140, 1925.385009, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 860.291809, 1925.354003, -85.196800, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 864.197692, 1917.277099, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 864.196472, 1917.717529, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 864.207885, 1918.397705, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 864.211242, 1918.837890, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 863.895874, 1918.047973, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 863.439575, 1918.059570, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 864.490539, 1918.057739, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 864.884643, 1918.048706, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 869.895935, 1918.013061, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 870.337951, 1918.010498, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 870.599304, 1917.771850, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 870.578308, 1918.323852, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 870.920837, 1918.018676, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 871.395202, 1918.014282, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 870.580627, 1917.269531, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 870.591064, 1918.776489, -83.969802, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 869.963745, 1949.749145, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 871.846313, 1949.899169, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 873.418762, 1950.617553, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 874.587707, 1951.754394, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 875.360900, 1953.190673, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 875.591186, 1955.079711, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 875.317871, 1956.541137, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 874.456298, 1958.068969, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 868.323608, 1950.169555, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 866.703552, 1951.230590, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 865.645874, 1952.860107, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 865.264709, 1954.867309, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 865.633300, 1956.858276, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 866.563415, 1958.300781, -94.111701, 180.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2184, 829.638610, 1918.608276, -88.556800, 0.000000, 0.000000, 112.564208, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2184, 828.909118, 1915.765380, -88.556800, 0.000000, 0.000000, 69.625183, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1754, 833.321350, 1914.055175, -88.555900, 0.000000, 0.000000, 195.992752, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1754, 830.485412, 1914.051879, -88.555900, 0.000000, 0.000000, 160.614334, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2082, 831.412414, 1913.363891, -88.554512, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2059, 829.294067, 1919.254760, -87.750503, 0.000000, 0.000000, 270.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19786, 829.536132, 1922.875488, -86.534263, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2344, 831.731872, 1914.104370, -88.053001, 0.000000, 0.000000, 113.967498, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1742, 826.331054, 1921.764282, -88.554702, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1742, 826.329162, 1920.325805, -88.554702, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2332, 826.851379, 1914.134887, -86.338180, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2332, 826.851379, 1914.134887, -88.153213, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2332, 826.851379, 1914.134887, -87.244178, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1569, 856.900390, 1923.151733, -84.999702, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1569, 856.927001, 1911.741455, -84.999702, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1569, 856.947448, 1917.587890, -84.999702, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1569, 862.054565, 1927.543701, -84.999702, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1569, 873.323791, 1927.565673, -84.999702, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1569, 873.040161, 1908.891235, -84.999702, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1569, 861.894836, 1908.914184, -84.999702, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19920, 828.989624, 1917.689331, -87.769599, 0.000000, 0.000000, 343.484710, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19172, 826.422546, 1918.032226, -86.599166, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2266, 826.941711, 1916.003417, -86.712722, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2357, 850.236694, 1918.149047, -90.403869, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2357, 845.977844, 1918.148071, -90.403869, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2357, 841.722534, 1918.146972, -90.403869, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18075, 883.529541, 1920.151000, -85.069992, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2076, 865.320251, 1918.069213, -84.651512, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19303, 884.061645, 1893.293457, -93.585418, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(3014, 884.331604, 1892.423461, -94.797981, 0.000000, 0.000000, 2.952558, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19303, 882.314147, 1893.293579, -93.585403, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2680, 883.182800, 1893.407714, -93.742500, -30.000000, 0.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19303, 880.565979, 1893.295043, -93.585403, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19303, 878.819213, 1893.294555, -93.585403, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19303, 877.070190, 1893.292236, -93.585403, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19303, 875.322998, 1893.292480, -93.585403, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2680, 879.703735, 1893.385375, -93.742500, -30.000000, 0.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2680, 876.207092, 1893.410278, -93.742500, -30.000000, 0.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2040, 883.302795, 1892.266113, -94.796600, 0.000000, 0.000000, 20.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2359, 884.282226, 1894.400390, -94.692001, 0.000000, 0.000000, 18.146400, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2359, 878.830322, 1892.695190, -91.984397, 0.000000, 0.000000, 128.146392, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2040, 883.019531, 1892.280639, -94.796577, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2040, 882.759155, 1892.359741, -94.796577, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2040, 883.304199, 1892.802734, -94.796600, 0.000000, 0.000000, 10.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2040, 883.651977, 1892.288330, -94.796577, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2040, 882.451721, 1892.697387, -94.796600, 0.000000, 0.000000, 2310.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(3014, 880.913452, 1892.442993, -94.797981, 0.000000, 0.000000, 351.004821, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(3014, 883.751342, 1892.932617, -94.797981, 0.000000, 0.000000, 351.004821, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2358, 880.174133, 1892.238281, -94.795196, 0.000000, 0.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2358, 880.006713, 1892.752319, -94.795196, 0.000000, 0.000000, 192.167190, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2358, 879.336730, 1892.331054, -94.795196, 0.000000, 0.000000, 172.585006, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2358, 879.135559, 1892.918212, -94.795196, 0.000000, 0.000000, 172.585006, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2040, 878.827270, 1892.325195, -94.796600, 0.000000, 0.000000, 2310.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2040, 878.573608, 1892.913330, -94.796600, 0.000000, 0.000000, 2312120.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2985, 876.092041, 1892.684204, -94.896400, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2358, 875.075256, 1892.310668, -94.795196, 0.000000, 0.000000, 172.585006, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2358, 875.273376, 1892.843627, -94.795196, 0.000000, 0.000000, 179.699157, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(358, 883.480651, 1891.990844, -93.747673, 0.000000, 0.000000, 6.609360, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(358, 883.480651, 1891.990844, -93.041656, 0.000000, 0.000000, 6.609360, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(358, 883.480651, 1891.990844, -93.344673, 0.000000, 0.000000, 6.609360, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(358, 882.344970, 1891.933471, -92.940658, 0.000000, 0.000000, 6.609360, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(358, 882.344970, 1891.933471, -93.242652, 0.000000, 0.000000, 6.609360, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(357, 882.392028, 1891.950683, -93.654411, 0.000000, 0.000000, 7.258399, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(357, 881.354187, 1891.978637, -94.056396, 0.000000, 5.000000, 7.258399, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(357, 881.354187, 1891.978637, -93.554412, 0.000000, 5.000000, 7.258399, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(356, 879.975097, 1891.964599, -93.963943, 0.000000, 0.000000, 4.166958, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(356, 880.489562, 1891.943115, -93.051856, 0.000000, 0.000000, 4.166958, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(356, 880.489562, 1891.943115, -92.748847, 0.000000, 0.000000, 4.166958, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(356, 879.856811, 1891.935791, -93.561950, 0.000000, 0.000000, 4.166958, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(355, 878.230346, 1891.962890, -93.771057, 0.000000, 0.000000, 4.286859, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(355, 879.005249, 1891.971435, -92.961013, 0.000000, 0.000000, 4.286859, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(355, 878.964904, 1892.002563, -93.263999, 0.000000, 0.000000, 184.286895, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(355, 877.823364, 1892.004516, -93.364997, 0.000000, 0.000000, 184.799072, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(372, 877.851501, 1891.960449, -94.249458, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(372, 881.882995, 1891.951416, -94.569976, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(372, 881.244689, 1891.966064, -93.134376, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(353, 877.461975, 1892.021728, -93.835113, 0.000000, 0.000000, 187.143539, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(353, 877.461975, 1892.021728, -94.236099, 0.000000, 0.000000, 187.143539, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(941, 884.311401, 1895.735961, -94.491661, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(923, 873.681884, 1898.495849, -94.090263, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(923, 873.347045, 1892.479736, -94.191261, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1271, 875.117858, 1898.388793, -94.600730, 0.000000, 0.000000, 19.877969, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1271, 876.172546, 1898.425659, -94.600700, 0.000000, 0.000000, 129.878005, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1271, 875.284545, 1897.367553, -94.600730, 0.000000, 0.000000, 351.940856, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1271, 871.975708, 1892.894653, -94.600730, 0.000000, 0.000000, 351.940856, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(11729, 883.568298, 1898.799560, -94.896469, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(11729, 882.891235, 1898.800659, -94.896469, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(14411, 886.773620, 1901.068115, -98.090896, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(3092, 891.685852, 1910.355468, -96.893997, 90.000000, 90.000000, 224.699783, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1805, 892.696166, 1903.925415, -97.830596, 0.000000, 88.000000, 331.300292, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(941, 890.355712, 1902.336669, -97.719886, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2907, 890.174133, 1901.981933, -97.147300, 0.000000, 0.000000, 335.996002, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2905, 890.656921, 1902.023681, -97.245437, 0.000000, 0.000000, 9.406450, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2908, 890.059631, 1902.704956, -97.189498, 0.000000, 0.000000, 261.832977, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2906, 890.539306, 1903.256225, -97.205596, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19583, 890.817504, 1903.322875, -97.237899, 0.000000, 0.000000, 344.007141, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(341, 889.879699, 1900.975585, -97.803497, 0.000000, 30.000000, 26.372840, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19924, 890.147216, 1902.610473, -95.013778, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19590, 890.304504, 1902.777587, -97.221298, 0.000000, 90.000000, 192.838867, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(3092, 892.484680, 1904.737182, -97.928298, 180.000000, 90.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2907, 891.932922, 1909.912231, -97.004302, 0.000000, 0.000000, 335.996002, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2905, 891.069824, 1909.505981, -97.027397, 0.000000, 0.000000, 17.048099, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2906, 892.284729, 1909.474243, -97.042701, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1463, 891.546691, 1911.464477, -97.211593, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1463, 892.306762, 1910.453979, -97.175605, 0.000000, 0.000000, 69.300003, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18694, 891.512023, 1911.340942, -101.443695, 91.499977, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19632, 901.447875, 1909.789062, -97.263168, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1463, 891.123535, 1909.961547, -97.275611, 0.000000, 0.000000, 147.700042, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1463, 892.927917, 1907.830688, -97.715599, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2805, 892.948608, 1906.119995, -96.915496, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2805, 892.322814, 1906.123046, -96.915496, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1370, 893.029907, 1900.156127, -97.519996, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2060, 890.221496, 1908.139038, -97.775199, 0.000000, 0.000000, 101.132202, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2060, 890.221496, 1908.139038, -97.934196, 0.000000, 0.000000, 84.351898, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1897, 893.273620, 1906.115478, -96.136802, 270.000000, 90.000000, 180.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2671, 891.352294, 1906.766479, -98.010803, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(3675, 891.619445, 1912.182739, -88.904693, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2359, 884.024169, 1892.755126, -91.984397, 0.000000, 0.000000, 18.146400, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2358, 884.573852, 1897.593383, -94.795196, 0.000000, 0.000000, 282.838928, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1544, 890.758117, 1903.568237, -97.256896, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1893, 872.465332, 1895.286010, -90.444297, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1893, 877.485168, 1895.181396, -90.444297, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1893, 881.643371, 1894.997192, -90.444297, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(1893, 892.099121, 1901.948852, -94.867103, 0.000000, 0.000000, 90.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2082, 856.929748, 1909.006469, -90.804656, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2082, 856.964721, 1926.548461, -90.804656, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2251, 857.326354, 1909.542480, -89.461402, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2251, 857.359375, 1927.052856, -89.461402, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18676, 865.653503, 1954.438110, -95.980865, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18676, 865.653503, 1954.438110, -95.980865, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18676, 867.390075, 1951.026611, -95.980865, 0.000000, 0.000000, 43.199996, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18676, 867.390075, 1951.026611, -95.980865, 0.000000, 0.000000, 43.199996, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18676, 872.795471, 1950.744140, -95.980865, 0.000000, 0.000000, 135.999954, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18676, 872.795471, 1950.744140, -95.980865, 0.000000, 0.000000, 135.999954, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18676, 875.194763, 1953.604736, -95.980865, 0.000000, 0.000000, 164.699981, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18676, 875.194763, 1953.604736, -95.980865, 0.000000, 0.000000, 164.699981, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 867.359130, 1959.069580, -93.105117, 90.800003, 174.900009, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 867.359130, 1959.055175, -92.025215, 90.800003, 174.900009, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 867.359130, 1959.039916, -90.925300, 90.800003, 174.900009, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 867.359130, 1959.023803, -89.705383, 90.800003, 174.900009, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 867.359130, 1959.003784, -88.285552, 90.800003, 174.900009, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 873.550231, 1959.073974, -88.284637, 90.800003, 174.900009, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 873.603576, 1959.066040, -93.135231, 90.800003, 174.900009, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 873.545715, 1959.077148, -92.064971, 90.800003, 174.900009, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 873.547546, 1959.083007, -90.974723, 90.800003, 174.900009, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2707, 873.548400, 1959.075073, -89.654670, 90.800003, 174.900009, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18676, 866.509094, 1957.755859, -95.970878, 0.000000, 0.000000, -22.899990, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18676, 866.509094, 1957.755859, -95.970878, 0.000000, 0.000000, -22.899990, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18676, 874.660339, 1957.331665, -95.970848, 0.000000, 0.000000, -159.999954, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18676, 874.660339, 1957.331665, -95.970848, 0.000000, 0.000000, -159.999954, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2232, 875.842041, 1947.651611, -90.719268, 0.000000, 0.000000, -88.500030, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2232, 865.115722, 1947.378417, -90.719268, 0.000000, 0.000000, 90.599922, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19152, 879.953491, 1962.379882, -91.200660, 0.000000, 0.000000, -32.099994, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19150, 870.650390, 1957.571533, -85.254829, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19152, 860.222473, 1961.486694, -90.560722, 0.000000, 0.000000, 35.800003, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19149, 870.016418, 1954.829956, -79.951271, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19152, 861.515380, 1952.832885, -92.418624, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19152, 879.675598, 1955.763061, -92.418624, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19294, 870.386474, 1960.429565, -70.595695, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19148, 871.652893, 1968.259643, -76.624084, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19156, 878.267883, 1961.580078, -88.756233, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19156, 863.397888, 1961.580078, -88.756233, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19152, 871.045471, 1957.105834, -81.776359, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19152, 867.612609, 1952.628417, -101.203414, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(18748, 891.606689, 1909.242675, -98.484703, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(337, 889.995605, 1907.334106, -97.238685, 177.999877, -8.399998, 170.199996, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2261, 857.349182, 1910.436035, -89.185867, 0.000000, 0.000000, 90.000022, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2261, 857.349182, 1925.565795, -89.185867, 0.000000, 0.000000, 90.000022, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19295, 869.754150, 1917.670776, -70.165901, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19295, 834.356933, 1922.335449, -95.926383, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19295, 849.796936, 1918.435424, -72.306396, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19295, 846.757446, 1918.497070, -109.406349, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(19295, 897.164184, 1917.670776, -91.675865, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2074, 891.567016, 1907.003173, -95.386337, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
+	streetgang = CreateDynamicObjectEx(2074, 891.567016, 1907.003173, -95.386337, 0.000000, 0.000000, 0.000000, 150.00, 150.00);
 	streetgang = CreateDynamicObjectEx(2855, 882.979309, 1913.056518, -89.385307, 0.000000, 0.000000, -45.999996, 150.00, 150.00);
 
 	//Toll - Flint
@@ -3686,7 +3807,7 @@ public OnGameModeInit()
 	//Auction
 	AuctionText = CreateDynamicObject(18244, 189.572525, -80.501548, 1032.988037, 89.999946, -0.499999, 0.699999, -1, -1, -1, 250.00, 250.00);
 	SetDynamicObjectMaterialText(AuctionText, 0, "{FFFF00}Welcome\nTo Los Santos\n{FFFF00}Auction Office", 90, "Ariel", 20, 1, 0x00000000, 0x00000001, 1);
-	HighBidText = CreateDynamicObject(3077, 195.396118, -81.974838, 1030.729858, 0.000000, 0.000000, -36.599998, -1, -1, -1, 300.00, 300.00); 
+	HighBidText = CreateDynamicObject(3077, 195.396118, -81.974838, 1030.729858, 0.000000, 0.000000, -36.599998, -1, -1, -1, 300.00, 300.00);
 	//hydr
 	hydr[0] = CreateDynamicObject(19817, 2193.24243, -2199.99780, 10.96290,   0.00000, 0.00000, 44.40000);
 	hydr[1] = CreateDynamicObject(19817, 2199.55225, -2193.81885, 10.96290,   0.00000, 0.00000, 44.40000);
@@ -3694,19 +3815,24 @@ public OnGameModeInit()
 	hydr[3] = CreateDynamicObject(19817, 2201.54321, -2237.80566, 10.88290,   0.00000, 0.00000, -136.98000);
 	hydr[4] = CreateDynamicObject(19817, 2208.19092, -2231.78809, 10.86690,   0.00000, 0.00000, -136.98000);
 	hydr[5] = CreateDynamicObject(19817, 2214.58667, -2225.68530, 10.85890,   0.00000, 0.00000, -136.98000);
+
+	objectpacket = CreateDynamicObject(11745, -1304.212036, 2525.925537, 87.532722-1, 0.0, 0.0, 0.0, 0);
 	//----------------------------------------------------------------------------------------------------
     CreateDynamicObject(19379, 1435.35657, -1227.07996, 151.31239,   360.00000, 90.00000, 0.00000);
 	CreateDynamicObject(19379, 1424.86401, -1227.07996, 151.31239,   360.00000, 90.00000, 1080.00000);
-	g_Discord_AndroVerifed = DCC_FindChannelById("864670614458728458");
-	g_discord_twt = DCC_FindChannelById("862531909727944775");
-	g_Discord_adslogs = DCC_FindChannelById("863082017985789962");
-	g_discord_ban = DCC_FindChannelById("865071798650535936");
-	g_discord_admins = DCC_FindChannelById("864854692831952936");
-	g_Discord_PcVerived = DCC_FindChannelById("865873292921798666");
-	g_Discord_Information = DCC_FindChannelById("857538441930473482");
-	g_discord_botcmd = DCC_FindChannelById("864671043763044352");
-	g_Admin_Command = DCC_FindChannelById("835257449349906453");
-	g_discord_logs = DCC_FindChannelById("861303832893325313");
+	g_Discord_AndroVerifed = DCC_FindChannelById("1178242694997360719");
+	g_discord_twt = DCC_FindChannelById("1178242694833786980");
+	g_Discord_adslogs = DCC_FindChannelById("1178242694670192724");
+	g_discord_ban = DCC_FindChannelById("1178242694833786972");
+	g_discord_admins = DCC_FindChannelById("1178242694997360710");
+	g_Discord_PcVerived = DCC_FindChannelById("1178242694997360718");
+	g_Discord_Information = DCC_FindChannelById("1178242695328714791");
+	g_discord_botcmd = DCC_FindChannelById("1178242695328714788");
+	g_Admin_Command = DCC_FindChannelById("1178242694833786980");
+	g_discord_logs = DCC_FindChannelById("1180108124544307201");
+
+	DCC_SetBotActivity("daong pride | "TEXT_GAMEMODE"");
+
 	//Butcher
     new obuther = CreateDynamicObject(1439, 944.436828, 2127.660644, 1010.021179, 0.000000, 0.000000, -90.000000, -1, -1, -1, 300.00, 300.00);
 	SetDynamicObjectMaterial(obuther, 0, 2803, "cj_meaty", "CJ_FLESH_2", 0x00000000);
@@ -3716,7 +3842,7 @@ public OnGameModeInit()
 	CreateDynamic3DTextLabel("Start Work: {f7ae11}H",0xFFFFFFFF,940.1020,2127.6326,1011.0303,5.0,INVALID_PLAYER_ID,INVALID_VEHICLE_ID,0, 0);
 
 	//-------------------------------------------------
-	
+
 	SpawnMale = LoadModelSelectionMenu("spawnmale.txt");
 	SpawnFemale = LoadModelSelectionMenu("spawnfemale.txt");
 	MaleSkins = LoadModelSelectionMenu("maleskin.txt");
@@ -3738,11 +3864,11 @@ public OnGameModeInit()
  	boatlist = LoadModelSelectionMenu("boatlist.txt");
 	viptoyslist = LoadModelSelectionMenu("viptoys.txt");
 	vtoylist = LoadModelSelectionMenu("vtoylist.txt");
-	
+
 	SAGSLobbyBtn[0] = CreateButton(1388.987670, -25.291969, 1001.358520, 180.000000);
 	SAGSLobbyBtn[1] = CreateButton(1391.275756, -25.481920, 1001.358520, 0.000000);
 	SAGSLobbyDoor = CreateDynamicObject(1569, 1389.375000, -25.387500, 999.978210, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00);
-	
+
 	SAPDLobbyBtn[0] = CreateButton(252.95264, 107.67332, 1004.00909, 264.79898);
 	SAPDLobbyBtn[1] = CreateButton(253.43437, 110.62970, 1003.92737, 91.00000);
 	SAPDLobbyDoor[0] = CreateDynamicObject(1569, 253.10965, 107.61060, 1002.21368,   0.00000, 0.00000, 91.00000);
@@ -3752,12 +3878,12 @@ public OnGameModeInit()
 	SAPDLobbyBtn[3] = CreateButton(238.75888, 116.12949, 1003.94086, 185.00000);
 	SAPDLobbyDoor[2] = CreateDynamicObject(1569, 239.69435, 116.15908, 1002.21411,   0.00000, 0.00000, 91.00000);
 	SAPDLobbyDoor[3] = CreateDynamicObject(1569, 239.64050, 119.08750, 1002.21332,   0.00000, 0.00000, 270.00000);
-	
+
 	//Family Button
 	LLFLobbyBtn[0] = CreateButton(-2119.90039, 655.96808, 1062.39954, 184.67528);
 	LLFLobbyBtn[1] = CreateButton(-2119.18481, 657.88519, 1062.39954, 90.00000);
 	LLFLobbyDoor = CreateDynamicObject(1569, -2119.21509, 657.54187, 1060.73560,   0.00000, 0.00000, -90.00000);
-	
+
 	printf("[Object] Number of Dynamic objects loaded: %d", CountDynamicObjects());
 	DCC_SendChannelMessage(g_Discord_Information, "```Server Sudah Kembali Online, Happy Roleplaying.``` @everyone");
 	return 1;
@@ -3776,7 +3902,7 @@ public OnGameModeExit()
 		}
 	}
 	printf("[Gas Station] Number of Saved: %d", count);
-	
+
 	foreach(new pid : Plants)
 	{
 		if(Iter_Contains(Plants, pid))
@@ -3786,7 +3912,7 @@ public OnGameModeExit()
 		}
 	}
 	printf("[Farmer Plant] Number of Saved: %d", count1);
-	for (new i = 0, j = GetPlayerPoolSize(); i <= j; i++) 
+	for (new i = 0, j = GetPlayerPoolSize(); i <= j; i++)
 	{
 		if (IsPlayerConnected(i))
 		{
@@ -3806,7 +3932,7 @@ public OnGameModeExit()
 	}
 	printf("[Database] User Saved: %d", user);
 	print("-------------- [ Auto Gmx ] --------------");
-	SendClientMessageToAll(COLOR_RED, "[!]"YELLOW_E" Sorry Server is Maintenance/Restart.{00FFFF} ~Radeetz");
+	SendClientMessageToAll(COLOR_RED, "[!]"YELLOW_E" Sorry Server is Maintenance/Restart.{00FFFF} ~BremX Share GM CITY BOTS");
 	new msg[100];
 	format(msg, sizeof(msg), "```The Server Is Now __Restarted__. [Database] User Saved: %d```", user);
 	DCC_SendChannelMessage(g_Discord_Information, msg);
@@ -3957,10 +4083,10 @@ public OnPlayerText(playerid, text[])
     new fmt_str[128];
     format(fmt_str, sizeof fmt_str, "```%s Says: %s```", pData[playerid][pName], text);
     DCC_SendChannelMessage(g_discord_logs, fmt_str);
-        
+
 	if(isnull(text)) return 0;
 	printf("[CHAT] %s(%d) : %s", pData[playerid][pName], playerid, text);
-	
+
 	if(pData[playerid][pSpawned] == 0 && pData[playerid][IsLoggedIn] == false)
 	{
 	    Error(playerid, "You must be spawned or logged in to use chat.");
@@ -4024,7 +4150,7 @@ public OnPlayerText(playerid, text[])
 					SendClientMessageEx(playerid, COLOR_YELLOW, "[SMS from %d]"WHITE_E" %s", pData[playerid][pPhone], tmp);
 					PlayerPlaySound(playerid, 6003, 0,0,0);
 					pData[playerid][pSMS] = pData[playerid][pPhone];
-					
+
 					pData[playerid][pPhoneCredit] -= 1;
 					return 0;
 				}
@@ -4083,13 +4209,13 @@ public OnPlayerText(playerid, text[])
 	}
 	if(pData[playerid][pCall] != INVALID_PLAYER_ID)
 	{
-		
+
 		UpperToLower(text);
 		new lstr[1024];
 		format(lstr, sizeof(lstr), "(cellphone) %s says: %s", ReturnName(playerid), text);
 		ProxDetector(10, playerid, lstr, 0xE6E6E6E6, 0xC8C8C8C8, 0xAAAAAAAA, 0x8C8C8C8C, 0x6E6E6E6E);
 		SetPlayerChatBubble(playerid, text, COLOR_WHITE, 10.0, 3000);
-		
+
 		SendClientMessageEx(pData[playerid][pCall], COLOR_YELLOW, "[CELLPHONE] "WHITE_E"%s.", text);
 		return 0;
 	}
@@ -4101,14 +4227,14 @@ public OnPlayerCommandPerformed(playerid, cmd[], params[], result, flags)
 {
     if (result == -1)
     {
-        Error(playerid, "The Command '/%s' Not Registered on The Server See (/help).", cmd);
+        Error(playerid, "the command '/%s' not registered on the server see '(/help)'.", cmd);
         return 0;
     }
 	printf("[CMD]: %s(%d) has used the command '%s' (%s)", pData[playerid][pName], playerid, cmd, params);
 	//dc
     new name[MAX_PLAYER_NAME + 1];
     GetPlayerName(playerid, name, sizeof name);
-    
+
     return 1;
 }
 /*public OnPlayerClickTextDraw(playerid, Text:clickedid)
@@ -4330,7 +4456,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 					rands = random(sizeof(RandomCPs));
     				SendClientMessage(playerid, 0x34AA33AA, "As you were in your plane. An airport officer noticed you then he approached you.");
 	 				cp[playerid] = SetPlayerCheckpoint(playerid, RandomCPs[rands][0],RandomCPs[rands][1],RandomCPs[rands][2], 5.0);
-	 				
+
 	 				TakingPs[playerid] = 1;
 	 				IsPassing[playerid] = true;
 	 				return 1;
@@ -4367,28 +4493,30 @@ public OnPlayerCommandText(playerid, cmdtext[])
 }
 public OnPlayerConnect(playerid)
 {
+	new hour, minute;
+	gettime(hour, minute);
 	online++;
 	togtextdraws[playerid] = 0;
 	new PlayerIP[16], country[MAX_COUNTRY_LENGTH], city[MAX_CITY_LENGTH];
 	g_MysqlRaceCheck[playerid]++;
-	
+
 	ResetVariables(playerid);
 	CreatePlayerTextDraws(playerid);
-	
+
 	GetPlayerName(playerid, pData[playerid][pName], MAX_PLAYER_NAME);
 	GetPlayerIp(playerid, PlayerIP, sizeof(PlayerIP));
 	pData[playerid][pIP] = PlayerIP;
-	
+
 	GetPlayerCountry(playerid, country, MAX_COUNTRY_LENGTH);
 	GetPlayerCity(playerid, city, MAX_CITY_LENGTH);
-	
+
 	SetTimerEx("SafeLogin", 5000, 0, "i", playerid);
 
 	new query[103];
 	mysql_format(g_SQL, query, sizeof query, "SELECT * FROM `players` WHERE `username` = '%e' LIMIT 1", pData[playerid][pName]);
 	mysql_pquery(g_SQL, query, "OnPlayerDataLoaded", "dd", playerid, g_MysqlRaceCheck[playerid]);
 	SetPlayerColor(playerid, COLOR_WHITE);
-	
+
 	//---[ Function ]---
 	SedangHauling[playerid] = 0;
 	DeletePVar(playerid,"MeatCheck");
@@ -4399,10 +4527,10 @@ public OnPlayerConnect(playerid)
 	IsAtEvent[playerid] = 0;
 	PlayerPBing[playerid] = false;
     PlayerPBKills[playerid] = 0;
-    //uif speedo
+    /*uif speedo
     PlayerSpeed[playerid] = 1;
 	PlayerSpeedObject[playerid] = -1;
-	PlayerSpeedObject2[playerid] = -1;
+	PlayerSpeedObject2[playerid] = -1;*/
 	//---------
 	Trash_InitPlayer(playerid);
 	//--------------------
@@ -4411,33 +4539,33 @@ public OnPlayerConnect(playerid)
 	{
 		if(pData[ii][pTogLog] == 0)
 		{
-			SendClientMessageEx(ii, COLOR_RED, "[JOIN]"WHITE_E" %s (%d) Is now joined to the Server "YELLOW_E"(%s, %s)", pData[playerid][pName], playerid, city, country);
+			SendClientMessageEx(ii, COLOR_RED, " JOIN: {FFFFFF}%s (%d) {FFFFFF}is now joined to the Server. ", pData[playerid][pName], playerid);
 		}
 	}
- 	format(fmt_join, sizeof fmt_join, "```[JOIN] %s (%d) Is Now Joined To The Server (%s, %s)```",  pData[playerid][pName], playerid, city, country);
+ 	format(fmt_join, sizeof fmt_join, "```[JOIN] %s (%d) Is now joined to the Server```",  pData[playerid][pName], playerid);
     DCC_SendChannelMessage(g_discord_logs, fmt_join);
 	pData[playerid][activitybar] = CreatePlayerProgressBar(playerid, 281.000000, 136.000000, 88.000000, 10.500000, -1061109611, 100, 0);
 	//HBE textdraw Modern
 	pData[playerid][damagebar] = CreatePlayerProgressBar(playerid, 386.000000, 441.000000, 7.000000, 78.000000, -16776961, 1000.0, 2);
 	pData[playerid][fuelbar] = CreatePlayerProgressBar(playerid, 405.000000, 440.000000, 7.000000, 78.000000, -16776961, 1000.0, 2);
-                
+
 	pData[playerid][hungrybar] = CreatePlayerProgressBar(playerid, 632.000000, 377.000000, 62.000000, 4.000000, 16711935, 100.0, 1);
 	pData[playerid][energybar] = CreatePlayerProgressBar(playerid, 632.000000, 398.000000, 62.000000, 4.000000, 16711935, 100.0, 1);
 	pData[playerid][bladdybar] = CreatePlayerProgressBar(playerid, 632.000000, 417.000000, 62.000000, 4.000000, 16711935, 100.0, 1);
-	
+
 	//HBE textdraw Simple
 	pData[playerid][spdamagebar] = CreatePlayerProgressBar(playerid, 577.000000, 389.000000, 62.000000, 4.000000, -16776961, 1000.0, 0);
-									
+
 	pData[playerid][spfuelbar] = CreatePlayerProgressBar(playerid, 577.000000, 405.000000, 62.000000, 4.000000, -16776961, 1000.0, 0);
-                
+
 	pData[playerid][sphungrybar] = CreatePlayerProgressBar(playerid, 467.500000, 433.833282, 41.000000, 8.000000, 16711935, 100.0, 0);
 	pData[playerid][spenergybar] = CreatePlayerProgressBar(playerid, 531.500000, 433.249938, 41.000000, 8.000000, 16711935, 100.0, 0);
 	pData[playerid][spbladdybar] = CreatePlayerProgressBar(playerid, 595.500000, 433.250061, 41.000000, 8.000000, 16711935, 100.0, 0);
-	
+
 	//Textdraw Mode
 	pData[playerid][BarHp] = CreatePlayerProgressBar(playerid, 523.000000, 150.000000, 85.500000, 6.500000, -16776961, 100.0, 0);
 	pData[playerid][BarArmour] = CreatePlayerProgressBar(playerid, 523.000000, 167.000000, 85.500000, 6.500000, -1, 100.0, 0);
-	
+
 	//cent money
 	//Server Cent
     Cent[0] = TextDrawCreate(580.000000, 54.000000, ".");
@@ -4467,7 +4595,7 @@ public OnPlayerConnect(playerid)
 	TextDrawUseBox(Cent[1], 0);
 	TextDrawSetProportional(Cent[1], 1);
 	TextDrawSetSelectable(Cent[1], 0);
-	
+
 	TextDrawShowForPlayer(playerid, Cent[0]);
 	TextDrawShowForPlayer(playerid, Cent[1]);
 
@@ -4498,8 +4626,12 @@ public OnPlayerConnect(playerid)
 	TextDrawUseBox(DigiAP[playerid], 0);
 	TextDrawSetProportional(DigiAP[playerid], 1);
 	TextDrawSetSelectable(DigiAP[playerid], 0);
-	
+
 	//PlayAudioStreamForPlayer(playerid, "");
+	//Custom mapping kek mememk
+	RemoveBuildingForPlayer(playerid, 4857, 1942.680, -1986.750, 14.898, 0.250);
+	RemoveBuildingForPlayer(playerid, 4979, 1942.680, -1986.750, 14.898, 0.250);
+	RemoveBuildingForPlayer(playerid, 3625, 1941.979, -1970.699, 14.984, 0.250);
     //----------------------------------[New Alhambra]----------------------------//
 	RemoveBuildingForPlayer(playerid, 5544, 1873.7422, -1682.4766, 34.7969, 0.25);
 	RemoveBuildingForPlayer(playerid, 1524, 1837.6641, -1640.3828, 13.7578, 0.25);
@@ -4536,22 +4668,6 @@ public OnPlayerConnect(playerid)
 	RemoveBuildingForPlayer(playerid, 1290, 1329.709, -1498.680, 18.226, 0.250);
 	RemoveBuildingForPlayer(playerid, 1290, 1316.660, -1519.270, 18.226, 0.250);
 	RemoveBuildingForPlayer(playerid, 1290, 1308.329, -1539.319, 18.226, 0.250);
-	// Deket Base Taksi
-	RemoveBuildingForPlayer(playerid, 713, 1098.4141, -1725.7422, 12.1563, 0.25);
-    RemoveBuildingForPlayer(playerid, 713, 1055.2813, -1725.7422, 12.1563, 0.25);
-    RemoveBuildingForPlayer(playerid, 5024, 1748.8438, -1883.0313, 14.1875, 0.25);
-    RemoveBuildingForPlayer(playerid, 1226, 1774.7578, -1901.5391, 16.3750, 0.25);
-    RemoveBuildingForPlayer(playerid, 6071, 1087.9844, -1682.3281, 19.4375, 0.25);
-    RemoveBuildingForPlayer(playerid, 647, 1051.8750, -1680.5156, 14.4609, 0.25);
-    RemoveBuildingForPlayer(playerid, 615, 1051.2500, -1678.0234, 13.2891, 0.25);
-    RemoveBuildingForPlayer(playerid, 1297, 1108.0625, -1707.1719, 15.9297, 0.25);
-    RemoveBuildingForPlayer(playerid, 647, 1055.6172, -1692.6484, 14.4609, 0.25);
-    RemoveBuildingForPlayer(playerid, 647, 1058.3125, -1695.7656, 14.6875, 0.25);
-    RemoveBuildingForPlayer(playerid, 6063, 1087.9844, -1682.3281, 19.4375, 0.25);
-    RemoveBuildingForPlayer(playerid, 647, 1097.4297, -1699.4219, 14.6875, 0.25);
-    RemoveBuildingForPlayer(playerid, 647, 1101.6563, -1699.5625, 14.6875, 0.25);
-    RemoveBuildingForPlayer(playerid, 1297, 1130.5391, -1684.3203, 15.8906, 0.25);
-    RemoveBuildingForPlayer(playerid, 717, 1322.2734, -1155.9063, 23.0000, 0.25);
 	//Dealership Ocean Docks
 	RemoveBuildingForPlayer(playerid, 1412, 2285.830, -2315.760, 13.757, 0.250);
 	RemoveBuildingForPlayer(playerid, 1412, 2282.070, -2312.050, 13.757, 0.250);
@@ -4606,7 +4722,7 @@ public OnPlayerConnect(playerid)
 	RemoveBuildingForPlayer(playerid, 5766, 1160.96, -1180.58, 70.4141, 250.0); // Awning shadows
 	RemoveBuildingForPlayer(playerid, 5767, 1160.96, -1180.58, 70.4141, 250.0); // Building
 	RemoveBuildingForPlayer(playerid, 5964, 1160.96, -1180.58, 70.4141, 250.0); // LOD
-	
+
 	//ms13 ws
 	RemoveBuildingForPlayer(playerid, 5821, 1120.3438, -1248.9375, 20.2734, 0.25);
 	RemoveBuildingForPlayer(playerid, 5855, 1095.6797, -1212.7813, 18.2891, 0.25);
@@ -4614,12 +4730,12 @@ public OnPlayerConnect(playerid)
 	//sa news
 	RemoveBuildingForPlayer(playerid, 1226, 642.0938, -1359.8203, 16.2734, 0.25);
 	RemoveBuildingForPlayer(playerid, 1226, 642.0938, -1334.8516, 16.2734, 0.25);
-	
+
 	//market
 	RemoveBuildingForPlayer(playerid, 4191, 1353.2578, -1764.5313, 15.5938, 0.25);
 	RemoveBuildingForPlayer(playerid, 4022, 1353.2578, -1764.5313, 15.5938, 0.25);
 	RemoveBuildingForPlayer(playerid, 1532, 1353.1328, -1759.6563, 12.5000, 0.25);
-	
+
 	//HooverWs
 	RemoveBuildingForPlayer(playerid, 3592, 2451.7344, -1637.4844, 15.1328, 0.25);
 	RemoveBuildingForPlayer(playerid, 762, 2446.5547, -1681.0703, 12.3828, 0.25);
@@ -4712,7 +4828,7 @@ public OnPlayerConnect(playerid)
 	RemoveBuildingForPlayer(playerid, 3627, 2195.0859, -2216.8438, 15.9063, 0.25);
 	RemoveBuildingForPlayer(playerid, 5244, 2198.8516, -2213.9219, 14.8828, 0.25);
 	RemoveBuildingForPlayer(playerid, 3574, 2193.0625, -2196.6406, 15.1016, 0.25);
-	
+
 	//ext rs
 	RemoveBuildingForPlayer(playerid, 5929, 1230.8906, -1337.9844, 12.5391, 0.25);
 	RemoveBuildingForPlayer(playerid, 739, 1231.1406, -1341.8516, 12.7344, 0.25);
@@ -4746,6 +4862,17 @@ public OnPlayerDisconnect(playerid, reason)
 	//end
     new name[MAX_PLAYER_NAME + 1];
     GetPlayerName(playerid, name, sizeof name);
+
+    if(pData[playerid][pPacket] == 1)
+    {
+        taked = 0;
+        pData[playerid][pPacket]--;
+        pCPPacket = INVALID_PLAYER_ID;
+        new Float:X, Float:Y, Float:Z;
+        GetPlayerPos(playerid, X, Y, Z);
+        objectpacket = CreateDynamicObject(11745, X, Y, Z-1, 80.0, 0.0, 0.0, 0);
+        taked = 0;
+    }
 
 	//pilot
 	if(TakingPs[playerid] == 1 || TakingPs[playerid] == 0) {
@@ -4784,22 +4911,25 @@ public OnPlayerDisconnect(playerid, reason)
 	DeletePVar(playerid,"OnWork");
 	TextDrawDestroy(DigiHP[playerid]);
 	TextDrawDestroy(DigiAP[playerid]);
-	
-	GetPacket[playerid] = 0;
 
 	killgr(playerid);
 	//trasher
 	if(HasTrash[playerid]) Trash_ResetPlayer(playerid);
 	//end trasher
 	SetPlayerName(playerid, pData[playerid][pName]);
-	
+
+	if(pData[playerid][pSekolahSim] == 1)
+	{
+		pData[playerid][pSekolahSim] = 0;
+		Global[SKM] = 0;
+	}
 	if(IsPlayerInAnyVehicle(playerid))
 	{
         RemovePlayerFromVehicle(playerid);
     }
 	//UpdateWeapons(playerid);
 	g_MysqlRaceCheck[playerid]++;
-	
+
 	if(pData[playerid][IsLoggedIn] == true)
 	{
 		/*if(IsAtEvent[playerid] == 0)
@@ -4894,12 +5024,12 @@ public OnPlayerDisconnect(playerid, reason)
 	}
 	if(IsValidDynamic3DTextLabel(pData[playerid][pAdoTag]))
             DestroyDynamic3DTextLabel(pData[playerid][pAdoTag]);
-			
+
 	if(IsValidDynamicObject(pData[playerid][pFlare]))
             DestroyDynamicObject(pData[playerid][pFlare]);
 
     pData[playerid][pAdoActive] = false;
-	
+
 	if(cache_is_valid(pData[playerid][Cache_ID]))
 	{
 		cache_delete(pData[playerid][Cache_ID]);
@@ -4913,10 +5043,10 @@ public OnPlayerDisconnect(playerid, reason)
 	}
 
 	pData[playerid][IsLoggedIn] = false;
-	
+
 	new Float:x, Float:y, Float:z;
 	GetPlayerPos(playerid, x, y, z);
-	
+
 	//hauling tr
 	for(new i; i <= 9; i++) // 9 = Total Dialog , Jadi kita mau tau kalau Player Ini Apakah Ambil Dialog dari 3 tersebut apa ga !
 	{
@@ -4950,7 +5080,7 @@ public OnPlayerDisconnect(playerid, reason)
 	}
 	Player_Fire_Enabled[playerid] = false;
 	Player_Key_Sprint_Time[playerid] = 0;
-	
+
 	return 1;
 }
 
@@ -4979,7 +5109,7 @@ public OnPlayerSpawn(playerid)
 	TogglePlayerControllable(playerid, 0);
 	SetPlayerSpawn(playerid);
 	LoadAnims(playerid);
-	
+
 	SetPlayerSkillLevel(playerid, WEAPON_COLT45, 1);
 	SetPlayerSkillLevel(playerid, WEAPON_SILENCED, 1);
 	SetPlayerSkillLevel(playerid, WEAPON_DEAGLE, 1);
@@ -5277,7 +5407,7 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 		{
 			new bizid = pData[playerid][pInBiz], price;
 			price = bData[bizid][bP][1];
-			
+
 			GivePlayerMoneyEx(playerid, -price);
 			if(pData[playerid][PurchasedToy] == false) MySQL_CreatePlayerToy(playerid);
 			pToys[playerid][pData[playerid][toySelected]][toy_model] = modelid;
@@ -5285,7 +5415,7 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 			strcat(finstring, ""dot"Spine\n"dot"Head\n"dot"Left upper arm\n"dot"Right upper arm\n"dot"Left hand\n"dot"Right hand\n"dot"Left thigh\n"dot"Right tigh\n"dot"Left foot\n"dot"Right foot");
 			strcat(finstring, "\n"dot"Right calf\n"dot"Left calf\n"dot"Left forearm\n"dot"Right forearm\n"dot"Left clavicle\n"dot"Right clavicle\n"dot"Neck\n"dot"Jaw");
 			ShowPlayerDialog(playerid, DIALOG_TOYPOSISIBUY, DIALOG_STYLE_LIST, ""WHITE_E"Select Bone", finstring, "Select", "Cancel");
-			
+
             SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s telah membeli object ID %d seharga %s.", ReturnName(playerid), modelid, FormatMoney(price));
             bData[bizid][bProd]--;
             bData[bizid][bMoney] += Server_Percent(price);
@@ -5304,7 +5434,7 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 			strcat(finstring, ""dot"Spine\n"dot"Head\n"dot"Left upper arm\n"dot"Right upper arm\n"dot"Left hand\n"dot"Right hand\n"dot"Left thigh\n"dot"Right tigh\n"dot"Left foot\n"dot"Right foot");
 			strcat(finstring, "\n"dot"Right calf\n"dot"Left calf\n"dot"Left forearm\n"dot"Right forearm\n"dot"Left clavicle\n"dot"Right clavicle\n"dot"Neck\n"dot"Jaw");
 			ShowPlayerDialog(playerid, DIALOG_TOYPOSISIBUY, DIALOG_STYLE_LIST, ""WHITE_E"Select Bone", finstring, "Select", "Cancel");
-			
+
             SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s telah mengambil object ID %d dilocker.", ReturnName(playerid), modelid);
 		}
 		else return Servers(playerid, "Canceled toys");
@@ -5736,9 +5866,9 @@ public OnPlayerDeath(playerid, killerid, reason)
 	Player_RemoveLumber(playerid);
 	Player_ResetMining(playerid);
 	Player_ResetHarvest(playerid);
-	
+
 	pData[playerid][CarryProduct] = 0;
-	
+
 	KillTimer(pData[playerid][pActivity]);
 	KillTimer(pData[playerid][pMechanic]);
 	KillTimer(pData[playerid][pProducting]);
@@ -5747,7 +5877,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 	PlayerTextDrawHide(playerid, ActiveTD[playerid]);
 	pData[playerid][pMechVeh] = INVALID_VEHICLE_ID;
 	pData[playerid][pActivityTime] = 0;
-	
+
 	pData[playerid][pMechDuty] = 0;
 	pData[playerid][pTaxiDuty] = 0;
 	pData[playerid][pMission] = -1;
@@ -5756,6 +5886,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 	//RecogioChatarra[playerid] = 0;
 
 	pData[playerid][pSideJob] = 0;
+	pData[playerid][pJobTime] = 0;
 	DisablePlayerCheckpoint(playerid);
 	DisablePlayerRaceCheckpoint(playerid);
 	SetPlayerColor(playerid, COLOR_WHITE);
@@ -5772,21 +5903,6 @@ public OnPlayerDeath(playerid, killerid, reason)
 		DestroyDynamicCP(cp[playerid]);
 		TakingPs[playerid] = 2;
 	}
-	if(GetPacket[playerid] == 1)
-	{
-		GetPlayerPos(playerid, ObjPacket[0], ObjPacket[1], ObjPacket[2]);
-		opacket = CreateDynamicObject(11745, ObjPacket[0], ObjPacket[1], ObjPacket[2], 0.00000, 0.00000, 0.00000);
-		GetPacket[playerid] = 0;
-		PacketInDelivery = 0;
-		foreach(new i : Player)
-		{
-			if(pData[i][pJob] == 8 || pData[i][pJob2] == 8)
-			{
-				SCM(i, COLOR_JOB, "SMUGGLER:"WHITE_E" Go to waypoint to get the packet");
-				SetPlayerCheckpoint(i, ObjPacket[0], ObjPacket[1], ObjPacket[2], 2.0);
-			}
-		}
-	}
 	return 1;
 }
 
@@ -5798,21 +5914,21 @@ public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Fl
         if(response == 1)
         {
             new enum_index = weaponid - 22, weaponname[18], string[340];
- 
+
             GetWeaponName(weaponid, weaponname, sizeof(weaponname));
-           
+
             WeaponSettings[playerid][enum_index][Position][0] = fOffsetX;
             WeaponSettings[playerid][enum_index][Position][1] = fOffsetY;
             WeaponSettings[playerid][enum_index][Position][2] = fOffsetZ;
             WeaponSettings[playerid][enum_index][Position][3] = fRotX;
             WeaponSettings[playerid][enum_index][Position][4] = fRotY;
             WeaponSettings[playerid][enum_index][Position][5] = fRotZ;
- 
+
             RemovePlayerAttachedObject(playerid, GetWeaponObjectSlot(weaponid));
             SetPlayerAttachedObject(playerid, GetWeaponObjectSlot(weaponid), GetWeaponModel(weaponid), WeaponSettings[playerid][enum_index][Bone], fOffsetX, fOffsetY, fOffsetZ, fRotX, fRotY, fRotZ, 1.0, 1.0, 1.0);
- 
+
             Servers(playerid, "You have successfully adjusted the position of your %s.", weaponname);
-           
+
             mysql_format(g_SQL, string, sizeof(string), "INSERT INTO weaponsettings (Owner, WeaponID, PosX, PosY, PosZ, RotX, RotY, RotZ) VALUES ('%d', %d, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f) ON DUPLICATE KEY UPDATE PosX = VALUES(PosX), PosY = VALUES(PosY), PosZ = VALUES(PosZ), RotX = VALUES(RotX), RotY = VALUES(RotY), RotZ = VALUES(RotZ)", pData[playerid][pID], weaponid, fOffsetX, fOffsetY, fOffsetZ, fRotX, fRotY, fRotZ);
             mysql_tquery(g_SQL, string);
         }
@@ -5839,7 +5955,7 @@ public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Fl
 			pToys[playerid][index][toy_sx] = fScaleX;
 			pToys[playerid][index][toy_sy] = fScaleY;
 			pToys[playerid][index][toy_sz] = fScaleZ;
-			
+
 			MySQL_SavePlayerToys(playerid);
 		}
 	}
@@ -5876,20 +5992,59 @@ public OnPlayerEditDynamicObject(playerid, STREAMER_TAG_OBJECT: objectid, respon
 	        new venid = pData[playerid][EditingVending];
 	        SetDynamicObjectPos(objectid, VendingData[venid][VendingPosX], VendingData[venid][VendingPosY], VendingData[venid][VendingPosZ]);
 	        SetDynamicObjectRot(objectid, VendingData[venid][VendingPosRX], VendingData[venid][VendingPosRY], VendingData[venid][VendingPosRZ]);
-	        pData[playerid][EditingATMID] = -1;
+	    	pData[playerid][EditingVending] = -1;
+	    }
+	}
+	if(pData[playerid][EditingVtoys] != -1)
+	{
+		if(response == EDIT_RESPONSE_FINAL)
+	    {
+	    	new vehicleid = GetNearestVehicleToPlayer(playerid, 5.0, false);
+	        new vehid = pvData[vehicleid][cVeh];
+	        new idxs = pvData[vehid][vtoySelected];
+	        vtData[vehid][idxs][vtoy_x] = x;
+	        vtData[vehid][idxs][vtoy_y] = y;
+	        vtData[vehid][idxs][vtoy_z] = z;
+	        vtData[vehid][idxs][vtoy_rx] = rx;
+	        vtData[vehid][idxs][vtoy_ry] = ry;
+	        vtData[vehid][idxs][vtoy_rz] = rz;
+
+	        SetDynamicObjectPos(objectid, vtData[vehid][idxs][vtoy_x], vtData[vehid][idxs][vtoy_y], vtData[vehid][idxs][vtoy_z]);
+	        SetDynamicObjectRot(objectid, vtData[vehid][idxs][vtoy_rx], vtData[vehid][idxs][vtoy_ry], vtData[vehid][idxs][vtoy_rz]);
+
+		    MySQL_SaveVehicleToys(vehicleid);
+	        pData[playerid][EditingVtoys] = -1;
+	    }
+
+	    if(response == EDIT_RESPONSE_CANCEL)
+	    {
+	        new vehid = pData[playerid][EditingVtoys];
+	        new idxs = pvData[vehid][vtoySelected];
+	        SetDynamicObjectPos(objectid, vtData[vehid][idxs][vtoy_x], vtData[vehid][idxs][vtoy_y], vtData[vehid][idxs][vtoy_z]);
+	        SetDynamicObjectRot(objectid, vtData[vehid][idxs][vtoy_rx], vtData[vehid][idxs][vtoy_ry], vtData[vehid][idxs][vtoy_rz]);
+	    	pData[playerid][EditingVtoys] = -1;
 	    }
 	}
 	//graf
-	if( response == EDIT_RESPONSE_FINAL ) 
+	if(response == EDIT_RESPONSE_FINAL )
 	{
-		if( GetPVarInt(playerid, "GraffitiCreating") == 1 ) 
+		if(GetPVarInt(playerid, "GraffitiCreating") == 1 )
 		{
-			spraytimerx[playerid] = SetTimerEx( "killgr", 90000, true, "i", playerid );
+			new id = nGraffiti();
+	        gInfo[id][Xpos] = x;
+	        gInfo[id][Ypos] = y;
+	        gInfo[id][Zpos] = z;
+	        gInfo[id][XYpos] = rx;
+	        gInfo[id][YYpos] = ry;
+	        gInfo[id][ZYpos] = rz;
+
+	        SetDynamicObjectPos(objectid, gInfo[id][Xpos], gInfo[id][Ypos], gInfo[id][Zpos]);
+	        SetDynamicObjectRot(objectid, gInfo[id][XYpos], gInfo[id][YYpos], gInfo[id][ZYpos]);
 		}
 	}
 	if( response == EDIT_RESPONSE_CANCEL )
 	{
-		if( GetPVarInt(playerid, "GraffitiCreating") == 1 )
+		if(GetPVarInt(playerid, "GraffitiCreating") == 1 )
 		{
 			DestroyDynamicObject( POBJECT[playerid] );
 			SendClientMessage( playerid,0xFF6800FF,"Creation of Graffiti Canceled" ); // <---
@@ -6133,7 +6288,7 @@ public OnPlayerEditDynamicObject(playerid, STREAMER_TAG_OBJECT: objectid, respon
 				new str[64];
 				format(str, sizeof(str), "Gate ID: %d", id);
 				gData[id][gText] = CreateDynamic3DTextLabel(str, COLOR_WHITE, gData[id][gCX], gData[id][gCY], gData[id][gCZ], 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
-				
+
 				pData[playerid][gEditID] = -1;
 				pData[playerid][gEdit] = 0;
 				Servers(playerid, " You have finished editing gate ID %d's closing position.", id);
@@ -6148,7 +6303,7 @@ public OnPlayerEditDynamicObject(playerid, STREAMER_TAG_OBJECT: objectid, respon
 				gData[id][gORX] = rx;
 				gData[id][gORY] = ry;
 				gData[id][gORZ] = rz;
-				
+
 				pData[playerid][gEditID] = -1;
 				pData[playerid][gEdit] = 0;
 				Servers(playerid, " You have finished editing gate ID %d's opening position.", id);
@@ -6270,7 +6425,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 	    ApplyAnimation(playerid, "GRENADE", "WEAPON_throwu", 4.1, 0, 0, 0, 0, 0);
 	    RemovePlayerAttachedObject(playerid, ATTACHMENT_INDEX);
 		SendClientMessage(playerid, COLOR_JOB, "BUTCHER: {FFFFFF}You've stored a meat bag.");
-				
+
 		Info(playerid, "You Has Stored "RED_E"%d "WHITE_E"Meat", StoreMeat[playerid]);
 		return 1;
 	}
@@ -6325,6 +6480,25 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 
 public OnPlayerEnterRaceCheckpoint(playerid)
 {
+	if(CheckpointLast[playerid] == 1)
+	{
+	    if(pData[playerid][pPacket] == 1)
+	    {
+		    DisablePlayerRaceCheckpoint(playerid);
+		    pData[playerid][pPacket] = 0;
+		    pCPPacket = INVALID_PLAYER_ID;
+		    CheckpointLast[playerid] = 0;
+		    taked = 0;
+		    packet = 0;
+		    new packet_price = Random(10000, 30000);
+
+		    GivePlayerMoneyEx(playerid, packet_price);
+		    new String[1280];
+		    format(String, sizeof String, "SMUGGLER: {FFFFFF}You get $%s from delivering packet", FormatMoney(packet_price));
+		 	SendClientMessage(playerid, COLOR_LOGS, String);
+		 	return 1;
+		}
+	}
     /*if(SedangHauling[playerid] > 0)
 	{
  		if(SedangHauling[playerid] == 1)
@@ -6596,6 +6770,11 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 		DisablePlayerRaceCheckpoint(playerid);
 		Info(playerid, "/gps(My Dealer Mission) , /storeveh.");
 	}
+	if(CheckpointPacket[playerid] == 1)
+	{
+		CheckpointPacket[playerid] = 0;
+		DisablePlayerRaceCheckpoint(playerid);
+	}
 	DisablePlayerRaceCheckpoint(playerid);
 	return 1;
 }
@@ -6612,7 +6791,7 @@ public OnPlayerHackTeleport(playerid, Float:distance)
 	}
 	return 1;
 }
-CMD:openpara(playerid) 
+CMD:openpara(playerid)
 {
 	if(IsPlayerInAnyVehicle(playerid) && GetPlayerVehicleSeat(playerid) == 0)
 	{
@@ -6631,7 +6810,7 @@ CMD:openpara(playerid)
 					StartVehicleParachuteAction(playerid);
 					CallLocalFunction("OnVehicleParachuteOpened","dd",playerid,vid);
 				}
-				else 
+				else
 				{
 					CallLocalFunction("OnVehicleParachuteOpenFail","dd",playerid,vid);
 				}
@@ -6659,17 +6838,67 @@ public OnVehicleParachuteOpenFail(playerid,vehicleid)
 public OnPlayerAirbreak(playerid)
 {
 	SendClientMessage(playerid, -1, "You have detected airbreak teleport.");
-	//Kick(playerid); 
+	//Kick(playerid);
 	return 1;
 }
 public OnPlayerEnterCheckpoint(playerid)
 {
+	if(pData[playerid][pSekolahSim] == 1)
+	{
+		new vehicleid = GetPlayerVehicleID(playerid);
+		if(GetVehicleModel(vehicleid) == 426)
+		{
+			if (IsPlayerInRangeOfPoint(playerid,  3.0, dmvpoint1))
+			{
+				SetPlayerCheckpoint(playerid, dmvpoint2, 3.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 3.0,dmvpoint2))
+			{
+				SetPlayerCheckpoint(playerid, dmvpoint3, 3.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 3.0,dmvpoint3))
+			{
+				SetPlayerCheckpoint(playerid, dmvpoint4, 3.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 3.0,dmvpoint4))
+			{
+				SetPlayerCheckpoint(playerid, dmvpoint5, 3.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 3.0,dmvpoint5))
+			{
+				SetPlayerCheckpoint(playerid, dmvpoint6, 3.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 3.0,dmvpoint6))
+			{
+				SetPlayerCheckpoint(playerid, dmvpoint7, 3.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 3.0,dmvpoint7))
+			{
+				SetPlayerCheckpoint(playerid, dmvpoint8, 3.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 3.0,dmvpoint8))
+			{
+				SetPlayerCheckpoint(playerid, dmvpoint9, 3.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 3.0,dmvpoint9))
+			{
+				pData[playerid][pDriveLic] = 1;
+				pData[playerid][pSekolahSim] = 0;
+				Global[SKM] = 0;
+				DisablePlayerCheckpoint(playerid);
+				pData[playerid][pDriveLicTime] = gettime() + (15 * 86400);
+				Info(playerid, "Anda telah berhasil membuat SIM");
+				RemovePlayerFromVehicle(playerid);
+				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
+			}
+		}
+	}
 	//butcher
 	if(GetPVarInt(playerid,"OnWork"))
 	{
 		DisablePlayerCheckpoint(playerid);
 	}
-    
+
 	if(IsPlayerInRangeOfPoint(playerid, 2.0, 2846.0537,955.7325,10.7500)) //lv
 	{
  		DisablePlayerCheckpoint(playerid);
@@ -6690,7 +6919,6 @@ public OnPlayerEnterCheckpoint(playerid)
  		DisablePlayerCheckpoint(playerid);
  		return 1;
 	}
-	
 
 	if(pData[playerid][CarryingLog] != -1)
 	{
@@ -6794,12 +7022,11 @@ public OnPlayerEnterCheckpoint(playerid)
 			}
 			if(IsPlayerInRangeOfPoint(playerid, 7.0,sweperpoint12))
 			{
-				new swp_price = Random(10000, 19000);
 				pData[playerid][pSideJob] = 0;
-				pData[playerid][pSideJobTime] = 300;
+				pData[playerid][pSweeperTime] = 900;
 				DisablePlayerCheckpoint(playerid);
-				AddPlayerSalary(playerid, "Sidejob(Sweeper)", swp_price);
-				SendClientMessage(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Sweeper)", FormatMoney(swp_price));
+				AddPlayerSalary(playerid, "Sidejob(Sweeper)", 10000);
+				Info(playerid, "Sidejob(Bus) telah masuk ke pending salary anda!");
 				RemovePlayerFromVehicle(playerid);
 				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
 			}
@@ -6916,12 +7143,217 @@ public OnPlayerEnterCheckpoint(playerid)
 			}
 			if(IsPlayerInRangeOfPoint(playerid, 7.0,buspoint27))
 			{
-				new bus_price = Random(10000, 20000);
 				pData[playerid][pSideJob] = 0;
-				pData[playerid][pSideJobTime] = 800;
+				pData[playerid][pBusTime] = 1200;
 				DisablePlayerCheckpoint(playerid);
-				AddPlayerSalary(playerid, "Sidejob(Bus)", bus_price);
-				SendClientMessage(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Bus)", FormatMoney(bus_price));
+				AddPlayerSalary(playerid, "Sidejob(Bus Route B)", 12500);
+				Info(playerid, "Sidejob(Bus) telah masuk ke pending salary anda!");
+				RemovePlayerFromVehicle(playerid);
+				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
+			}
+		}
+	}
+	if(pData[playerid][pSideJob] == 2)
+	{
+		new vehicleid = GetPlayerVehicleID(playerid);
+		if(GetVehicleModel(vehicleid) == 431)
+		{
+		    if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus1))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus2, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus2))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus3, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus3))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus4, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus4))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus5, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus5))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus6, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus6))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus7, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus7))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus8, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus8))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus9, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus9))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus10, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus10))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus11, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus11))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus12, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus12))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus13, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus13))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus14, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus14))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus15, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus15))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus16, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus16))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus17, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus17))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus18, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus18))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus19, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus19))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus20, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus20))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus21, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus21))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus22, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,cpbus22))
+			{
+			    SetPlayerCheckpoint(playerid,cpbus23, 7.0);
+			}
+			if(IsPlayerInRangeOfPoint(playerid, 7.0,cpbus23))
+			{
+				SetPlayerCheckpoint(playerid,cpbus24, 7.0);
+			}
+			if(IsPlayerInRangeOfPoint(playerid, 7.0,cpbus24))
+			{
+			    pData[playerid][pSideJob] = 0;
+				pData[playerid][pBusTime] = 1200;
+				DisablePlayerCheckpoint(playerid);
+				AddPlayerSalary(playerid, "Sidejob(Bus Route B)", 15500);
+				Info(playerid, "Sidejob(Bus) telah masuk ke pending salary anda!");
+				RemovePlayerFromVehicle(playerid);
+				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
+			}
+		}
+	}
+	if(pData[playerid][pSideJob] == 2)
+	{
+		new vehicleid = GetPlayerVehicleID(playerid);
+		if(GetVehicleModel(vehicleid) == 431)
+		{
+		    if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp1))
+			{
+			    SetPlayerCheckpoint(playerid,buscp2, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp2))
+			{
+			    SetPlayerCheckpoint(playerid,buscp3, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp3))
+			{
+			    SetPlayerCheckpoint(playerid,buscp4, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp4))
+			{
+			    SetPlayerCheckpoint(playerid,buscp5, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp5))
+			{
+			    SetPlayerCheckpoint(playerid,buscp6, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp6))
+			{
+			    SetPlayerCheckpoint(playerid,buscp7, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp7))
+			{
+			    SetPlayerCheckpoint(playerid,buscp8, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp8))
+			{
+			    SetPlayerCheckpoint(playerid,buscp9, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp9))
+			{
+			    SetPlayerCheckpoint(playerid,buscp10, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp10))
+			{
+			    SetPlayerCheckpoint(playerid,buscp11, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp11))
+			{
+			    SetPlayerCheckpoint(playerid,buscp12, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp12))
+			{
+			    SetPlayerCheckpoint(playerid,buscp13, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp13))
+			{
+			    SetPlayerCheckpoint(playerid,buscp14, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp14))
+			{
+			    SetPlayerCheckpoint(playerid,buscp15, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp15))
+			{
+			    SetPlayerCheckpoint(playerid,buscp16, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp16))
+			{
+			    SetPlayerCheckpoint(playerid,buscp17, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp17))
+			{
+			    SetPlayerCheckpoint(playerid,buscp18, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp18))
+			{
+			    SetPlayerCheckpoint(playerid,buscp19, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp19))
+			{
+			    SetPlayerCheckpoint(playerid,buscp20, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp20))
+			{
+			    SetPlayerCheckpoint(playerid,buscp21, 7.0);
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 7.0,buscp21))
+			{
+			    pData[playerid][pSideJob] = 0;
+				pData[playerid][pBusTime] = 1200;
+				DisablePlayerCheckpoint(playerid);
+				AddPlayerSalary(playerid, "Sidejob(Bus Route C)", 20000);
+				Info(playerid, "Sidejob(Bus) telah masuk ke pending salary anda!");
 				RemovePlayerFromVehicle(playerid);
 				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
 			}
@@ -6934,9 +7366,9 @@ public OnPlayerEnterCheckpoint(playerid)
 		{
 			if (IsPlayerInRangeOfPoint(playerid, 4.0,forpoint1))
 			{
-				SetPlayerCheckpoint(playerid, 2400.02,-2565.49,13.21, 4.0);
+				SetPlayerCheckpoint(playerid, forpoint2, 4.0);
 				TogglePlayerControllable(playerid, 0);
-				pData[playerid][pActivity] = SetTimerEx("ForkliftTake", 1300, true, "i", playerid);
+				pData[playerid][pActivity] = SetTimerEx("ForkliftTake", 400, true, "i", playerid);
 				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Mengangkat Box...");
 				PlayerTextDrawShow(playerid, ActiveTD[playerid]);
 				ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
@@ -6944,22 +7376,101 @@ public OnPlayerEnterCheckpoint(playerid)
 			}
 			if (IsPlayerInRangeOfPoint(playerid, 4.0,forpoint2))
 			{
-				SetPlayerCheckpoint(playerid, 2752.89,-2392.60,13.64, 4.0);
+				SetPlayerCheckpoint(playerid, forpoint3, 4.0);
 				TogglePlayerControllable(playerid, 0);
-				pData[playerid][pActivity] = SetTimerEx("ForkliftDown", 1300, true, "i", playerid);
+				pData[playerid][pActivity] = SetTimerEx("ForkliftDown", 400, true, "i", playerid);
 				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Meletakkan Box...");
 				PlayerTextDrawShow(playerid, ActiveTD[playerid]);
 				ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
 				return 1;
 			}
-			if(IsPlayerInRangeOfPoint(playerid, 4.0,forpoint3))
+			if (IsPlayerInRangeOfPoint(playerid, 4.0,forpoint3))
 			{
-				new frc_price = Random(9000, 15000);
+				SetPlayerCheckpoint(playerid, forpoint4, 4.0);
+				TogglePlayerControllable(playerid, 0);
+				pData[playerid][pActivity] = SetTimerEx("ForkliftTake", 400, true, "i", playerid);
+				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Mengangkat Box...");
+				PlayerTextDrawShow(playerid, ActiveTD[playerid]);
+				ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
+				return 1;
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 4.0,forpoint4))
+			{
+				SetPlayerCheckpoint(playerid, forpoint5, 4.0);
+				TogglePlayerControllable(playerid, 0);
+				pData[playerid][pActivity] = SetTimerEx("ForkliftDown", 400, true, "i", playerid);
+				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Meletakkan Box...");
+				PlayerTextDrawShow(playerid, ActiveTD[playerid]);
+				ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
+				return 1;
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 4.0,forpoint5))
+			{
+				SetPlayerCheckpoint(playerid, forpoint6, 4.0);
+				TogglePlayerControllable(playerid, 0);
+				pData[playerid][pActivity] = SetTimerEx("ForkliftTake", 400, true, "i", playerid);
+				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Mengangkat Box...");
+				PlayerTextDrawShow(playerid, ActiveTD[playerid]);
+				ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
+				return 1;
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 4.0,forpoint6))
+			{
+				SetPlayerCheckpoint(playerid, forpoint7, 4.0);
+				TogglePlayerControllable(playerid, 0);
+				pData[playerid][pActivity] = SetTimerEx("ForkliftDown", 400, true, "i", playerid);
+				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Meletakkan Box...");
+				PlayerTextDrawShow(playerid, ActiveTD[playerid]);
+				ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
+				return 1;
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 4.0,forpoint7))
+			{
+				SetPlayerCheckpoint(playerid, forpoint8, 4.0);
+				TogglePlayerControllable(playerid, 0);
+				pData[playerid][pActivity] = SetTimerEx("ForkliftTake", 400, true, "i", playerid);
+				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Mengangkat Box...");
+				PlayerTextDrawShow(playerid, ActiveTD[playerid]);
+				ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
+				return 1;
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 4.0,forpoint8))
+			{
+				SetPlayerCheckpoint(playerid, forpoint9, 4.0);
+				TogglePlayerControllable(playerid, 0);
+				pData[playerid][pActivity] = SetTimerEx("ForkliftDown", 400, true, "i", playerid);
+				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Meletakkan Box...");
+				PlayerTextDrawShow(playerid, ActiveTD[playerid]);
+				ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
+				return 1;
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 4.0,forpoint9))
+			{
+				SetPlayerCheckpoint(playerid, forpoint10, 4.0);
+				TogglePlayerControllable(playerid, 0);
+				pData[playerid][pActivity] = SetTimerEx("ForkliftTake", 400, true, "i", playerid);
+				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Mengangkat Box...");
+				PlayerTextDrawShow(playerid, ActiveTD[playerid]);
+				ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
+				return 1;
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 4.0,forpoint10))
+			{
+				SetPlayerCheckpoint(playerid, forpoint11, 4.0);
+				TogglePlayerControllable(playerid, 0);
+				pData[playerid][pActivity] = SetTimerEx("ForkliftDown", 400, true, "i", playerid);
+				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Meletakkan Box...");
+				PlayerTextDrawShow(playerid, ActiveTD[playerid]);
+				ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
+				return 1;
+			}
+			if(IsPlayerInRangeOfPoint(playerid, 4.0,forpoint11))
+			{
 				pData[playerid][pSideJob] = 0;
-				pData[playerid][pSideJobTime] = 460;
+				pData[playerid][pForkliftTime] = 900;
 				DisablePlayerCheckpoint(playerid);
-				AddPlayerSalary(playerid, "Sidejob(Forklift)", frc_price);
-				SendClientMessage(playerid, COLOR_LOGS, "JOBS: {FFFFFF}You get $%s From Sidejobs(Forklift)", FormatMoney(frc_price));
+				AddPlayerSalary(playerid, "Sidejob(Forklift)", 10000);
+				Info(playerid, "Sidejob(Bus) telah masuk ke pending salary anda!");
 				RemovePlayerFromVehicle(playerid);
 				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
 				return 1;
@@ -6969,14 +7480,86 @@ public OnPlayerEnterCheckpoint(playerid)
     if(SedangAnterPizza[playerid] == 1) // pizza
 	{
         SedangAnterPizza[playerid] = 0;
-	    pData[playerid][pSideJobTime] = 600;
+	    pData[playerid][pPizzaTime] = 600;
     	AddPlayerSalary(playerid, "Sidejob(Pizza)", 5000);
     	new fmt_str[1280];
     	RemovePlayerAttachedObject(playerid,1);
     	format(fmt_str, sizeof fmt_str, "PIZZA JOB: {ffffff}Kamu mendapatkan $50.00 dari hasil mengirim pizza dan dimasukkan ke salary.");
-    	SendClientMessage(playerid,COLOR_JOB, "PIZZA JOB: {ffffff}Kamu berhasil mengirimkan pizza dan mendapat delay 15 menit.");
-        SendClientMessage(playerid,COLOR_JOB, fmt_str);
+    	SendClientMessage(playerid,COLOR_RIKO, "PIZZA JOB: {ffffff}Kamu berhasil mengirimkan pizza dan mendapat delay 10 menit.");
+        SendClientMessage(playerid,COLOR_RIKO, fmt_str);
         DisablePlayerCheckpoint(playerid);
+	}
+    if(pData[playerid][pJob] == 4 || pData[playerid][pJob2] == 4)
+	{
+		new vehicleid = GetPlayerVehicleID(playerid);
+		if(GetVehicleModel(vehicleid) == 578)
+		{
+			if (IsPlayerInRangeOfPoint(playerid, 4.0,containerpoint1))
+			{
+				SetPlayerCheckpoint(playerid, 2869.1934,917.6111,10.7500, 4.0);
+				TogglePlayerControllable(playerid, 0);
+				pData[playerid][pActivity] = SetTimerEx("ContainerTake", 400, true, "i", playerid);
+				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Memuat Container...");
+				PlayerTextDrawShow(playerid, ActiveTD[playerid]);
+				ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
+				return 1;
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 4.0,containerpoint2))
+			{
+				TogglePlayerControllable(playerid, 0);
+				pData[playerid][pActivity] = SetTimerEx("ContainerDown", 400, true, "i", playerid);
+				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Meletakkan Container...");
+				PlayerTextDrawShow(playerid, ActiveTD[playerid]);
+				ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
+				pData[playerid][pSideJob] = 0;
+				pData[playerid][pJobTime] = 1800;
+				DisablePlayerCheckpoint(playerid);
+				AddPlayerSalary(playerid, "Trucker(Container)", 35000);
+				Info(playerid, "Trucker(Container) telah masuk ke pending salary anda!");
+				return 1;
+			}
+		}
+	}
+	if(pData[playerid][pJob] == 9 || pData[playerid][pJob2] == 9)
+	{
+		new vehicleid = GetPlayerVehicleID(playerid);
+		if(GetVehicleModel(vehicleid) == 482)
+		{
+			if (IsPlayerInRangeOfPoint(playerid, 4.0, 2787.4229,-2417.5588,13.6338))
+			{
+				SetPlayerCheckpoint(playerid, 2785.6194,-2455.9802,13.6342, 4.0);
+				TogglePlayerControllable(playerid, 0);
+				pData[playerid][pActivity] = SetTimerEx("KurirDone", 400, true, "i", playerid);
+				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Meletakkan Crate...");
+				PlayerTextDrawShow(playerid, ActiveTD[playerid]);
+				ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
+				return 1;
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 4.0, 2785.6194,-2455.9802,13.6342))
+			{
+				SetPlayerCheckpoint(playerid, 2787.2864,-2494.1882,13.6509, 4.0);
+				TogglePlayerControllable(playerid, 0);
+				pData[playerid][pActivity] = SetTimerEx("KurirDone", 400, true, "i", playerid);
+				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Memuat Crate...");
+				PlayerTextDrawShow(playerid, ActiveTD[playerid]);
+				ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
+				return 1;
+			}
+			if (IsPlayerInRangeOfPoint(playerid, 4.0,2787.2864,-2494.1882,13.6509))
+			{
+				TogglePlayerControllable(playerid, 0);
+				pData[playerid][pActivity] = SetTimerEx("KurirDone", 400, true, "i", playerid);
+				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Memuat Crate...");
+				PlayerTextDrawShow(playerid, ActiveTD[playerid]);
+				ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
+				pData[playerid][pSideJob] = 0;
+				pData[playerid][pJobTime] = 800;
+				DisablePlayerCheckpoint(playerid);
+				AddPlayerSalary(playerid, "Couriers(Jobs)", 6500);
+				Info(playerid, "Couriers(Jobs) telah masuk ke pending salary anda!");
+				return 1;
+			}
+		}
 	}
 	//DisablePlayerCheckpoint(playerid);
 	return 1;
@@ -6985,36 +7568,49 @@ public OnPlayerEnterCheckpoint(playerid)
 public OnPlayerExitVehicle(playerid, vehicleid)
 {
 	KillTimer(pData[playerid][LimitSpeedTimer]);
+	if(pData[playerid][pSekolahSim] == 1)
+	{
+		//new vehicleid = GetPlayerVehicleID(playerid);
+		if(GetVehicleModel(vehicleid) == 426)
+		{
+		    DisablePlayerCheckpoint(playerid);
+		    Info(playerid, "Anda gagal test mengemudi karena telah keluar dari kendaraan!");
+		    RemovePlayerFromVehicle(playerid);
+		    Global[SKM] = 0;
+		    pData[playerid][pSekolahSim] = 0;
+		    SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
+		}
+	}
     if (GetVehicleModel(vehicleid) == 574)
 	{
 	    {
-	        SendClientMessageEx(playerid,COLOR_JOB,"Kamu telah berhenti bekerja, kamu dapat bekerja Street Sweeper 10 menit lagi.");
+	        SendClientMessageEx(playerid,COLOR_RIKO,"SIDEJOB:{FFFFFF}Kamu telah berhenti bekerja, kamu dapat bekerja Street Sweeper 10 menit lagi.");
 			pData[playerid][pSideJob] = 0;
 			RemovePlayerFromVehicle(playerid);
 			SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
-			pData[playerid][pSideJobTime] = 600;
+			pData[playerid][pSweeperTime] = 600;
 			DisablePlayerCheckpoint(playerid);
 	    }
 	}
 	else if (GetVehicleModel(vehicleid) == 431)
 	{
 	    {
-	        SendClientMessageEx(playerid,COLOR_JOB,"Kamu telah berhenti bekerja, kamu dapat bekerja sebagai Bus Driver 10 menit lagi.");
+	        SendClientMessageEx(playerid,COLOR_RIKO,"SIDEJOB:{FFFFFF}Kamu telah berhenti bekerja, kamu dapat bekerja sebagai Bus Driver 10 menit lagi.");
 			pData[playerid][pSideJob] = 0;
 			RemovePlayerFromVehicle(playerid);
 			SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
-			pData[playerid][pSideJobTime] = 600;
+			pData[playerid][pBusTime] = 600;
 			DisablePlayerCheckpoint(playerid);
 	    }
 	}
 	else if (GetVehicleModel(vehicleid) == 530)
 	{
 	    {
-	        SendClientMessageEx(playerid,COLOR_JOB,"Kamu telah berhenti bekerja, kamu dapat bekerja Forklift 10 menit lagi.");
+	        SendClientMessageEx(playerid,COLOR_RIKO,"SIDEJOB:{FFFFFF}Kamu telah berhenti bekerja, kamu dapat bekerja Forklift 10 menit lagi.");
 			pData[playerid][pSideJob] = 0;
 			RemovePlayerFromVehicle(playerid);
 			SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
-			pData[playerid][pSideJobTime] = 600;
+			pData[playerid][pForkliftTime] = 600;
 			DisablePlayerCheckpoint(playerid);
 	    }
 	}
@@ -7044,8 +7640,8 @@ public OnDynamicObjectMoved(objectid)
         else
         {
             if(y == 2123.890380)
-            {        
-			    if(StoreMeat[playerid] == -1) 
+            {
+			    if(StoreMeat[playerid] == -1)
 				{
 			    	Info(playerid, "Finish.");
 			    	if(IsValidDynamicObject(playerobject[playerid][0])) DestroyDynamicObject(playerobject[playerid][0]);
@@ -7059,7 +7655,7 @@ public OnDynamicObjectMoved(objectid)
 					DeletePVar(playerid,"BadMeatDel");
 					DeletePVar(playerid,"BadMeat");
 					DeletePVar(playerid,"OldSkin");
-					DeletePVar(playerid,"OnWork");	
+					DeletePVar(playerid,"OnWork");
 			    }
 			    if(GetPVarInt(playerid,"BadMeat")) GameTextForPlayer(playerid,"~r~BAD JOB",500,5);
                 else GameTextForPlayer(playerid,"~g~GOOD JOB",500,5);
@@ -7158,7 +7754,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 	}
 	if(newkeys & KEY_YES && !GetPVarInt(playerid,"MeatCheck") && GetPVarInt(playerid,"InWork") && GetPVarInt(playerid,"OnWork"))
 	{
-		if(StoreMeat[playerid] == 0) 
+		if(StoreMeat[playerid] == 0)
 		{
 		    if(GetPVarInt(playerid,"BadMeat"))
 		    {
@@ -7186,7 +7782,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		SetPlayerVirtualWorld(playerid,0);
 	    TogglePlayerControllable(playerid, 1);
 	    SetCameraBehindPlayer(playerid);
-	    DeletePVar(playerid,"InWork");	
+	    DeletePVar(playerid,"InWork");
 	}
     if((newkeys & KEY_NO) && HasTrash[playerid])
 	{
@@ -7269,7 +7865,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 				if(dData[did][dLocked])
 					return Error(playerid, "This entrance is locked at the moment.");
-					
+
 				if(dData[did][dFaction] > 0)
 				{
 					if(dData[did][dFaction] != pData[playerid][pFaction])
@@ -7280,19 +7876,19 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 					if(dData[did][dFamily] != pData[playerid][pFamily])
 						return Error(playerid, "This door only for family.");
 				}
-				
+
 				if(dData[did][dVip] > pData[playerid][pVip])
 					return Error(playerid, "Your VIP level not enough to enter this door.");
-				
+
 				if(dData[did][dAdmin] > pData[playerid][pAdmin])
 					return Error(playerid, "Your admin level not enough to enter this door.");
-					
+
 				if(strlen(dData[did][dPass]))
 				{
 					new params[256];
 					if(sscanf(params, "s[256]", params)) return Usage(playerid, "/enter [password]");
 					if(strcmp(params, dData[did][dPass])) return Error(playerid, "Invalid door password.");
-					
+
 					if(dData[did][dCustom])
 					{
 						SetPlayerPositionEx(playerid, dData[did][dIntposX], dData[did][dIntposY], dData[did][dIntposZ], dData[did][dIntposA]);
@@ -7331,7 +7927,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 					if(dData[did][dFaction] != pData[playerid][pFaction])
 						return Error(playerid, "This door only for faction.");
 				}
-				
+
 				if(dData[did][dCustom])
 				{
 					SetPlayerPositionEx(playerid, dData[did][dExtposX], dData[did][dExtposY], dData[did][dExtposZ], dData[did][dExtposA]);
@@ -7357,10 +7953,10 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 				if(bData[bid][bLocked])
 					return Error(playerid, "This bisnis is locked!");
-					
+
 				pData[playerid][pInBiz] = bid;
 				SetPlayerPositionEx(playerid, bData[bid][bIntposX], bData[bid][bIntposY], bData[bid][bIntposZ], bData[bid][bIntposA]);
-				
+
 				PlayAudioStreamForPlayer(playerid, bData[bid][bSong], bData[bid][bIntposX], bData[bid][bIntposY], bData[bid][bIntposZ], 15.0, 1);
 				SetPlayerInterior(playerid, bData[bid][bInt]);
 				SetPlayerVirtualWorld(playerid, bid);
@@ -7373,7 +7969,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		{
 			pData[playerid][pInBiz] = -1;
 			SetPlayerPositionEx(playerid, bData[inbisnisid][bExtposX], bData[inbisnisid][bExtposY], bData[inbisnisid][bExtposZ], bData[inbisnisid][bExtposA]);
-			
+
 			StopAudioStreamForPlayer(playerid);
 			SetPlayerInterior(playerid, 0);
 			SetPlayerVirtualWorld(playerid, 0);
@@ -7390,7 +7986,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 				if(hData[hid][hLocked])
 					return Error(playerid, "This house is locked!");
-				
+
 				pData[playerid][pInHouse] = hid;
 				SetPlayerPositionEx(playerid, hData[hid][hIntposX], hData[hid][hIntposY], hData[hid][hIntposZ], hData[hid][hIntposA]);
 
@@ -7405,7 +8001,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		{
 			pData[playerid][pInHouse] = -1;
 			SetPlayerPositionEx(playerid, hData[inhouseid][hExtposX], hData[inhouseid][hExtposY], hData[inhouseid][hExtposZ], hData[inhouseid][hExtposA]);
-			
+
 			SetPlayerInterior(playerid, 0);
 			SetPlayerVirtualWorld(playerid, 0);
 			SetCameraBehindPlayer(playerid);
@@ -7422,7 +8018,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				if(pData[playerid][pFaction] == 0)
 					if(pData[playerid][pFamily] == -1)
 						return Error(playerid, "You dont have registered for this door!");
-					
+
 				SetPlayerPositionEx(playerid, fData[fid][fIntposX], fData[fid][fIntposY], fData[fid][fIntposZ], fData[fid][fIntposA]);
 
 				SetPlayerInterior(playerid, fData[fid][fInt]);
@@ -7477,7 +8073,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 			break;
 	    }
 	}
-	if((newkeys & KEY_NO ))
+	if((newkeys & KEY_CTRL_BACK ))
 	{
 		if(IsPlayerInAnyVehicle(playerid) && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 		{
@@ -7526,7 +8122,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 						if(dData[did][dLocked])
 							return Error(playerid, "This entrance is locked at the moment.");
-							
+
 						if(dData[did][dFaction] > 0)
 						{
 							if(dData[did][dFaction] != pData[playerid][pFaction])
@@ -7537,19 +8133,19 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 							if(dData[did][dFamily] != pData[playerid][pFamily])
 								return Error(playerid, "This door only for family.");
 						}
-						
+
 						if(dData[did][dVip] > pData[playerid][pVip])
 							return Error(playerid, "Your VIP level not enough to enter this door.");
-						
+
 						if(dData[did][dAdmin] > pData[playerid][pAdmin])
 							return Error(playerid, "Your admin level not enough to enter this door.");
-							
+
 						if(strlen(dData[did][dPass]))
 						{
 							new params[256];
 							if(sscanf(params, "s[256]", params)) return Usage(playerid, "/enter [password]");
 							if(strcmp(params, dData[did][dPass])) return Error(playerid, "Invalid door password.");
-							
+
 							if(dData[did][dCustom])
 							{
 								SetVehiclePositionEx(playerid, GetPlayerVehicleID(playerid), dData[did][dIntposX], dData[did][dIntposY], dData[did][dIntposZ], dData[did][dIntposA]);
@@ -7592,7 +8188,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 							if(dData[xid][dFaction] != pData[playerid][pFaction])
 								return Error(playerid, "This door only for faction.");
 						}
-					
+
 						if(dData[xid][dCustom])
 						{
 							SetVehiclePositionEx(playerid, GetPlayerVehicleID(playerid), dData[xid][dExtposX], dData[xid][dExtposY], dData[xid][dExtposZ], dData[xid][dExtposA]);
@@ -7641,7 +8237,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	    new vehicleid = GetPlayerVehicleID(playerid);
 	    if(GetVehicleModel(vehicleid) == 408)
 	    {
-		    if(LoadedTrash[vehicleid] > 0) 
+		    if(LoadedTrash[vehicleid] > 0)
 		    {
 		        new string[128];
 		        format(string, sizeof(string), "TRASHMASTER: {FFFFFF}This vehicle has {F39C12}%d {FFFFFF}trash bags which is worth {2ECC71}$%d.", LoadedTrash[vehicleid], LoadedTrash[vehicleid] * TRASH_BAG_VALUE);
@@ -7693,7 +8289,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		SetPVarInt(playerid, "LastVehicleID", vehicleid);
 	}
 	if(newstate == PLAYER_STATE_WASTED && pData[playerid][pJail] < 1)
-    {	
+    {
 		if(pData[playerid][pInjured] == 0)
         {
             pData[playerid][pInjured] = 1;
@@ -7734,7 +8330,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			RemovePlayerFromVehicle(playerid);
             SetPlayerHealthEx(playerid, 99999);
         }
-		foreach (new ii : Player) if(pData[ii][pSpec] == playerid) 
+		foreach (new ii : Player) if(pData[ii][pSpec] == playerid)
 		{
             PlayerSpectateVehicle(ii, GetPlayerVehicleID(playerid));
         }
@@ -7745,15 +8341,15 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		TextDrawHideForPlayer(playerid, DPvehfare[playerid]);
 	}
 	if(oldstate == PLAYER_STATE_DRIVER)
-    {	
+    {
 		if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_CARRY || GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_CUFFED)
             return RemovePlayerFromVehicle(playerid);/*RemoveFromVehicle(playerid);*/
-			
+
 		PlayerTextDrawHide(playerid, DPvehname[playerid]);
         PlayerTextDrawHide(playerid, DPvehengine[playerid]);
         PlayerTextDrawHide(playerid, DPvehspeed[playerid]);
         PlayerTextDrawHide(playerid, HBEC[playerid]);
-		
+
 		TextDrawHideForPlayer(playerid, DPvehfare[playerid]);
 		TextDrawHideForPlayer(playerid, VehBox);
         for(new txd; txd < 6; txd++)
@@ -7769,7 +8365,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		{
 			TextDrawHideForPlayer(playerid, DGhudveh[txd]);
 		}
-		
+
 		if(pData[playerid][pTaxiDuty] == 1)
 		{
 			pData[playerid][pTaxiDuty] = 0;
@@ -7783,19 +8379,19 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			pData[playerid][pFare] = 0;
 			pData[playerid][pTotalFare] = 0;
 		}
-		
+
         HidePlayerProgressBar(playerid, pData[playerid][fuelbar]);
         HidePlayerProgressBar(playerid, pData[playerid][damagebar]);
-        
+
         HidePlayerProgressBar(playerid, pData[playerid][spfuelbar]);
         HidePlayerProgressBar(playerid, pData[playerid][spdamagebar]);
 	}
-	//mt speedo
+	/*mt speedo
 	if(newstate != PLAYER_STATE_DRIVER)
 	{
 		DestroyPlayerObject(playerid,PlayerSpeedObject[playerid]);
 		DestroyPlayerObject(playerid,PlayerSpeedObject2[playerid]);
-	}
+	}*/
 	else if(newstate == PLAYER_STATE_DRIVER)
     {
 		foreach(new pv : PVehicles)
@@ -7826,6 +8422,14 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	        }
 	        VehicleLastEnterTime[playerid] = gettime() + 2;
 	    }
+	    if(IsADmvVeh(vehicleid))
+        {
+            if(pData[playerid][pSekolahSim] == 0)
+            {
+                RemovePlayerFromVehicle(playerid);
+                Error(playerid, "Anda Tidak Memulai {FFFF00}DMV {FFFFFF}Test");
+			}
+		}
 		if(IsATrashVeh(vehicleid))
 		{
 			ShowPlayerDialog(playerid, DIALOG_TRASH, DIALOG_STYLE_MSGBOX, "Side Job - Trashmaster", "Anda akan bekerja sebagai pengangkut sampah?", "Start Job", "Close");
@@ -7836,7 +8440,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		}
 		if(IsASweeperVeh(vehicleid))
 		{
-			ShowPlayerDialog(playerid, DIALOG_SWEEPER, DIALOG_STYLE_LIST, "Side Job - Sweeper", "Anda Ingin Bekerja Sweeper?", "Start Job", "Close");
+			ShowPlayerDialog(playerid, DIALOG_SWEEPER, DIALOG_STYLE_MSGBOX, "Side Job - Sweeper", "Anda akan bekerja sebagai pembersih jalan?", "Start Job", "Close");
 		}
 		if(IsAPizzaVeh(vehicleid))
 		{
@@ -7844,7 +8448,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		}
 		if(IsABusVeh(vehicleid))
 		{
-			ShowPlayerDialog(playerid, DIALOG_BUS, DIALOG_STYLE_LIST, "Side Job - Bus", "1.Route A\tLos Santos Bank\n2.Route B\tMarket\n3.Route C\tMaintenance", "Start Job", "Close");
+			ShowPlayerDialog(playerid, DIALOG_BUS, DIALOG_STYLE_LIST, "Side Job - Bus", "1.Route A\tLos Santos Bank\n2.Route B\tOcean Docks\n3.Route C\tEast Side\n", "Start Job", "Close");
 		}
 		if(!IsEngineVehicle(vehicleid))
         {
@@ -7852,7 +8456,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
         }
 		if(IsEngineVehicle(vehicleid) && pData[playerid][pDriveLic] <= 0)
         {
-            Info(playerid, "Anda tidak memiliki surat izin mengemudi, berhati-hatilah.");
+            Info(playerid, "Anda tidak memiliki {FFFF00}Driving Licenses{FFFFFF}, berhati-hatilah.");
         }
 		if(pData[playerid][pHBEMode] == 1)
 		{
@@ -7866,7 +8470,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			//PlayerTextDrawShow(playerid, SPvehspeed[playerid]);
 			ShowPlayerProgressBar(playerid, pData[playerid][spfuelbar]);
 			ShowPlayerProgressBar(playerid, pData[playerid][spdamagebar]);
-			//mt speedo
+			/*mt speedo
 			if(PlayerSpeed[playerid]==0) return 1;
 			UpdateSpeedo(playerid);
 			if(newstate == PLAYER_STATE_DRIVER)
@@ -7877,7 +8481,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 				SetPlayerObjectMaterial(playerid, PlayerSpeedObject2[playerid], 0, 8487, "ballyswater", "waterclear256", 0x00000000);
 				new vehid = GetPlayerVehicleID(playerid);
 				AttachSpeedBoard(playerid,vehid);
-			}
+			}*/
 		}
 		else if(pData[playerid][pHBEMode] == 2)
 		{
@@ -7895,13 +8499,13 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		}
 		else
 		{
-		
+
 		}
 		new Float:health;
         GetVehicleHealth(GetPlayerVehicleID(playerid), health);
         VehicleHealthSecurityData[GetPlayerVehicleID(playerid)] = health;
         VehicleHealthSecurity[GetPlayerVehicleID(playerid)] = true;
-		
+
 		if(pData[playerid][playerSpectated] != 0)
   		{
 			foreach(new ii : Player)
@@ -7969,6 +8573,63 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
         else return 1;
     }
 	return 1;
+}
+
+stock GivePlayerHealth(playerid,Float:Health)
+{
+	new Float:health; GetPlayerHealth(playerid,health);
+	SetPlayerHealth(playerid,health+Health);
+}
+
+public OnVehicleDamageStatusUpdate(vehicleid, playerid)
+{
+	new
+        Float: vehicleHealth,
+        playerVehicleId = GetPlayerVehicleID(playerid);
+
+    new Float:health = GetPlayerHealth(playerid, health);
+    GetVehicleHealth(playerVehicleId, vehicleHealth);
+    new panels, doors, lights, tires;
+    GetVehicleDamageStatus(vehicleid, panels, doors, lights, tires);
+    UpdateVehicleDamageStatus(vehicleid, panels, doors, lights, tires);
+    // if(pData[playerid][pSeatBelt] == 0 || pData[playerid][pHelmetOn] == 0)
+    // {
+    // 	if(GetVehicleSpeed(vehicleid) <= 20)
+    // 	{
+    // 		GivePlayerHealth(playerid, -8);
+    // 		return 1;
+    // 	}
+    // 	if(GetVehicleSpeed(vehicleid) <= 50)
+    // 	{
+    // 		GivePlayerHealth(playerid, -10);
+    // 		return 1;
+    // 	}
+    // 	if(GetVehicleSpeed(vehicleid) <= 90)
+    // 	{
+    // 		GivePlayerHealth(playerid, -20);
+    // 		return 1;
+    // 	}
+    // 	return 1;
+    // }
+    // if(pData[playerid][pSeatBelt] == 1 || pData[playerid][pHelmetOn] == 1)
+    // {
+    // 	if(GetVehicleSpeed(vehicleid) <= 20)
+    // 	{
+    // 		GivePlayerHealth(playerid, -1);
+    // 		return 1;
+    // 	}
+    // 	if(GetVehicleSpeed(vehicleid) <= 50)
+    // 	{
+    // 		GivePlayerHealth(playerid, -3);
+    // 		return 1;
+    // 	}
+    // 	if(GetVehicleSpeed(vehicleid) <= 100)
+    // 	{
+    // 		GivePlayerHealth(playerid, -8);
+    // 		return 1;
+    // 	}
+    // }
+    return 1;
 }
 
 public OnPlayerTakeDamage(playerid, issuerid, Float: amount, weaponid, bodypart)
@@ -8040,23 +8701,34 @@ public OnVehicleSpawn(vehicleid)
 	//trasher
     LoadedTrash[vehicleid] = 0;
     //end
-    
+
 	foreach(new ii : PVehicles)
 	{
 		if(vehicleid == pvData[ii][cVeh] && pvData[ii][cRent] == 0)
 		{
+			/*if(pvData[ii][cClaim] != 0)
+			{
+				foreach(new pid : Player) if (pvData[ii][cOwner] == pData[pid][pID])
+				{
+					Info(pid, "Anda masih memiliki claim kendaraan, silahkan ambil di city hall!");
+				}
+				if(IsValidVehicle(pvData[ii][cVeh]))
+					DestroyVehicle(pvData[ii][cVeh]);
+					
+				return 1;
+			}*/
 			if(pvData[ii][cInsu] > 0)
     		{
 				pvData[ii][cInsu]--;
 				pvData[ii][cClaim] = 1;
-				pvData[ii][cClaimTime] = gettime() + (1 * 3600);
+				pvData[ii][cClaimTime] = gettime() + (1 * 86400);
 				foreach(new pid : Player) if (pvData[ii][cOwner] == pData[pid][pID])
         		{
-            		Info(pid, "Kendaraan anda hancur dan anda masih memiliki insuransi, silahkan ambil di insurance office setelah 3 jam.");
+            		Info(pid, "Kendaraan anda hancur dan anda masih memiliki {FFFF00}insuransi{FFFFFF}, silahkan ambil di kantor sags setelah 24 jam.");
 				}
 				if(IsValidVehicle(pvData[ii][cVeh]))
 					DestroyVehicle(pvData[ii][cVeh]);
-
+				
 				pvData[ii][cVeh] = 0;
 			}
 			else
@@ -8068,7 +8740,7 @@ public OnVehicleSpawn(vehicleid)
 					mysql_tquery(g_SQL, query);
 					if(IsValidVehicle(pvData[ii][cVeh]))
 						DestroyVehicle(pvData[ii][cVeh]);
-            		SendClientMessage(pid, COLOR_JOB, "VEHICLE: {FFFFFF}Kendaraan anda hancur dan tidak memiliki insuransi.");
+            		Info(pid, "Kendaraan anda hancur dan tidak memiliki {FFFF00}insuransi.");
 					Iter_SafeRemove(PVehicles, ii, ii);
 				}
 			}
@@ -8083,7 +8755,7 @@ ptask PlayerVehicleUpdate[200](playerid)
 	if(IsValidVehicle(vehicleid))
 	{
 		if(!GetEngineStatus(vehicleid) && IsEngineVehicle(vehicleid))
-		{	
+		{
 			SwitchVehicleEngine(vehicleid, false);
 		}
 		if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
@@ -8140,21 +8812,21 @@ ptask PlayerVehicleUpdate[200](playerid)
 			{
 				new Float:fDamage, fFuel, color1, color2;
 				new tstr[64];
-				
+
 				GetVehicleColor(vehicleid, color1, color2);
 
 				GetVehicleHealth(vehicleid, fDamage);
-				
+
 				//fDamage = floatdiv(1000 - fDamage, 10) * 1.42999;
 
 				if(fDamage <= 350.0) fDamage = 0.0;
 				else if(fDamage > 1000.0) fDamage = 1000.0;
-				
+
 				fFuel = GetVehicleFuel(vehicleid);
-				
+
 				if(fFuel < 0) fFuel = 0;
 				else if(fFuel > 1000) fFuel = 1000;
-				
+
 				if(!GetEngineStatus(vehicleid))
 				{
 					PlayerTextDrawSetString(playerid, DPvehengine[playerid], "~r~OFF");
@@ -8163,7 +8835,7 @@ ptask PlayerVehicleUpdate[200](playerid)
 				{
 					PlayerTextDrawSetString(playerid, DPvehengine[playerid], "~g~ON");
 				}
-				
+
 				SetPlayerProgressBarValue(playerid, pData[playerid][fuelbar], fFuel);
 				SetPlayerProgressBarValue(playerid, pData[playerid][damagebar], fDamage);
 
@@ -8175,7 +8847,7 @@ ptask PlayerVehicleUpdate[200](playerid)
 			}
 			else
 			{
-			
+
 			}
 		}
 	}
@@ -8216,9 +8888,9 @@ ptask PlayerUpdate[999](playerid)
 	{
 		new fmt_msg[128];
 		SetPlayerArmourEx(playerid, 0);
-		SendClientMessageToAllEx(0xFF5533FF, "BotCmd: %s(%i) has been kicked by BOT.", pData[playerid][pName], playerid);
+		SendClientMessageToAllEx(COLOR_BAN, "BotCmd: %s(%i) has been kicked by BOT.", pData[playerid][pName], playerid);
 		format(fmt_msg, sizeof fmt_msg, "Reason: Armour Hacks");
-        SendClientMessageToAll(0xFF5533FF, fmt_msg);
+        SendClientMessageToAll(COLOR_BAN, fmt_msg);
 		FixedKick(playerid);
 		//AutoBan(playerid);
 	}
@@ -8231,7 +8903,7 @@ ptask PlayerUpdate[999](playerid)
 
             if(pData[playerid][pWeapon] >= 1 && pData[playerid][pWeapon] <= 45 && pData[playerid][pWeapon] != 42 && pData[playerid][pWeapon] != 2 && pData[playerid][pGuns][g_aWeaponSlots[pData[playerid][pWeapon]]] != GetPlayerWeapon(playerid))
             {
-                SendAdminMessage(COLOR_LOGS, ""WHITE_E"%s(%d) has possibly used weapon hacks (%s), Please to check /spec this player first!", pData[playerid][pName], playerid, ReturnWeaponName(pData[playerid][pWeapon]));
+                SendAdminWarn(COLOR_YELLOW, "%s (%d) has possibly used weapon hacks (%s), Please to check /spec this player first!", pData[playerid][pName], playerid, ReturnWeaponName(pData[playerid][pWeapon]));
                 SetWeapons(playerid); //Reload old weapons
                 //AutoBan(playerid);
             }
@@ -8241,29 +8913,29 @@ ptask PlayerUpdate[999](playerid)
 	if(NetStats_GetConnectedTime(playerid) - WeaponTick[playerid] >= 250)
 	{
 		static weaponid, ammo, objectslot, count, index;
- 
+
 		for (new i = 2; i <= 7; i++) //Loop only through the slots that may contain the wearable weapons
 		{
 			GetPlayerWeaponData(playerid, i, weaponid, ammo);
 			index = weaponid - 22;
-		   
+
 			if (weaponid && ammo && !WeaponSettings[playerid][index][Hidden] && IsWeaponWearable(weaponid) && EditingWeapon[playerid] != weaponid)
 			{
 				objectslot = GetWeaponObjectSlot(weaponid);
- 
+
 				if (GetPlayerWeapon(playerid) != weaponid)
 					SetPlayerAttachedObject(playerid, objectslot, GetWeaponModel(weaponid), WeaponSettings[playerid][index][Bone], WeaponSettings[playerid][index][Position][0], WeaponSettings[playerid][index][Position][1], WeaponSettings[playerid][index][Position][2], WeaponSettings[playerid][index][Position][3], WeaponSettings[playerid][index][Position][4], WeaponSettings[playerid][index][Position][5], 1.0, 1.0, 1.0);
- 
+
 				else if (IsPlayerAttachedObjectSlotUsed(playerid, objectslot)) RemovePlayerAttachedObject(playerid, objectslot);
 			}
 		}
 		for (new i = 4; i <= 8; i++) if (IsPlayerAttachedObjectSlotUsed(playerid, i))
 		{
 			count = 0;
- 
+
 			for (new j = 22; j <= 38; j++) if (PlayerHasWeapon(playerid, j) && GetWeaponObjectSlot(j) == i)
 				count++;
- 
+
 			if(!count) RemovePlayerAttachedObject(playerid, i);
 		}
 		WeaponTick[playerid] = NetStats_GetConnectedTime(playerid);
@@ -8331,7 +9003,7 @@ ptask PlayerUpdate[999](playerid)
 		if(pData[playerid][pInjured] == 1)
 		{
 			SetPlayerPosition(playerid, -2028.32, -92.87, 1067.43, 275.78, 1);
-		
+
 			SetPlayerInterior(playerid, 1);
 			SetPlayerVirtualWorld(playerid, playerid + 100);
 
@@ -8357,7 +9029,7 @@ ptask PlayerUpdate[999](playerid)
 			pData[playerid][pBladder] = 50;
 			SetPlayerHealthEx(playerid, 50);
 			pData[playerid][pSick] = 0;
-			GivePlayerMoneyEx(playerid, -150);
+			GivePlayerMoneyEx(playerid, -20000);
 			SetPlayerHealthEx(playerid, 50);
 
             for (new i; i < 20; i++)
@@ -8366,9 +9038,9 @@ ptask PlayerUpdate[999](playerid)
             }
 
 			SendClientMessage(playerid, COLOR_GREY, "--------------------------------------------------------------------------------------------------------");
-            SendClientMessage(playerid, COLOR_WHITE, "Kamu telah keluar dari rumah sakit, kamu membayar $150 kerumah sakit.");
+            SendClientMessage(playerid, COLOR_WHITE, "Kamu telah keluar dari rumah sakit, kamu membayar {00FF00}$200.00 {FFFFFF}kerumah sakit.");
             SendClientMessage(playerid, COLOR_GREY, "--------------------------------------------------------------------------------------------------------");
-			
+
 			SetPlayerPosition(playerid, 1182.8778, -1324.2023, 13.5784, 269.8747);
 
             TogglePlayerControllable(playerid, 1);
@@ -8386,12 +9058,12 @@ ptask PlayerUpdate[999](playerid)
 		new mstr[64];
         format(mstr, sizeof(mstr), "/death for spawn to hospital");
 		InfoTD_MSG(playerid, 1000, mstr);
-		
+
 		if(GetPVarInt(playerid, "GiveUptime") == -1)
 		{
 			SetPVarInt(playerid, "GiveUptime", gettime());
 		}
-		
+
 		if(GetPVarInt(playerid,"GiveUptime"))
         {
             if((gettime()-GetPVarInt(playerid, "GiveUptime")) > 100)
@@ -8400,9 +9072,9 @@ ptask PlayerUpdate[999](playerid)
                 SetPVarInt(playerid, "GiveUptime", 0);
             }
         }
-		
+
         ApplyAnimation(playerid, "CRACK", "null", 4.0, 0, 0, 0, 1, 0, 1);
-        ApplyAnimation(playerid, "CRACK", "crckdeth4", 4.0, 0, 0, 0, 1, 0, 1);
+        ApplyAnimation(playerid, "PED", "KO_skid_front", 4.0, 0, 0, 0, 1, 0, 1);
         SetPlayerHealthEx(playerid, 99999);
     }
 	if(pData[playerid][pInjured] == 0 && pData[playerid][pGender] != 0) //Pengurangan Data
@@ -8466,7 +9138,7 @@ ptask PlayerUpdate[999](playerid)
 			}
 		}
 	}
-	
+
 	//Jail Player
 	if(pData[playerid][pJail] > 0)
 	{
@@ -8592,9 +9264,9 @@ CMD:trash(playerid, params[])
 CMD:getmeat(playerid, params[])
 {
 	if(IsPlayerInAnyVehicle(playerid)) return Error(playerid, "You can't do at this moment.");
-	
+
     if(GetMeatBag[playerid]) return Error(playerid, "You're already put a meat bag.");
-	
+
 	StoremeatCP[playerid] = CreateDynamicCP(942.3542, 2117.8999, 1011.0303, 3.0, .playerid = playerid);
 	GetMeatBag[playerid] = true;
 	ApplyAnimation(playerid, "CARRY", "liftup105", 4.1, 0, 0, 0, 0, 0);
@@ -8726,7 +9398,7 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 	//butcher
     if(areaid == meatsp)
 	{
-	    if(!GetPVarInt(playerid,"OnWork")) 
+	    if(!GetPVarInt(playerid,"OnWork"))
 	    {
 	    	ShowPlayerDialog(playerid,D_WORK,DIALOG_STYLE_MSGBOX,"Butcher Job","Do you want to start working on the Assembly line?","Yes","");
 	    }
@@ -8757,6 +9429,260 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 		}
 	}
 	return 1;
+}
+
+forward OnSecondTimer();
+public OnSecondTimer()
+{
+	new minute;
+	gettime(_, minute);
+
+	foreach(new playerid : Player)
+	{
+		CallLocalFunction("OnPlayerTimer", "i", playerid);
+	}
+}
+
+forward OnPlayerTimer(playerid);
+public OnPlayerTimer(playerid)
+{
+	if(pData[playerid][IsLoggedIn] == true)
+	{	
+		if(pData[playerid][pJob] == 8 || pData[playerid][pJob2] == 8)
+		{
+			if(packet == 1)
+			{
+				pData[playerid][pSmugglerTimer]++;
+
+				if(pData[playerid][pSmugglerTimer] == 25)
+					SendClientMessage(playerid, COLOR_LOGS, "JOB: {FFFFFF}Smuggling job is currently active!, use "YELLOW_E"'/findpacket'"WHITE_E" to trace the package"),
+					pData[playerid][pSmugglerTimer] = 0;
+			}
+		}
+		if(pData[playerid][pJob] == 8 || pData[playerid][pJob2] == 8)
+		{
+			if(packet == 2)
+			{
+				pData[playerid][pSmugglerTimer]++;
+
+				if(pData[playerid][pSmugglerTimer] == 25)
+					SendClientMessage(playerid, COLOR_LOGS, "JOB: {FFFFFF}Smuggling job is currently active!, use "YELLOW_E"'/findpacket'"WHITE_E" to trace the package"),
+					pData[playerid][pSmugglerTimer] = 0;
+			}
+		}
+	}
+    return 1;
+}
+
+forward OnMinuteTimer();
+public OnMinuteTimer()
+{
+	new hour, minute, second;
+	gettime(hour, minute, second);
+
+//	UpdateBet();
+
+	switch(minute)
+	{
+		case 0:
+		{
+			if(hour == 0 && taked == 0)
+		    {
+		        DestroyDynamicObject(objectpacket);
+		        packet = 2;
+		        objectpacket = CreateDynamicObject(11745, -127.492500, 2258.050048, 28.337009-1, 0.0, 0.0, 0.0, 0);
+		        taked = 0;
+		    }
+			
+			if(hour == 1 && taked == 0)
+		    {
+		        DestroyDynamicObject(objectpacket);
+		        packet = 1;
+		        objectpacket = CreateDynamicObject(11745, -1304.212036, 2525.925537, 87.532722-1, 0.0, 0.0, 0.0, 0);
+		        taked = 0;
+		    }
+		    
+		    if(hour == 2 && taked == 0)
+		    {
+		        DestroyDynamicObject(objectpacket);
+		        packet = 1;
+		        objectpacket = CreateDynamicObject(11745, -1304.212036, 2525.925537, 87.532722-1, 0.0, 0.0, 0.0, 0);
+		        taked = 0;
+		    }
+		    
+		    if(hour == 7 && taked == 0)
+		    {
+		        DestroyDynamicObject(objectpacket);
+		        packet = 2;
+		        objectpacket = CreateDynamicObject(11745, -127.492500, 2258.050048, 28.337009-1, 0.0, 0.0, 0.0, 0);
+		        taked = 0;
+		    }
+		    
+		    if(hour == 8 && taked == 0)
+		    {
+		        DestroyDynamicObject(objectpacket);
+		        packet = 1;
+		        objectpacket = CreateDynamicObject(11745, -1304.212036, 2525.925537, 87.532722-1, 0.0, 0.0, 0.0, 0);
+		        taked = 0;
+		    }
+		    
+		    if(hour == 10 && taked == 0)
+		    {
+		        DestroyDynamicObject(objectpacket);
+		        packet = 1;
+		        objectpacket = CreateDynamicObject(11745, -1304.212036, 2525.925537, 87.532722-1, 0.0, 0.0, 0.0, 0);
+		        taked = 0;
+		    }
+
+            if(hour == 11 && taked == 0)
+		    {
+		        DestroyDynamicObject(objectpacket);
+		        packet = 2;
+		        objectpacket = CreateDynamicObject(11745, -127.492500, 2258.050048, 28.337009-1, 0.0, 0.0, 0.0, 0);
+		        taked = 0;
+		    }
+		    
+		    if(hour == 13 && taked == 0)
+		    {
+		        DestroyDynamicObject(objectpacket);
+		        packet = 2;
+		        objectpacket = CreateDynamicObject(11745, -127.492500, 2258.050048, 28.337009-1, 0.0, 0.0, 0.0, 0);
+		        taked = 0;
+		    }
+		    
+		    if(hour == 15 && taked == 0)
+		    {
+		        DestroyDynamicObject(objectpacket);
+		        packet = 2;
+		        objectpacket = CreateDynamicObject(11745, -127.492500, 2258.050048, 28.337009-1, 0.0, 0.0, 0.0, 0);
+		        taked = 0;
+		    }
+		    
+		    if(hour == 17 && taked == 0)
+		    {
+		        DestroyDynamicObject(objectpacket);
+		        packet = 1;
+		        objectpacket = CreateDynamicObject(11745, -1304.212036, 2525.925537, 87.532722-1, 0.0, 0.0, 0.0, 0);
+		        taked = 0;
+		    }
+		    
+		    if(hour == 20 && taked == 0)
+		    {
+		        DestroyDynamicObject(objectpacket);
+		        packet = 1;
+		        objectpacket = CreateDynamicObject(11745, -1304.212036, 2525.925537, 87.532722-1, 0.0, 0.0, 0.0, 0);
+		        taked = 0;
+		    }
+		}
+	 	case 30:
+		{
+		    if(hour == 4 && taked == 0)
+		    {
+				DestroyDynamicObject(objectpacket);
+		        packet = 1;
+		        objectpacket = CreateDynamicObject(11745, -1304.212036, 2525.925537, 87.532722-1, 0.0, 0.0, 0.0, 0);
+		        taked = 0;
+		    }
+		}
+		case 20:
+		{
+		    if(hour == 12 && taked == 0)
+		    {
+		        DestroyDynamicObject(objectpacket);
+		        packet = 2;
+		        objectpacket = CreateDynamicObject(11745, -127.492500, 2258.050048, 28.337009-1, 0.0, 0.0, 0.0, 0);
+		        taked = 0;
+		    }
+		}
+		case 22:
+		{
+      		if(hour == 21 && taked == 0)
+		    {
+		        DestroyDynamicObject(objectpacket);
+		        packet = 1;
+		        objectpacket = CreateDynamicObject(11745, -1304.212036, 2525.925537, 87.532722-1, 0.0, 0.0, 0.0, 0);
+		        taked = 0;
+		    }
+		}
+		case 40:
+		{
+		    if(hour == 4)
+		    {
+		        new msg[500];
+		        format(msg, sizeof(msg), "**BOT Pengingat Sholat\nAssalamualaikum Semuanya Warga BremX Share GM\nBagi Yang Ber Agama Islam Jangan Lupa Sholat Subuh Yaa!\nSekarang Sudah Jam %d:%02d WIB\n@everyone**", hour, minute);
+	    		DCC_SendChannelMessage(g_Discord_Information, msg);
+		    }
+		}
+		case 9:
+		{
+		    if(hour == 12)
+		    {
+		        new msg[500];
+		        format(msg, sizeof(msg), "**BOT Pengingat Sholat\nAssalamualaikum Semuanya Warga BremX Share GM\nBagi Yang Ber Agama Islam Jangan Lupa Sholat Dzuhur Yaa!\nSekarang Sudah Jam %d:%02d WIB\n@everyone**", hour, minute);
+	    		DCC_SendChannelMessage(g_Discord_Information, msg);
+		    }
+		}
+		case 25:
+		{
+		    if(hour == 15)
+		    {
+		        new msg[500];
+		        format(msg, sizeof(msg), "**BOT Pengingat Sholat\nAssalamualaikum Semuanya Warga BremX Share GM\nBagi Yang Ber Agama Islam Jangan Lupa Sholat Ashar Yaa!\nSekarang Sudah Jam %d:%02d WIB\n@everyone**", hour, minute);
+	    		DCC_SendChannelMessage(g_Discord_Information, msg);
+		    }
+		    else if(hour == 19)
+		    {
+		        new msg[500];
+		        format(msg, sizeof(msg), "**BOT Pengingat Sholat\nAssalamualaikum Semuanya Warga BremX Share GM\nBagi Yang Ber Agama Islam Jangan Lupa Sholat Isya Yaa!\nSekarang Sudah Jam %d:%02d WIB\n@everyone**", hour, minute);
+	    		DCC_SendChannelMessage(g_Discord_Information, msg);
+		    }
+		}
+		case 15:
+		{
+		    if(hour == 18)
+		    {
+		        new msg[500];
+		        format(msg, sizeof(msg), "**BOT Pengingat Sholat\nAssalamualaikum Semuanya Warga BremX Share GM\nBagi Yang Ber Agama Islam Jangan Lupa Sholat Maghrib Yaa!\nSekarang Sudah Jam %d:%02d WIB\n@everyone**", hour, minute);
+	    		DCC_SendChannelMessage(g_Discord_Information, msg);
+		    }
+		}
+	}
+
+	SetWorldTime(WorldTime);
+	OnPlayersWorldTimeInit(hour, minute);
+
+	return 1;
+}
+
+forward OnPlayersWorldTimeInit(hour, minute);
+public OnPlayersWorldTimeInit(hour, minute)
+{
+	foreach(new playerid : Player)
+	{
+		SetPlayerTime(playerid, hour, minute);
+	}
+}
+
+forward Packet(packetid);
+public Packet(packetid)
+{
+	switch(packetid)
+	{
+		case 1:
+		{
+		    DestroyDynamicObject(objectpacket);
+		    packet = 1;
+		    objectpacket = CreateDynamicObject(11745, -1304.212036, 2525.925537, 87.532722-1, 0.0, 0.0, 0.0, 0);
+		    taked = 0;
+		}
+		case 2:
+		{
+		    DestroyDynamicObject(objectpacket);
+	        packet = 2;
+	        objectpacket = CreateDynamicObject(11745, -127.492500, 2258.050048, 28.337009-1, 0.0, 0.0, 0.0, 0);
+	        taked = 0;
+		}
+	}
 }
 
 public OnPlayerLeaveDynamicArea(playerid, areaid)
@@ -8806,21 +9732,21 @@ CMD:setskill(playerid, params[])
 	{
 		pData[giveplayerid][pMechSkill] = amount;
 		format(String, sizeof(String), "SKILLINFO: You've set %s mechanic Skill to Level %d", pData[giveplayerid][pName], amount);
-		
+
 		SendClientMessage(playerid, COLOR_WHITE, String);
 	}
 	else if(strcmp(choice, "trucker", true) == 0)
 	{
 		pData[giveplayerid][pTruckSkill] = amount;
 		format(String, sizeof(String), "SKILLINFO: You've set %s trucker Skill to Level %d", pData[giveplayerid][pName], amount);
-		
+
 		SendClientMessage(playerid, COLOR_WHITE, String);
 	}
 	else if(strcmp(choice, "smuggler", true) == 0)
 	{
 		pData[giveplayerid][pSmuggSkill] = amount;
 		format(String, sizeof(String), "SKILLINFO: You've set %s smuggler Skill to Level %d", pData[giveplayerid][pName], amount);
-		
+
 		SendClientMessage(playerid, COLOR_WHITE, String);
 	}
 	return 1;
@@ -8834,9 +9760,52 @@ ptask AfkCheck[1000](playerid)  {
     if(p_tick[playerid] == 0) {
         p_afktime[playerid]++;
     }
-    if(p_afktime[playerid] > 0) {
+    /*if(p_afktime[playerid] > 0) {
         format(str, sizeof str,"[ATIP] %d Second(s)",p_afktime[playerid]);
-        SetPlayerChatBubble(playerid, str, COLOR_LOGS, 10.0, 1000);
-    }
+        SetPlayerChatBubble(playerid, str, COLOR_YELLOW, 10.0, 1000);
+    }*/
+    new afk_minutes = ConvertUnixTime(p_afktime[playerid], CONVERT_TIME_TO_MINUTES);
+	new afk_seconds = ConvertUnixTime(p_afktime[playerid]);
+
+	if(afk_minutes > 0)
+	{
+		format(str, sizeof str, "[ATIP] %d:%02d Minute(s).", afk_minutes, afk_seconds);
+	}
+	else format(str, sizeof str, "[ATIP] %d Seconds(s).", afk_seconds);
+	SetPlayerChatBubble(playerid, str, COLOR_SYSTEM, 10.0, 1000);
     return 1;
 }
+stock ConvertUnixTime(unix_time, type = CONVERT_TIME_TO_SECONDS)
+{
+	switch(type)
+	{
+		case CONVERT_TIME_TO_SECONDS:
+		{
+			unix_time %= 60;
+		}
+		case CONVERT_TIME_TO_MINUTES:
+		{
+			unix_time = (unix_time / 60) % 60;
+		}
+		case CONVERT_TIME_TO_HOURS:
+		{
+			unix_time = (unix_time / 3600) % 24;
+		}
+		case CONVERT_TIME_TO_DAYS:
+		{
+			unix_time = (unix_time / 86400) % 30;
+		}
+		case CONVERT_TIME_TO_MONTHS:
+		{
+			unix_time = (unix_time / 2629743) % 12;
+		}
+		case CONVERT_TIME_TO_YEARS:
+		{
+			unix_time = (unix_time / 31556926) + 1970;
+		}
+		default:
+			unix_time %= 60;
+	}
+	return unix_time;
+}
+

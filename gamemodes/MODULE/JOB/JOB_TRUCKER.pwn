@@ -7,6 +7,10 @@ CreateJoinTruckPoint()
 	CreateDynamic3DTextLabel(strings, COLOR_YELLOW, -77.38, -1136.52, 1.07, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1); // truck
 }
 
+//Container CheckPoint
+#define containerpoint1 -1733.8103,187.5354,3.5547
+#define containerpoint2 2869.1934,917.6111,10.7500
+
 //Vending
 GetRestockVending()
 {
@@ -190,9 +194,9 @@ CMD:dealermission(playerid)
 			return Error(playerid, "You must level 5 to use this!");
 	if(pData[playerid][pJob] == 4 || pData[playerid][pJob2] == 4)
 	{
-	    if(pData[playerid][pTruckerTime] > 0)
+	    if(pData[playerid][pJobTime] > 0)
 		{
-	    	Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pTruckerTime]);
+	    	Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pJobTime]);
 	    	return 1;
 		}
 		if(GetRestockDealer() <= 0) return Error(playerid, "Dealership Mission sedang kosong.");
@@ -256,7 +260,7 @@ CMD:storestock(playerid, params[])
 			VendingData[vid][VendingStock] += VehProduct[vehicleid];
 			VendingData[vid][VendingMoney] -= pay;
 			Info(playerid, "Anda menjual "RED_E"%d "WHITE_E"product dengan seharga "GREEN_E"%s", VehProduct[vehicleid], FormatMoney(pay));
-			GivePlayerMoneyEx(playerid, pay);
+			AddPlayerSalary(playerid, "Trucker(vending)", pay);
 			if((carid = Vehicle_Nearest(playerid)) != -1)
 			{
 				pvData[carid][cProduct] = 0;
@@ -290,7 +294,7 @@ CMD:storeproduct(playerid, params[])
 			bData[bid][bProd] += VehProduct[vehicleid];
 			bData[bid][bMoney] -= pay;
 			Info(playerid, "Anda menjual "RED_E"%d "WHITE_E"product dengan seharga "GREEN_E"%s", VehProduct[vehicleid], FormatMoney(pay));
-			GivePlayerMoneyEx(playerid, pay);
+			AddPlayerSalary(playerid, "Trucker(Restock bisnis)", pay);
 			if((carid = Vehicle_Nearest(playerid)) != -1)
 			{
 				pvData[carid][cProduct] = 0;
@@ -315,11 +319,11 @@ CMD:storeveh(playerid, params[])
 		{
 			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER && !IsATruck(vehicleid)) return Error(playerid, "Anda harus mengendarai truck.");
 			DealerData[bid][dealerMoney] -= 500000;
-			Info(playerid, "Anda merestock dealerhsip"WHITE_E"dan diberi imbalan uang "GREEN_E"$220.00");
-			GivePlayerMoneyEx(playerid, 22000);
+			Info(playerid, "Anda merestock dealerhsip"WHITE_E"dan diberi imbalan uang "GREEN_E"$250.00");
+			AddPlayerSalary(playerid, "Trucker(Restock Dealer)", 25000);
 			pData[playerid][pDealerMission] = -1;
 			DealerData[bid][dealerStock] += 5;
-			pData[playerid][pTruckerTime] += 3600;
+			pData[playerid][pJobTime] += 3600;
 			if(IsTrailerAttachedToVehicle(GetPlayerVehicleID(playerid)))
 			DestroyVehicle(GetVehicleTrailer(GetPlayerVehicleID(playerid)));
 		}
@@ -337,9 +341,9 @@ CMD:haulingmission(playerid)
 			return Error(playerid, "You must level 5 to use this!");
 	if(pData[playerid][pJob] == 4 || pData[playerid][pJob2] == 4)
 	{
-		if(pData[playerid][pTruckerTime] > 0)
+		if(pData[playerid][pJobTime] > 0)
 		{
-	    	Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pTruckerTime]);
+	    	Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pJobTime]);
 	    	return 1;
 		}
 		if(GetRestockGStation() <= 0) return Error(playerid, "Tidak ada gas station yang harus di restock.");
@@ -380,8 +384,8 @@ CMD:storegas(playerid, params[])
 			gsData[id][gsStock] += VehGasOil[vehicleid];
 			Server_MinMoney(pay);
 			Info(playerid, "Anda menjual "RED_E"%d "WHITE_E"liters gas oil dengan seharga "GREEN_E"%s", VehGasOil[vehicleid], FormatMoney(pay));
-			GivePlayerMoneyEx(playerid, pay);
-			pData[playerid][pTruckerTime] += 3600;
+			AddPlayerSalary(playerid, "Trucker(Restock GasStation)", pay);
+			pData[playerid][pJobTime] += 3600;
 			if((carid = Vehicle_Nearest(playerid)) != -1)
 			{
 				pvData[carid][cGasOil] = 0;

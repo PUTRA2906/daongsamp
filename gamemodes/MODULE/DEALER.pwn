@@ -419,6 +419,20 @@ DealerRefresh(id)
 			type= "Unknown";
 		}
 		
+		new tstr[218];
+		if(DealerData[id][dealerPosX] != 0 && DealerData[id][dealerPosY] != 0 && DealerData[id][dealerPosZ] != 0 && strcmp(DealerData[id][dealerOwner], "-"))
+		{
+			format(tstr, sizeof(tstr), "[ID: %d]\n"WHITE_E"Name: {FFFF00}%s\n"WHITE_E"Owned by %s\nType: "YELLOW_E"%s\n"WHITE_E"Use "RED_E"/buypv "WHITE_E"to buy vehicle in this dealership", id, DealerData[id][dealerName], DealerData[id][dealerOwner], type);
+			DealerData[id][dealerLabel] = CreateDynamic3DTextLabel(tstr, COLOR_LBLUE, DealerData[id][dealerPosX], DealerData[id][dealerPosY], DealerData[id][dealerPosZ], 5.0);
+            DealerData[id][dealerPickup] = CreateDynamicPickup(1239, 23, DealerData[id][dealerPosX], DealerData[id][dealerPosY], DealerData[id][dealerPosZ]);
+		}
+		else if(DealerData[id][dealerPosX] != 0 && DealerData[id][dealerPosY] != 0 && DealerData[id][dealerPosZ] != 0)
+		{
+			format(tstr, sizeof(tstr), "[ID: %d]\n"WHITE_E"This dealership for sell\nLocation: %s\nPrice: "GREEN_E"%s\n"WHITE_E"Type: "YELLOW_E"%s", id, GetLocation(DealerData[id][dealerPosX], DealerData[id][dealerPosY], DealerData[id][dealerPosZ]), FormatMoney(DealerData[id][dealerPrice]), type);
+			DealerData[id][dealerLabel] = CreateDynamic3DTextLabel(tstr, COLOR_LBLUE, DealerData[id][dealerPosX], DealerData[id][dealerPosY], DealerData[id][dealerPosZ], 5.0);
+            DealerData[id][dealerPickup] = CreateDynamicPickup(1239, 23, DealerData[id][dealerPosX], DealerData[id][dealerPosY], DealerData[id][dealerPosZ]);
+   		}
+   		
         if(DealerData[id][dealerType] == 1)
 		{
 			DealerData[id][dealerMap] = CreateDynamicMapIcon(DealerData[id][dealerPosX], DealerData[id][dealerPosY], DealerData[id][dealerPosZ], 55, -1, -1, -1, -1, 70.0);
@@ -443,20 +457,6 @@ DealerRefresh(id)
 		{
 			DestroyDynamicMapIcon(DealerData[id][dealerMap]);
 		}
-		
-		new tstr[218];
-		if(DealerData[id][dealerPosX] != 0 && DealerData[id][dealerPosY] != 0 && DealerData[id][dealerPosZ] != 0 && strcmp(DealerData[id][dealerOwner], "-"))
-		{
-			format(tstr, sizeof(tstr), "[ID: %d]\n"WHITE_E"Name: {FFFF00}%s\n"WHITE_E"Owned by %s\nType: "YELLOW_E"%s\n"WHITE_E"Use "RED_E"/buypv "WHITE_E"to buy vehicle in this dealership", id, DealerData[id][dealerName], DealerData[id][dealerOwner], type);
-			DealerData[id][dealerLabel] = CreateDynamic3DTextLabel(tstr, COLOR_LBLUE, DealerData[id][dealerPosX], DealerData[id][dealerPosY], DealerData[id][dealerPosZ], 5.0);
-            DealerData[id][dealerPickup] = CreateDynamicPickup(1239, 23, DealerData[id][dealerPosX], DealerData[id][dealerPosY], DealerData[id][dealerPosZ]);
-		}
-		else if(DealerData[id][dealerPosX] != 0 && DealerData[id][dealerPosY] != 0 && DealerData[id][dealerPosZ] != 0)
-		{
-			format(tstr, sizeof(tstr), "[ID: %d]\n"WHITE_E"This dealership for sell\nLocation: %s\nPrice: "GREEN_E"%s\n"WHITE_E"Type: "YELLOW_E"%s", id, GetLocation(DealerData[id][dealerPosX], DealerData[id][dealerPosY], DealerData[id][dealerPosZ]), FormatMoney(DealerData[id][dealerPrice]), type);
-			DealerData[id][dealerLabel] = CreateDynamic3DTextLabel(tstr, COLOR_LBLUE, DealerData[id][dealerPosX], DealerData[id][dealerPosY], DealerData[id][dealerPosZ], 5.0);
-            DealerData[id][dealerPickup] = CreateDynamicPickup(1239, 23, DealerData[id][dealerPosX], DealerData[id][dealerPosY], DealerData[id][dealerPosZ]);
-   		}
 		printf("DEBUG: DealerRefresh Called on Dealer ID %d", id);
 	}
 }
@@ -499,9 +499,6 @@ DealerBuyVehicle(playerid, dealerid)
 {
 	if(dealerid <= -1 )
         return 0;
-
-    static
-    string[512];
 
     switch(DealerData[dealerid][dealerType])
     {
@@ -576,7 +573,7 @@ DealerBuyVehicle(playerid, dealerid)
 		{
 			//Job Cars
 			new str[1024];
-			format(str, sizeof(str), ""WHITE_E"%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s",
+			format(str, sizeof(str), ""WHITE_E"%s\t\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n",
 			GetVehicleModelName(420), FormatMoney(GetDealerVehicleCost(420)),
 			GetVehicleModelName(438), FormatMoney(GetDealerVehicleCost(438)),
 			GetVehicleModelName(403), FormatMoney(GetDealerVehicleCost(403)),
@@ -751,7 +748,7 @@ GetDealerVehicleCost(carid)
 	if(carid == 543) return 120000; //Sadler
 	if(carid == 552) return 16000; //Utility Van
 	if(carid == 554) return 185000; //Yosemite
-	if(carid == 578) return 200000; //DFT-30
+	if(carid == 578) return 300000; //DFT-30
 	if(carid == 609) return 180000; //Boxville
 	if(carid == 423) return 150000; //Mr Whoopee/Ice cream
 	if(carid == 588) return 162000; //Hotdog
@@ -1430,8 +1427,9 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			new model, color1, color2;
 			DealerData[dealerid][dealerMoney] += cost;
 			DealerData[dealerid][dealerStock]--;
-			if(DealerData[dealerid][dealerStock] < 1)
+			if(DealerData[dealerid][dealerStock] < 0)
 				return Error(playerid, "This dealer is out of stock product.");
+			SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s Purchase a vehicle at a dealership %s ", ReturnName(playerid), DealerData[dealerid][dealerName]);
 			color1 = 1;
 			color2 = 1;
 			model = modelid;

@@ -26,6 +26,7 @@ enum ddoor
 	Float:dIntposZ,
 	Float:dIntposA,
 	//NotSave
+	dCP,
 	Text3D:dLabelext,
 	Text3D:dLabelint,
 	dPickupext,
@@ -61,6 +62,9 @@ Doors_Updatelabel(id)
 
         if(IsValidDynamicPickup(dData[id][dPickupint]))
             DestroyDynamicPickup(dData[id][dPickupint]);
+
+        if(IsValidDynamicCP(dData[id][dCP]))
+			DestroyDynamicCP(dData[id][dCP]);
 		
 		if(dData[id][dGarage] == 1)
 		{
@@ -68,6 +72,7 @@ Doors_Updatelabel(id)
 			format(mstr,sizeof(mstr),"[ID: %d]\n"LB_E"%s\n{FFFFFF}Press '{FF0000}ALT{FFFFFF}' To Enter", id, dData[id][dName]);
 			dData[id][dPickupext] = CreateDynamicPickup(19130, 23, dData[id][dExtposX], dData[id][dExtposY], dData[id][dExtposZ], dData[id][dExtvw], dData[id][dExtint]);
 			dData[id][dLabelext] = CreateDynamic3DTextLabel(mstr, COLOR_LOGS, dData[id][dExtposX], dData[id][dExtposY], dData[id][dExtposZ]+0.35, 15.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, dData[id][dExtvw], dData[id][dExtint]);
+			//dData[id][dCP] = CreateDynamicCP(dData[id][dExtposX], dData[id][dExtposY], dData[id][dExtposZ], 3.0, id);
 		}
 		else
 		{
@@ -75,6 +80,7 @@ Doors_Updatelabel(id)
 			format(mstr,sizeof(mstr),"[ID: %d]\n"LB_E"%s\n{FFFFFF}Press '{FF0000}ENTER{FFFFFF}' To Enter", id, dData[id][dName]);
 			dData[id][dPickupext] = CreateDynamicPickup(19130, 23, dData[id][dExtposX], dData[id][dExtposY], dData[id][dExtposZ], dData[id][dExtvw], dData[id][dExtint]);
 			dData[id][dLabelext] = CreateDynamic3DTextLabel(mstr, COLOR_LOGS, dData[id][dExtposX], dData[id][dExtposY], dData[id][dExtposZ]+0.35, 15.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, dData[id][dExtvw], dData[id][dExtint]);
+			//dData[id][dCP] = CreateDynamicCP(dData[id][dExtposX], dData[id][dExtposY], dData[id][dExtposZ], 3.0, id);
 		}
 		
         if(dData[id][dIntposX] != 0.0 && dData[id][dIntposY] != 0.0 && dData[id][dIntposZ] != 0.0)
@@ -86,6 +92,7 @@ Doors_Updatelabel(id)
 
 				dData[id][dLabelint] = CreateDynamic3DTextLabel(mstr, COLOR_LOGS, dData[id][dIntposX], dData[id][dIntposY], dData[id][dIntposZ]+0.7, 5.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, dData[id][dIntvw], dData[id][dIntint]);
 				dData[id][dPickupint] = CreateDynamicPickup(19130, 23, dData[id][dIntposX], dData[id][dIntposY], dData[id][dIntposZ], dData[id][dIntvw], dData[id][dIntint], -1, 7);
+				//dData[id][dCP] = CreateDynamicCP(dData[id][dIntposX], dData[id][dIntposY], dData[id][dIntposZ], 3.0, id);
 			}
 			else
 			{
@@ -94,6 +101,7 @@ Doors_Updatelabel(id)
 
 				dData[id][dLabelint] = CreateDynamic3DTextLabel(mstr, COLOR_LOGS, dData[id][dIntposX], dData[id][dIntposY], dData[id][dIntposZ]+0.7, 5.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, dData[id][dIntvw], dData[id][dIntint]);
 				dData[id][dPickupint] = CreateDynamicPickup(19130, 23, dData[id][dIntposX], dData[id][dIntposY], dData[id][dIntposZ], dData[id][dIntvw], dData[id][dIntint], -1, 7);
+				//dData[id][dCP] = CreateDynamicCP(dData[id][dIntposX], dData[id][dIntposY], dData[id][dIntposZ], 3.0, id);
 			}
 		}
 	}
@@ -445,6 +453,7 @@ CMD:editdoor(playerid, params[])
 		DestroyDynamicPickup(dData[did][dPickupext]);
 		DestroyDynamic3DTextLabel(dData[did][dLabelint]);
 		DestroyDynamicPickup(dData[did][dPickupint]);
+		DestroyDynamicCP(dData[did][dPickupint]);
 			
 		dData[did][dExtposX] = 0;
 		dData[did][dExtposY] = 0;

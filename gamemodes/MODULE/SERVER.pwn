@@ -140,6 +140,7 @@ CreateServerPoint()
 	if(IsValidDynamicPickup(MeatSellPickup))
 		DestroyDynamicPickup(MeatSellPickup);
 		
+		
 	//JOBS
 	MatPickup = CreateDynamicPickup(1239, 23, -258.54, -2189.92, 28.97, -1, -1, -1, 5.0);
 	format(strings, sizeof(strings), "[Material]\n"WHITE_E"Material Stock: "LG_E"%d\n\n"WHITE_E"Material Price: "LG_E"%s /item\n\n"WHITE_E"Lumber Price: "LG_E"%s /item\n"LB_E"/buy", Material, FormatMoney(MaterialPrice), FormatMoney(LumberPrice));
@@ -158,7 +159,7 @@ CreateServerPoint()
 	OreText = CreateDynamic3DTextLabel(strings, COLOR_LOGS, 293.73, 913.17, 20.40, 5.0); // sell ore
 	
 	ProductPickup = CreateDynamicPickup(1239, 23, -279.67, -2148.42, 28.54, -1, -1, -1, 5.0);
-	format(strings, sizeof(strings), "[PRODUCT]\n"WHITE_E"Product Stock: "LG_E"%d\n\n"WHITE_E"Product Price: "LG_E"%s /item\n"LB_E"/buy /sellproduct", Product, FormatMoney(ProductPrice));
+	format(strings, sizeof(strings), "[PRODUCT]\n"WHITE_E"Product Stock: "LG_E"%d\n\n"WHITE_E"Product Price: "LG_E"%s /item\n"WHITE_E"\n"LB_E"/buy /sellproduct", Product, FormatMoney(ProductPrice));
 	ProductText = CreateDynamic3DTextLabel(strings, COLOR_LOGS, -279.67, -2148.42, 28.54, 5.0); // product
 	
 	ApotekPickup = CreateDynamicPickup(1239, 23, 1435.34, -23.91, 1000.92, -1, -1, -1, 5.0);

@@ -10,7 +10,7 @@ new Text:ServerName;
 new Text:TDTime[2];
 new TD_Random_Messages_Intro[ ][ ] =
 {
-	"Indoluck ~w~Roleplay"
+	"Indo Vibes ~w~Roleplay"
 };
 
 function TDUpdates()
@@ -1150,7 +1150,7 @@ CreateTextDraw()
 	TextDrawAlignment(AnimH4N,3); // align right
 	
 	//Server Name
- 	ServerName = TextDrawCreate(490.000000, 8.000038, "Indoluck ~w~Roleplay");
+ 	ServerName = TextDrawCreate(490.000000, 8.000038, "Indo Vibes ~w~Roleplay");
     TextDrawLetterSize(ServerName, 0.269998, 1.405864);
     TextDrawAlignment(ServerName, 1);
     TextDrawColor(ServerName, -16776961);

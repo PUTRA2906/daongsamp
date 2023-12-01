@@ -8,9 +8,9 @@ new TrashCar[3];
 
 AddTrashVehicle()
 {
-    TrashCar[0] = AddStaticVehicle(408, 2223.406,-2172.089,13.546,312.675, -1, -1);
-    TrashCar[1] = AddStaticVehicle(408, 2231.840,-2174.691,13.553,144.076, -1, -1);
-    TrashCar[2] = AddStaticVehicle(408, 2244.677,-2186.725,13.546,132.662, -1, -1);
+    TrashCar[0] = AddStaticVehicle(408, 2227.7964,-2169.8083,13.5469,136.3253, 6, 6);
+    TrashCar[1] = AddStaticVehicle(408, 2231.840,-2174.691,13.553,144.076, 6, 6);
+    TrashCar[2] = AddStaticVehicle(408, 2244.677,-2186.725,13.546,132.662, 6, 6);
 }
 IsATrashVeh(carid)
 {

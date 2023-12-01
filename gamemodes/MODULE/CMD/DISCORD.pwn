@@ -43,7 +43,7 @@ DCMD:dcmd(user, channel, params[])
 DCMD:players(user, channel, params[])
 {
  	new strl[124];
- 	format(strl, sizeof(strl), "> <:adv:843892396709904434> - **%s** Player's In Game", number_format(Iter_Count(Player)));
+ 	format(strl, sizeof(strl), "> **Fierro City Roleplay** - **%s** Player's In Game", number_format(Iter_Count(Player)));
  	
  	DCC_SendChannelMessage(channel,strl);
 }
@@ -52,7 +52,7 @@ DCMD:rategay(user, channel, params[])
 {
 	new rate, strl[124];
 	rate = random(100);
-	format(strl, sizeof(strl), "Your Gay Rate is **%s**", number_format(rate));
+	format(strl, sizeof(strl), "```Your Gay Rate is %s```", number_format(rate));
  
  	DCC_SendChannelMessage(channel,strl);
 }

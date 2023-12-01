@@ -520,7 +520,7 @@ CMD:pump(playerid,params[]) { ApplyAnimation(playerid, "BOMBER", "BOM_Plant", 4.
 CMD:tosteal(playerid,params[]) { ApplyAnimation(playerid,"ped", "ARRESTgun", 4.0, 1, 0, 0, 0, 0, 1); return 1; }
 CMD:laugh(playerid,params[]) { ApplyAnimation(playerid, "RAPPING", "Laugh_01", 4.0, 1, 0, 0, 0, 0, 1); return 1; }
 CMD:lookout(playerid,params[])  { ApplyAnimation(playerid, "SHOP", "ROB_Shifty", 4.0, 1, 0, 0, 0, 0, 1); return 1; }
-CMD:robman(playerid,params[]) { ApplyAnimation(playerid, "SHOP", "ROB_Loop_Threat", 4.0, 1, 0, 0, 0, 0, 1); return 1; }
+//CMD:robman(playerid,params[]) { ApplyAnimation(playerid, "SHOP", "ROB_Loop_Threat", 4.0, 1, 0, 0, 0, 0, 1); return 1; }
 CMD:hide(playerid,params[]) { ApplyAnimation(playerid, "ped", "cower",4.0, 1, 0, 0, 0, 0, 1); return 1; }
 CMD:vomit(playerid,params[]) { ApplyAnimation(playerid, "FOOD", "EAT_Vomit_P", 4.0, 1, 0, 0, 0, 0, 1); return 1; }
 CMD:eat(playerid,params[]) { ApplyAnimation(playerid, "FOOD", "EAT_Burger", 4.0, 1, 0, 0, 0, 0, 1); return 1; }
@@ -533,6 +533,21 @@ CMD:carjacked1(playerid, params[])//17, 12:58pm, 4/27/2012
 {
 	ApplyAnimation(playerid,"PED","CAR_jackedLHS",4.0, 1, 0, 0, 0, 0, 1);
     return 1;
+}
+CMD:robman(playerid, params[])
+{
+	new gesture;
+	if(GetPlayerState(playerid) != PLAYER_STATE_ONFOOT || pData[playerid][pInjured] == 1) return Error(playerid, "You can't do at this moment.");
+	if(sscanf(params, "d", gesture)) return Usage(playerid, ""WHITE_E" /robman [1-4]");
+	switch(strval(params))
+	{
+		case 1: ApplyAnimation(playerid, "SHOP", "ROB_Loop_Threat", 4.0, 1, 0, 0, 0, 0, 1);
+		case 2: ApplyAnimation(playerid, "SHOP", "SHP_Gun_Aim", 4.0, 1, 0, 0, 0, 0, 1);
+		case 3: ApplyAnimation(playerid, "SHOP", "SHP_Gun_Threat", 4.0, 1, 0, 0, 0, 0, 1);
+		case 4: ApplyAnimation(playerid, "PED", "Gun_stand", 4.0, 1, 0, 0, 0, 0, 1);
+		default: SendClientMessage(playerid, COLOR_RIKO, "USAGE: "WHITE_E" /robman [1-4]");
+	}
+	return 1;
 }
 CMD:carjacked2(playerid, params[])//18, 12:59pm, 4/27/2012
 {

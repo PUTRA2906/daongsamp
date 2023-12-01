@@ -612,7 +612,7 @@ CMD:ore(playerid, params[])
 				
 			if(!IsATruck(GetPVarInt(playerid, "LastVehicleID"))) return Error(playerid, "Your last vehicle isn't available for mining.");
 		
-			if(pData[playerid][pMinerTime] > 0) return Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik untuk bisa bekerja kembali.", pData[playerid][pMinerTime]);
+			if(pData[playerid][pJobTime] > 0) return Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik untuk bisa bekerja kembali.", pData[playerid][pJobTime]);
 				
 			new tid = GetClosestOre(playerid);
 
@@ -698,10 +698,10 @@ CMD:ore(playerid, params[])
 			Info(playerid, "Sold "BLUE_E"%d "WHITE_E"ores and earned "LG_E"%s.", Vehicle_LogCount(vehicleid), FormatMoney(cash));
 			Component += LogStorage[vehicleid][0] + 50;
 			GasOil += LogStorage[vehicleid][1] + 100;
-			GivePlayerMoneyEx(playerid, cash);
+			AddPlayerSalary(playerid, "Miner(Jobs)", cash);
 			Server_MinMoney(cash);
 			Vehicle_CleanUp(vehicleid);
-			pData[playerid][pMinerTime] += 150;
+			pData[playerid][pJobTime] += 150;
 			if((carid = Vehicle_Nearest2(playerid)) != -1)
 			{
 				pvData[carid][cMetal] = 0;

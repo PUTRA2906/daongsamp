@@ -55,9 +55,9 @@ function LoadATM()
 			cache_get_value_name_float(i, "posrz", AtmData[id][atmRZ]);
 			cache_get_value_name_int(i, "interior", AtmData[id][atmInt]);
 			cache_get_value_name_int(i, "world", AtmData[id][atmWorld]);
-			AtmData[id][atmObjID] = CreateDynamicObject(2754, AtmData[id][atmX], AtmData[id][atmY], AtmData[id][atmZ], AtmData[id][atmRX], AtmData[id][atmRY], AtmData[id][atmRZ], AtmData[id][atmWorld], AtmData[id][atmInt], -1, 10.0, 10.0);
-			format(str, sizeof(str), "[ID: %d]\n"YELLOW_E"/ATM", id);
-			AtmData[id][atmLabel] = CreateDynamic3DTextLabel(str, COLOR_LIGHTGREEN, AtmData[id][atmX], AtmData[id][atmY], AtmData[id][atmZ]+0.3, 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, AtmData[id][atmWorld], AtmData[id][atmInt], -1, 10.0);
+			AtmData[id][atmObjID] = CreateDynamicObject(19324, AtmData[id][atmX], AtmData[id][atmY], AtmData[id][atmZ], AtmData[id][atmRX], AtmData[id][atmRY], AtmData[id][atmRZ], AtmData[id][atmWorld], AtmData[id][atmInt], -1, 10.0, 10.0);
+			format(str, sizeof(str), "[ID: %d]\n{FF0000}/atm {FFFFFF}to use this machine", id);
+			AtmData[id][atmLabel] = CreateDynamic3DTextLabel(str, COLOR_LBLUE, AtmData[id][atmX], AtmData[id][atmY], AtmData[id][atmZ]+0.3, 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, AtmData[id][atmWorld], AtmData[id][atmInt], -1, 10.0);
 			//AtmData[id][atmMap] = CreateDynamicMapIcon(ATMIslem[id][atmPos][0], ATMIslem[id][atmPos][1], ATMIslem[id][atmPos][2], 52, -1, -1, -1, -1, 100.0, 1);
 			//AtmData[id][atmCP] = CreateDynamicCP(ATMIslem[id][atmPos][0], ATMIslem[id][atmPos][1], ATMIslem[id][atmPos][2], 1.5, -1, -1, -1, 3.0);
 			Iter_Add(ATMS, id);
@@ -113,9 +113,9 @@ CMD:createatm(playerid, params[])
 	AtmData[id][atmWorld] = GetPlayerVirtualWorld(playerid);
 	
 	new str[128];
-	AtmData[id][atmObjID] = CreateDynamicObject(2754, AtmData[id][atmX], AtmData[id][atmY], AtmData[id][atmZ], AtmData[id][atmRX], AtmData[id][atmRY], AtmData[id][atmRZ], AtmData[id][atmWorld], AtmData[id][atmInt], -1, 10.0, 10.0);
-	format(str, sizeof(str), "[ID: %d]\n"YELLOW_E"/ATM", id);
-	AtmData[id][atmLabel] = CreateDynamic3DTextLabel(str, COLOR_LIGHTGREEN, AtmData[id][atmX], AtmData[id][atmY], AtmData[id][atmZ] + 0.3, 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, AtmData[id][atmWorld], AtmData[id][atmInt], -1, 10.0);
+	AtmData[id][atmObjID] = CreateDynamicObject(19324, AtmData[id][atmX], AtmData[id][atmY], AtmData[id][atmZ], AtmData[id][atmRX], AtmData[id][atmRY], AtmData[id][atmRZ], AtmData[id][atmWorld], AtmData[id][atmInt], -1, 10.0, 10.0);
+	format(str, sizeof(str), "[ID: %d]\n{FF0000}/atm {FFFFFF}to use this machine", id);
+	AtmData[id][atmLabel] = CreateDynamic3DTextLabel(str, COLOR_LBLUE, AtmData[id][atmX], AtmData[id][atmY], AtmData[id][atmZ] + 0.3, 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, AtmData[id][atmWorld], AtmData[id][atmInt], -1, 10.0);
 	Iter_Add(ATMS, id);
 	
 	mysql_format(g_SQL, query, sizeof(query), "INSERT INTO atms SET id='%d', posx='%f', posy='%f', posz='%f', posrx='%f', posry='%f', posrz='%f', interior='%d', world='%d'", id, AtmData[id][atmX], AtmData[id][atmY], AtmData[id][atmZ], AtmData[id][atmRX], AtmData[id][atmRY], AtmData[id][atmRZ], GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid));

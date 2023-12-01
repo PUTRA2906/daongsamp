@@ -156,6 +156,7 @@ CMD:bid(playerid, params[])
             SetPVarInt(playerid, "Sontol", Amount);
 
             RefreshTextHighOffer(playerid);
+            RefreshAuctionText(PropID, PropType);
        }
        else Error(playerid, "You cannot enter a value smaller than the highest bidder's value");
     }

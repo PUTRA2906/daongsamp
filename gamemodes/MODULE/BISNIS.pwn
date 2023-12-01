@@ -166,33 +166,34 @@ Bisnis_BuyMenu(playerid, bizid)
     {
         case 1:
         {
-            format(string, sizeof(string), "Fried Chicken - %s\nPizza Stack - %s\nPatty Burger - %s\nSprunk - %s",
+            format(string, sizeof(string), "Fried Chicken - $%s\nPizza Stack - $%s\nPatty Burger $%s\nSprunk - %s\nFrozen Pizza - $%s",
                 FormatMoney(bData[bizid][bP][0]),
                 FormatMoney(bData[bizid][bP][1]),
                 FormatMoney(bData[bizid][bP][2]),
-                FormatMoney(bData[bizid][bP][3])
+                FormatMoney(bData[bizid][bP][3]),
+                FormatMoney(bData[bizid][bP][4])
             );
             ShowPlayerDialog(playerid, BISNIS_BUYPROD, DIALOG_STYLE_LIST, bData[bizid][bName], string, "Buy", "Cancel");
         }
         case 2:
         {
-            format(string, sizeof(string), "Snack - %s\nSprunk - %s\nGas Fuel - %s\nBandage - %s\nGPS - %s\nPhone - %s\nPhone Credit - %s\nPhone Book - %s\nWalkie Talkie - %s\nBoombox - %s",
+            format(string, sizeof(string), "Snack - $%s\nSprunk - $%s\nGas Fuel - $%s\nBandage - $%s\nGPS System - $%s\nPhone - $%s\nPhone Credit - $%s\nPhone Book - $%s\nWalkie Talkie - $%s\nBoombox - $%s",
                 FormatMoney(bData[bizid][bP][0]),
                 FormatMoney(bData[bizid][bP][1]),
                 FormatMoney(bData[bizid][bP][2]),
                 FormatMoney(bData[bizid][bP][3]),
-				FormatMoney(bData[bizid][bP][4]),
-				FormatMoney(bData[bizid][bP][5]),
-				FormatMoney(bData[bizid][bP][6]),
-				FormatMoney(bData[bizid][bP][7]),
-				FormatMoney(bData[bizid][bP][8]),
-				FormatMoney(bData[bizid][bP][9])
+                FormatMoney(bData[bizid][bP][4]),
+                FormatMoney(bData[bizid][bP][5]),
+                FormatMoney(bData[bizid][bP][6]),
+                FormatMoney(bData[bizid][bP][7]),
+                FormatMoney(bData[bizid][bP][8]),
+                FormatMoney(bData[bizid][bP][9])
             );
             ShowPlayerDialog(playerid, BISNIS_BUYPROD, DIALOG_STYLE_LIST, bData[bizid][bName], string, "Buy", "Cancel");
         }
         case 3:
         {
-            format(string, sizeof(string), "Clothes - %s\nToys - %s\nMask - %s\nHelmet - %s",
+            format(string, sizeof(string), "Clothes - $%s\nToys - $%s\nMask - %s\nHelmet - $%s",
                 FormatMoney(bData[bizid][bP][0]),
                 FormatMoney(bData[bizid][bP][1]),
                 FormatMoney(bData[bizid][bP][2]),
@@ -202,7 +203,7 @@ Bisnis_BuyMenu(playerid, bizid)
         }
         case 4:
         {
-            format(string, sizeof(string), "Brass Knuckles - %s\nKnife - %s\nBaseball Bat - %s\nShovel -%s\nChainsaw - %s\nCane - %s\nFishing Tool - %s\nWorm - %s",
+            format(string, sizeof(string), "Brass Knuckles - $%s\nKnife - $%s\nBaseball Bat - $%s\nShovel - $%s\nChainsaw - $%s\nCane - $%s\nFishing Tool - $%s\nWorm - $%s",
                 FormatMoney(bData[bizid][bP][0]),
                 FormatMoney(bData[bizid][bP][1]),
                 FormatMoney(bData[bizid][bP][2]),
@@ -216,7 +217,7 @@ Bisnis_BuyMenu(playerid, bizid)
         }
         case 5:
         {
-            format(string, sizeof(string), "Wine - %s\nBeer Alcohol - %s\nVodka - %s\nRum - %s",
+            format(string, sizeof(string), "Wine - $%s\nBeer Alcohol - $%s\nVodka - $%s\nRum - $%s",
                 FormatMoney(bData[bizid][bP][0]),
                 FormatMoney(bData[bizid][bP][1]),
                 FormatMoney(bData[bizid][bP][2]),
@@ -240,33 +241,34 @@ Bisnis_ProductMenu(playerid, bizid)
     {
         case 1:
         {
-            format(string, sizeof(string), "Fried Chicken - %s\nPizza Stack - %s\nPatty Burger - %s\nSprunk - %s",
+            format(string, sizeof(string), "Fried Chicken - $%s\nPizza Stack - $%s\nPatty Burger $%s\nSprunk - %s\nFrozen Pizza - $%s",
                 FormatMoney(bData[bizid][bP][0]),
                 FormatMoney(bData[bizid][bP][1]),
                 FormatMoney(bData[bizid][bP][2]),
-                FormatMoney(bData[bizid][bP][3])
+                FormatMoney(bData[bizid][bP][3]),
+                FormatMoney(bData[bizid][bP][4])
             );
             ShowPlayerDialog(playerid, BISNIS_EDITPROD, DIALOG_STYLE_LIST, "Business: Modify Item", string, "Modify", "Cancel");
         }
         case 2:
         {
-            format(string, sizeof(string), "Snack - %s\nSprunk - %s\nGas Fuel - %s\nBandage - %s\nGPS - %s\nPhone - %s\nPhone Credit - %s\nPhone Book - %s\nWalkie Talkie - %s\nBoombox - %s",
+            format(string, sizeof(string), "Snack - $%s\nSprunk - $%s\nGas Fuel - $%s\nBandage - $%s\nGPS System - $%s\nPhone - $%s\nPhone Credit - $%s\nPhone Book - $%s\nWalkie Talkie - $%s\nBoombox - $%s",
                 FormatMoney(bData[bizid][bP][0]),
                 FormatMoney(bData[bizid][bP][1]),
                 FormatMoney(bData[bizid][bP][2]),
                 FormatMoney(bData[bizid][bP][3]),
-				FormatMoney(bData[bizid][bP][4]),
-				FormatMoney(bData[bizid][bP][5]),
-				FormatMoney(bData[bizid][bP][6]),
-				FormatMoney(bData[bizid][bP][7]),
-				FormatMoney(bData[bizid][bP][8]),
-				FormatMoney(bData[bizid][bP][9])
+                FormatMoney(bData[bizid][bP][4]),
+                FormatMoney(bData[bizid][bP][5]),
+                FormatMoney(bData[bizid][bP][6]),
+                FormatMoney(bData[bizid][bP][7]),
+                FormatMoney(bData[bizid][bP][8]),
+                FormatMoney(bData[bizid][bP][9])
             );
             ShowPlayerDialog(playerid, BISNIS_EDITPROD, DIALOG_STYLE_LIST, "Business: Modify Item", string, "Modify", "Cancel");
         }
         case 3:
         {
-            format(string, sizeof(string), "Clothes - %s\nToys - %s\nMask - %s\nHelmet - %s",
+            format(string, sizeof(string), "Clothes - $%s\nToys - $%s\nMask - %s\nHelmet - $%s",
                 FormatMoney(bData[bizid][bP][0]),
                 FormatMoney(bData[bizid][bP][1]),
                 FormatMoney(bData[bizid][bP][2]),
@@ -276,7 +278,7 @@ Bisnis_ProductMenu(playerid, bizid)
         }
         case 4:
         {
-            format(string, sizeof(string), "Brass Knuckles - %s\nKnife - %s\nBaseball Bat - %s\nShovel -%s\nChainsaw - %s\nCane - %s\nFishing Tool -%s\nWorm - %s",
+            format(string, sizeof(string), "Brass Knuckles - $%s\nKnife - $%s\nBaseball Bat - $%s\nShovel - $%s\nChainsaw - $%s\nCane - $%s\nFishing Tool - $%s\nWorm - $%s",
                 FormatMoney(bData[bizid][bP][0]),
                 FormatMoney(bData[bizid][bP][1]),
                 FormatMoney(bData[bizid][bP][2]),
@@ -290,7 +292,7 @@ Bisnis_ProductMenu(playerid, bizid)
         }
         case 5:
         {
-            format(string, sizeof(string), "Wine - %s\nBeer Alcohol - %s\nVodka - %s\nRum - %s",
+            format(string, sizeof(string), "Wine - $%s\nBeer Alcohol - $%s\nVodka - $%s\nRum - $%s",
                 FormatMoney(bData[bizid][bP][0]),
                 FormatMoney(bData[bizid][bP][1]),
                 FormatMoney(bData[bizid][bP][2]),
@@ -467,21 +469,22 @@ Bisnis_Refresh(id)
 		}
         if(strcmp(bData[id][bOwner], "-"))
 		{
-			format(string, sizeof(string), "[ID: %d]\n"LB_E"Name: {FFFF00}%s\n"WHITE_E"Owned by %s\nPress '{FF0000}ENTER{FFFFFF}' To Enter", id, bData[id][bName], bData[id][bOwner]);
+			format(string, sizeof(string), "[ID: %d]\n{FFFFFF}Name: {FFFF00}%s\n{FFFFFF}Owned by %s\nPress '{FF0000}F{FFFFFF}' To Enter", id, bData[id][bName], bData[id][bOwner]);
 			bData[id][bPickup] = CreateDynamicPickup(19133, 23, bData[id][bExtposX], bData[id][bExtposY], bData[id][bExtposZ]+0.2, 0, 0, _, 8.0);
+        	//bData[id][bCP] = CreateDynamicCP(bData[id][bExtposX], bData[id][bExtposY], bData[id][bExtposZ], 3.0, id);
         }
         else
         {
-            format(string, sizeof(string), "[ID: %d]\n{00FF00}This bisnis for sell\n{FFFFFF}Location: {FFFF00}%s\n{FFFFFF}Price: {FFFF00}%s\n{FFFFFF}Type: {FFFF00}%s\n"WHITE_E"Type /buy to purchase", id, GetLocation(bData[id][bExtposX], bData[id][bExtposY], bData[id][bExtposZ]), FormatMoney(bData[id][bPrice]), type);
+            format(string, sizeof(string), "[ID: %d]\n{FFFFFF}This bisnis for sell\n{FFFFFF}Location: {FFFF00}%s\n{FFFFFF}Price: {FFFF00}%s\n{FFFFFF}Type: {FFFF00}%s\n"WHITE_E"Type /buy to purchase", id, GetLocation(bData[id][bExtposX], bData[id][bExtposY], bData[id][bExtposZ]), FormatMoney(bData[id][bPrice]), type);
             bData[id][bPickup] = CreateDynamicPickup(19133, 23, bData[id][bExtposX], bData[id][bExtposY], bData[id][bExtposZ]+0.2, 0, 0, _, 8.0);
+        	//bData[id][bCP] = CreateDynamicCP(bData[id][bExtposX], bData[id][bExtposY], bData[id][bExtposZ], 3.0, id);
         }
 		bData[id][bPickPoint] = CreateDynamicPickup(1274, 23, bData[id][bPointX], bData[id][bPointY], bData[id][bPointZ]+0.2, id, bData[id][bInt], _, 4);
 		
-		format(tstr, 128, "[ID: %d]\n"LB_E"Bisnis Point\n"LB_E"Use '/buy' In Here", id);
+		format(tstr, 128, "[ID: %d]\n"WHITE_E"Bisnis Point\nUse {FFFF00}'/buy' In Here", id);
 		bData[id][bLabelPoint] = CreateDynamic3DTextLabel(tstr, COLOR_LOGS, bData[id][bPointX], bData[id][bPointY], bData[id][bPointZ]+0.5, 3.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, id, bData[id][bInt]);
 		
-		//bData[id][bCP] = CreateDynamicCP(bData[id][bIntposX], bData[id][bIntposY], bData[id][bIntposZ], 1.0, id, bData[id][bInt], -1, 3.0);
-        bData[id][bLabel] = CreateDynamic3DTextLabel(string, COLOR_GREEN, bData[id][bExtposX], bData[id][bExtposY], bData[id][bExtposZ]+0.5, 2.5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, 0, 0);
+        bData[id][bLabel] = CreateDynamic3DTextLabel(string, COLOR_LBLUE, bData[id][bExtposX], bData[id][bExtposY], bData[id][bExtposZ]+0.5, 2.5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, 0, 0);
 		
 		if(bData[id][bType] == 1)
 		{
@@ -652,7 +655,7 @@ CMD:editbisnis(playerid, params[])
     if(sscanf(params, "ds[24]S()[128]", bid, type, string))
     {
         Usage(playerid, "/editbisnis [id] [name]");
-        SendClientMessage(playerid, COLOR_YELLOW, "[NAMES]:{FFFFFF} location, interior, locked, owner, point, price, type, product, restock, reset");
+        SendClientMessage(playerid, COLOR_YELLOW, "[NAMES]:{FFFFFF} location, interior, locked owner, point, price, type, product, restock, reset");
         return 1;
     }
     if((bid < 0 || bid >= MAX_BISNIS))

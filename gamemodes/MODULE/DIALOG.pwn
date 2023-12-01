@@ -20,13 +20,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			printf("[LOGS] %s(%d) Succesfuly Login With Password(%s)", pData[playerid][pName], playerid, inputtext);
 			SendClientMessage(playerid, -1, "");
 			SendClientMessage(playerid, -1, "");
-			SendMessage(playerid, ""WHITE_E" Welcome {FF0000}%s {FFFFFF}To Server Indoluck Roleplay!", pData[playerid][pName]);
-			SendMessage(playerid, ""WHITE_E" Dear {FF0000}%s{FFFFFF},Happy Roleplaying dikota Indoluck Roleplay!", pData[playerid][pName]);
+			SendClientMessage(playerid, -1, "");
+			SendClientMessage(playerid, -1, "");
+			SendMessage(playerid, ""WHITE_E" Welcome {FF0000}%s {FFFFFF}To Server Indo Vibes Roleplay!", pData[playerid][pName]);
+			SendMessage(playerid, ""WHITE_E" Dear {FF0000}%s{FFFFFF},Happy Roleplaying dikota Indo Vibes Roleplay!", pData[playerid][pName]);
 			SendMessage(playerid, ""WHITE_E" Jangan Lupa Ikuti Rules Server!");
 			SendMessage(playerid, ""WHITE_E" Player Saat ini {FF0000}%d {FFFFFF}Yuk Ramaikan lagi!", online);
 			SendMessage(playerid, ""WHITE_E" Server memerlukan waktu "YELLOW_E"%d miliseconds "WHITE_E"untuk memuat data char anda", count);
+			SendMessage(playerid, ""WHITE_E" Sering Sering /savestats ya!");
 
-			
+
 			mysql_format(g_SQL, query1, sizeof(query1), "INSERT INTO loglogin (username,reg_id,password,time) VALUES('%s','%d','%s',CURRENT_TIMESTAMP())", pData[playerid][pName], pData[playerid][pID], inputtext);
 			mysql_tquery(g_SQL, query1);
 		}
@@ -46,16 +49,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	if(dialogid == DIALOG_REGISTER)
     {
 		if (!response) return Kick(playerid);
-	
+
 		if (strlen(inputtext) <= 5) return ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registration", "Your password must be longer than 5 characters!\nPlease enter your password in the field below:", "Register", "Abort");
-		
+
 		if(!IsValidPassword(inputtext))
 		{
 			Error(playerid, "Password can contain only A-Z, a-z, 0-9, _, [ ], ( )");
 			ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registration", "Your password must be valid characters!\nPlease enter your password in the field below:", "Register", "Abort");
 			return 1;
 		}
-		
+
 		for (new i = 0; i < 16; i++) pData[playerid][pSalt][i] = random(94) + 33;
 		SHA256_PassHash(inputtext, pData[playerid][pSalt], pData[playerid][pPassword], 65);
 
@@ -77,7 +80,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				day,
 				month,
 				year;
-				
+
 			getdate(year, month, day);
 
 			static const
@@ -95,7 +98,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			else if(iDay < 1 || iDay > arrMonthDays[iMonth - 1]) {
 				ShowPlayerDialog(playerid, DIALOG_AGE, DIALOG_STYLE_INPUT, "Tanggal Lahir", "Error! Invalid Input\nMasukan tanggal lahir (Tgl/Bulan/Tahun): 15/04/1998", "Pilih", "Batal");
 			}
-			else 
+			else
 			{
 				format(pData[playerid][pAge], 50, inputtext);
 				ShowPlayerDialog(playerid, DIALOG_GENDER, DIALOG_STYLE_LIST, "Gender", "1. Male/Laki-Laki\n2. Female/Perempuan", "Pilih", "Batal");
@@ -110,9 +113,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			pData[playerid][pGender] = listitem + 1;
-			switch (listitem) 
+			switch (listitem)
 			{
-				case 0: 
+				case 0:
 				{
 					SendClientMessageEx(playerid,COLOR_WHITE,"Server : "YELLOW_E"Register Succesfuly! Thanks To You After Register And join to server!");
 					SendClientMessageEx(playerid,COLOR_WHITE,"Server : Tanggal Lahir : "YELLOW_E"%s | "WHITE_E"Gender : "BLUE_E"Male/Laki-Laki", pData[playerid][pAge]);
@@ -125,7 +128,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						case 2: ShowModelSelectionMenu(playerid, SpawnFemale, "Choose your skin");
 					}
 				}
-				case 1: 
+				case 1:
 				{
 					SendClientMessageEx(playerid,COLOR_WHITE,"Server : "YELLOW_E"Register Succesfuly! Thanks To You After Register And join to server!");
 					SendClientMessageEx(playerid,COLOR_WHITE,"Server : "YELLOW_E"%s | "WHITE_E"Gender : "BLUE_E"Female/Perempuan", pData[playerid][pAge]);
@@ -223,26 +226,22 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return callcmd::changepass(playerid);
 				}
 				case 2:
-				{	
+				{
 					ShowPlayerDialog(playerid, DIALOG_HBEMODE, DIALOG_STYLE_LIST, "HBE Mode", ""LG_E"Simple\n"LG_E"Modern\n"RED_E"Disable", "Set", "Close");
 				}
 				case 3:
-				{	
-					ShowPlayerDialog(playerid, DIALOG_TDMODE, DIALOG_STYLE_LIST, "Textdraw Mode", ""LG_E"Simple\n"LG_E"Bar\n"RED_E"Disable", "Set", "Close");
-				}
-				case 4:
 				{
 					return callcmd::togpm(playerid);
 				}
-				case 5:
+				case 4:
 				{
 					return callcmd::toglog(playerid);
 				}
-				case 6:
+				case 5:
 				{
 					return callcmd::togads(playerid);
 				}
-				case 7:
+				case 6:
 				{
 					return callcmd::togwt(playerid);
 				}
@@ -299,7 +298,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					PlayerTextDrawShow(playerid, HBEO[playerid]);
                     TextDrawShowForPlayer(playerid, CharBox);
 					pData[playerid][pHBEMode] = 2;
-					
+
 					ShowPlayerProgressBar(playerid, pData[playerid][hungrybar]);
 					ShowPlayerProgressBar(playerid, pData[playerid][energybar]);
 					ShowPlayerProgressBar(playerid, pData[playerid][bladdybar]);
@@ -318,9 +317,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						TextDrawHideForPlayer(playerid, DGhudchar[txd]);
 					}
-					
+
 					pData[playerid][pHBEMode] = 0;
-					
+
 					HidePlayerProgressBar(playerid, pData[playerid][hungrybar]);
 					HidePlayerProgressBar(playerid, pData[playerid][energybar]);
 					HidePlayerProgressBar(playerid, pData[playerid][bladdybar]);
@@ -337,7 +336,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 		}
 	}
-	if(dialogid == DIALOG_TDMODE)
+/*	if(dialogid == DIALOG_TDMODE)
 	{
 		if(response)
 		{
@@ -405,6 +404,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 		}
 	}
+ */
 	if(dialogid == DIALOG_CHANGEAGE)
     {
 		if(response)
@@ -416,7 +416,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				day,
 				month,
 				year;
-				
+
 			getdate(year, month, day);
 
 			static const
@@ -434,7 +434,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			else if(iDay < 1 || iDay > arrMonthDays[iMonth - 1]) {
 				ShowPlayerDialog(playerid, DIALOG_CHANGEAGE, DIALOG_STYLE_INPUT, "Tanggal Lahir", "Error! Invalid Input\nMasukan tanggal lahir (Tgl/Bulan/Tahun): 15/04/1998", "Pilih", "Batal");
 			}
-			else 
+			else
 			{
 				format(pData[playerid][pAge], 50, inputtext);
 				Info(playerid, "New Age for your character is "YELLOW_E"%s.", pData[playerid][pAge]);
@@ -519,7 +519,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		new str[248];
 		SetPVarInt(playerid, "SellingBisnis", ReturnPlayerBisnisID(playerid, (listitem + 1)));
 		format(str, sizeof(str), "Are you sure you will sell bisnis id: %d", GetPVarInt(playerid, "SellingBisnis"));
-				
+
 		ShowPlayerDialog(playerid, DIALOG_SELL_BISNIS, DIALOG_STYLE_MSGBOX, "Sell Bisnis", str, "Sell", "Cancel");
 	}
 	if(dialogid == DIALOG_SELL_BISNIS)
@@ -557,7 +557,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(bData[bid][bLocked] == 1)
 				{
 					lock = "{FF0000}Locked";
-			
+
 				}
 				else
 				{
@@ -566,7 +566,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(bData[bid][bType] == 1)
 				{
 					type = "Fast Food";
-			
+
 				}
 				else if(bData[bid][bType] == 2)
 				{
@@ -620,7 +620,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			switch(listitem)
 			{
 				case 0:
-				{	
+				{
 					new mstr[248], lstr[512];
 					format(mstr,sizeof(mstr),"Bisnis ID %d", bid);
 					format(lstr,sizeof(lstr),"Bisnis Name:\t%s\nBisnis Locked:\t%s\nBisnis Product:\t%d\nBisnis Vault:\t%s", bData[bid][bName], lock, bData[bid][bProd], FormatMoney(bData[bid][bMoney]));
@@ -677,7 +677,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			new bid = pData[playerid][pInBiz];
 
 			if(!Player_OwnsBisnis(playerid, pData[playerid][pInBiz])) return Error(playerid, "You don't own this bisnis.");
-			
+
 			if (isnull(inputtext))
 			{
 				new mstr[512];
@@ -757,7 +757,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			Bisnis_Save(bid);
 
 			GivePlayerMoneyEx(playerid, -amount);
-			
+
 			SendClientMessageEx(playerid, COLOR_LBLUE,"BUSINESS: "WHITE_E"You have deposit "GREEN_E"%s "WHITE_E"into the business vault.", FormatMoney(strval(inputtext)));
 		}
 		else
@@ -779,7 +779,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 			if(bData[bizid][bProd] < 1)
 				return Error(playerid, "This business is out of stock product.");
-				
+
 			new Float:health;
 			GetPlayerHealth(playerid,health);
 			if(bData[bizid][bType] == 1)
@@ -833,6 +833,18 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						pData[playerid][pTrash] += 1;
 						//SetPlayerSpecialAction(playerid,SPECIAL_ACTION_DRINK_SPRUNK);
 						SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s telah membeli minuman seharga %s.", ReturnName(playerid), FormatMoney(price));
+						//SetPVarInt(playerid, "UsingSprunk", 1);
+					}
+					case 4:
+					{
+						GivePlayerMoneyEx(playerid, -price);
+						bData[bizid][bProd]--;
+						bData[bizid][bMoney] += price;
+						Server_AddPercent(price);
+						Bisnis_Save(bizid);
+						pData[playerid][pFrozenPizza] += 1;
+						//SetPlayerSpecialAction(playerid,SPECIAL_ACTION_DRINK_SPRUNK);
+						SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s telah membeli frozen pizza seharga %s.", ReturnName(playerid), FormatMoney(price));
 						//SetPVarInt(playerid, "UsingSprunk", 1);
 					}
 				}
@@ -1239,7 +1251,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			new bid = pData[playerid][pInBiz];
 
 			if(!Player_OwnsBisnis(playerid, pData[playerid][pInBiz])) return Error(playerid, "You don't own this bisnis.");
-			
+
 			if (isnull(inputtext))
 			{
 				new mstr[512];
@@ -1271,7 +1283,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			new bid = pData[playerid][pInBiz];
 
 			if(!Player_OwnsBisnis(playerid, pData[playerid][pInBiz])) return Error(playerid, "You don't own this bisnis.");
-			
+
 			if (isnull(inputtext))
 			{
 				ShowPlayerDialog(playerid, BISNIS_PH, DIALOG_STYLE_INPUT,"Bisnis Phone Number", ""RED_E"Error: "WHITE_E"Masukkan Nomor Telepon untuk bisnis anda!","Done","Back");
@@ -1294,7 +1306,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		new str[248];
 		SetPVarInt(playerid, "SellingHouse", ReturnPlayerHousesID(playerid, (listitem + 1)));
 		format(str, sizeof(str), "Are you sure you will sell house id: %d", GetPVarInt(playerid, "SellingHouse"));
-				
+
 		ShowPlayerDialog(playerid, DIALOG_SELL_HOUSE, DIALOG_STYLE_MSGBOX, "Sell House", str, "Sell", "Cancel");
 	}
 	if(dialogid == DIALOG_SELL_HOUSE)
@@ -1332,7 +1344,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(hData[hid][hLocked] == 1)
 				{
 					lock = "{FF0000}Locked";
-			
+
 				}
 				else
 				{
@@ -1341,7 +1353,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(hData[hid][hType] == 1)
 				{
 					type = "Small";
-			
+
 				}
 				else if(hData[hid][hType] == 2)
 				{
@@ -1373,16 +1385,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	if(dialogid == HOUSE_STORAGE)
 	{
 		new hid = pData[playerid][pInHouse];
-		if(!Player_OwnsHouse(playerid, pData[playerid][pInHouse])) 
+		if(!Player_OwnsHouse(playerid, pData[playerid][pInHouse]))
 			if(pData[playerid][pFaction] != 1)
 				return Error(playerid, "You don't own this house.");
 		if(response)
 		{
-			if(listitem == 0) 
+			if(listitem == 0)
 			{
 				House_WeaponStorage(playerid, hid);
 			}
-			else if(listitem == 1) 
+			else if(listitem == 1)
 			{
 				ShowPlayerDialog(playerid, HOUSE_MONEY, DIALOG_STYLE_LIST, "Money Safe", "Withdraw from safe\nDeposit into safe", "Select", "Back");
 			}
@@ -1392,10 +1404,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	if(dialogid == HOUSE_WEAPONS)
 	{
 		new houseid = pData[playerid][pInHouse];
-		if(!Player_OwnsHouse(playerid, pData[playerid][pInHouse])) 
+		if(!Player_OwnsHouse(playerid, pData[playerid][pInHouse]))
 			if(pData[playerid][pFaction] != 1)
 				return Error(playerid, "You don't own this house.");
-				
+
 		if(response)
 		{
 			if(hData[houseid][hWeapon][listitem] != 0)
@@ -1449,13 +1461,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			switch (listitem)
 			{
-				case 0: 
+				case 0:
 				{
 					new str[128];
 					format(str, sizeof(str), "Safe Balance: %s\n\nPlease enter how much money you wish to withdraw from the safe:", FormatMoney(hData[houseid][hMoney]));
 					ShowPlayerDialog(playerid, HOUSE_WITHDRAWMONEY, DIALOG_STYLE_INPUT, "Withdraw from safe", str, "Withdraw", "Back");
 				}
-				case 1: 
+				case 1:
 				{
 					new str[128];
 					format(str, sizeof(str), "Safe Balance: %s\n\nPlease enter how much money you wish to deposit into the safe:", FormatMoney(hData[houseid][hMoney]));
@@ -1470,7 +1482,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		new houseid = pData[playerid][pInHouse];
 		if(!Player_OwnsHouse(playerid, pData[playerid][pInHouse])) return Error(playerid, "You don't own this house.");
-		
+
 		if(response)
 		{
 			new amount = strval(inputtext);
@@ -1536,7 +1548,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	//------------[ Private Player Vehicle Dialog ]--------
 	if(dialogid == DIALOG_FINDVEH)
 	{
-		if(response) 
+		if(response)
 		{
 			ShowPlayerDialog(playerid, DIALOG_TRACKVEH, DIALOG_STYLE_INPUT, "Find Veh", "Enter your own vehicle id:", "Find", "Close");
 		}
@@ -1544,11 +1556,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	}
 	if(dialogid == DIALOG_TRACKVEH)
 	{
-		if(response) 
-		{	
+		if(response)
+		{
 			new Float:posisiX, Float:posisiY, Float:posisiZ,
 				carid = strval(inputtext);
-			
+
 			foreach(new veh : PVehicles)
 			{
 				if(pvData[veh][cVeh] == carid)
@@ -1572,11 +1584,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	}
 	if(dialogid == DIALOG_GOTOVEH)
 	{
-		if(response) 
+		if(response)
 		{
 			new Float:posisiX, Float:posisiY, Float:posisiZ,
 				carid = strval(inputtext);
-			
+
 			GetVehiclePos(carid, posisiX, posisiY, posisiZ);
 			Servers(playerid, "Your teleport to %s (vehicle id: %d).", GetLocation(posisiX, posisiY, posisiZ), carid);
 			SetPlayerPosition(playerid, posisiX, posisiY, posisiZ+3.0, 4.0, 0);
@@ -1585,11 +1597,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	}
 	if(dialogid == DIALOG_GETVEH)
 	{
-		if(response) 
+		if(response)
 		{
 			new Float:posisiX, Float:posisiY, Float:posisiZ,
 				carid = strval(inputtext);
-			
+
 			GetPlayerPos(playerid, posisiX, posisiY, posisiZ);
 			Servers(playerid, "Your get spawn vehicle to %s (vehicle id: %d).", GetLocation(posisiX, posisiY, posisiZ), carid);
 			SetVehiclePos(carid, posisiX, posisiY, posisiZ+0.5);
@@ -1598,12 +1610,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	}
 	if(dialogid == DIALOG_DELETEVEH)
 	{
-		if(response) 
+		if(response)
 		{
 			new carid = strval(inputtext);
-			
+
 			//for(new i = 0; i != MAX_PRIVATE_VEHICLE; i++) if(Iter_Contains(PVehicles, i))
-			foreach(new i : PVehicles)			
+			foreach(new i : PVehicles)
 			{
 				if(carid == pvData[i][cVeh])
 				{
@@ -1620,10 +1632,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	}
 	if(dialogid == DIALOG_BUYPLATE)
 	{
-		if(response) 
+		if(response)
 		{
 			new carid = strval(inputtext);
-			
+
 			//for(new i = 0; i != MAX_PRIVATE_VEHICLE; i++) if(Iter_Contains(PVehicles, i))
 			foreach(new i : PVehicles)
 			{
@@ -1654,12 +1666,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					pvData[x][vtoySelected] = 0;
 					if(vtData[x][0][vtoy_modelid] == 0)
 					{
-						
+
 					}
 					else
 					{
 						new string[512];
-						format(string, sizeof(string), ""dot""GREY_E"Edit Toy Position(Andoid & Pc)\n"dot"Remove Object\n"dot"Show/Hide Object\n"dot"Change Colour\n"dot"Share Position\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
+						format(string, sizeof(string), ""dot""GREY_E"Edit Vehicle Toys(PC only)\n"dot"Edit Toy Position(Andoid & Pc)\n"dot"Remove Object\n"dot"Show/Hide Object\n"dot"Change Colour\n"dot"Share Position\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
 						vtData[x][pvData[x][vtoySelected]][vtoy_x], vtData[x][pvData[x][vtoySelected]][vtoy_y], vtData[x][pvData[x][vtoySelected]][vtoy_z],
 						vtData[x][pvData[x][vtoySelected]][vtoy_rx], vtData[x][pvData[x][vtoySelected]][vtoy_ry], vtData[x][pvData[x][vtoySelected]][vtoy_rz]);
 						ShowPlayerDialog(playerid, DIALOG_VTOYEDIT, DIALOG_STYLE_LIST, ""RED_E"IndoluckRp "WHITE_E"Vehicle Toys", string, "Select", "Cancel");
@@ -1671,12 +1683,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					pvData[x][vtoySelected] = 1;
 					if(vtData[x][1][vtoy_modelid] == 0)
 					{
-						
+
 					}
 					else
 					{
 						new string[512];
-						format(string, sizeof(string), ""dot""GREY_E"Edit Toy Position(Andoid & Pc)\n"dot"Remove Object\n"dot"Show/Hide Object\n"dot"Change Colour\n"dot"Share Position\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
+						format(string, sizeof(string), ""dot""GREY_E"Edit Vehicle Toys(PC only)\n"dot"Edit Toy Position(Andoid & Pc)\n"dot"Remove Object\n"dot"Show/Hide Object\n"dot"Change Colour\n"dot"Share Position\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
 						vtData[x][pvData[x][vtoySelected]][vtoy_x], vtData[x][pvData[x][vtoySelected]][vtoy_y], vtData[x][pvData[x][vtoySelected]][vtoy_z],
 						vtData[x][pvData[x][vtoySelected]][vtoy_rx], vtData[x][pvData[x][vtoySelected]][vtoy_ry], vtData[x][pvData[x][vtoySelected]][vtoy_rz]);
 						ShowPlayerDialog(playerid, DIALOG_VTOYEDIT, DIALOG_STYLE_LIST, ""RED_E"IndoluckRp "WHITE_E"Vehicle Toys", string, "Select", "Cancel");
@@ -1688,12 +1700,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					pvData[x][vtoySelected] = 2;
 					if(vtData[x][2][vtoy_modelid] == 0)
 					{
-						
+
 					}
 					else
 					{
 						new string[512];
-						format(string, sizeof(string), ""dot""GREY_E"Edit Toy Position(Andoid & Pc)\n"dot"Remove Object\n"dot"Show/Hide Object\n"dot"Change Colour\n"dot"Share Position\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
+						format(string, sizeof(string), ""dot""GREY_E"Edit Vehicle Toys(PC only)\n"dot"Edit Toy Position(Andoid & Pc)\n"dot"Remove Object\n"dot"Show/Hide Object\n"dot"Change Colour\n"dot"Share Position\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
 						vtData[x][pvData[x][vtoySelected]][vtoy_x], vtData[x][pvData[x][vtoySelected]][vtoy_y], vtData[x][pvData[x][vtoySelected]][vtoy_z],
 						vtData[x][pvData[x][vtoySelected]][vtoy_rx], vtData[x][pvData[x][vtoySelected]][vtoy_ry], vtData[x][pvData[x][vtoySelected]][vtoy_rz]);
 						ShowPlayerDialog(playerid, DIALOG_VTOYEDIT, DIALOG_STYLE_LIST, ""RED_E"IndoluckRp "WHITE_E"Vehicle Toys", string, "Select", "Cancel");
@@ -1705,12 +1717,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					pvData[x][vtoySelected] = 3;
 					if(vtData[x][3][vtoy_modelid] == 0)
 					{
-						
+
 					}
 					else
 					{
 						new string[512];
-						format(string, sizeof(string), ""dot""GREY_E"Edit Toy Position(Andoid & Pc)\n"dot"Remove Object\n"dot"Show/Hide Object\n"dot"Change Colour\n"dot"Share Position\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
+						format(string, sizeof(string), ""dot""GREY_E"Edit Vehicle Toys(PC only)\n"dot"Edit Toy Position(Andoid & Pc)\n"dot"Remove Object\n"dot"Show/Hide Object\n"dot"Change Colour\n"dot"Share Position\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
 						vtData[x][pvData[x][vtoySelected]][vtoy_x], vtData[x][pvData[x][vtoySelected]][vtoy_y], vtData[x][pvData[x][vtoySelected]][vtoy_z],
 						vtData[x][pvData[x][vtoySelected]][vtoy_rx], vtData[x][pvData[x][vtoySelected]][vtoy_ry], vtData[x][pvData[x][vtoySelected]][vtoy_rz]);
 						ShowPlayerDialog(playerid, DIALOG_VTOYEDIT, DIALOG_STYLE_LIST, ""RED_E"IndoluckRp "WHITE_E"Vehicle Toys", string, "Select", "Cancel");
@@ -1833,10 +1845,20 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				case 0: // edit
 				{
+					new vehid = pData[playerid][EditingVtoys];
+	        		new idxs = pvData[vehid][vtoySelected];
+					Info(playerid,"Fungsi ini untuk mengatur berapa jumlah float pos vehicle toys (PC Only)(COMINGSOON)");
+					EditDynamicObject(playerid, vtData[vehid][idxs][vtoy_modelid]);
+					GetDynamicObjectPos(vtData[vehid][idxs][vtoy_model], vtData[vehid][idxs][vtoy_x], vtData[vehid][idxs][vtoy_y], vtData[vehid][idxs][vtoy_z]);
+					GetDynamicObjectRot(vtData[vehid][idxs][vtoy_model], vtData[vehid][idxs][vtoy_rx], vtData[vehid][idxs][vtoy_ry], vtData[vehid][idxs][vtoy_rz]);
+					pData[playerid][EditingVtoys] = vehid;
+				}
+				case 1: // edit
+				{
 					Info(playerid,"Fungsi ini untuk mengatur berapa jumlah float pos +/- untuk sekali click pada textdraw.");
 					ShowPlayerDialog(playerid, VTOYSET_VALUE, DIALOG_STYLE_INPUT, "Vehicle Toy PosX", "Set current float value\nNormal Value = 0.05\n\nEnter Float NudgeValue in here:", "Select", "Back");
 				}
-				case 1: // remove toy
+				case 2: // remove toy
 				{
 					new vehid = GetPlayerVehicleID(playerid);
 		    		foreach(new i: PVehicles)
@@ -1852,7 +1874,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		    			}
 		    		}
 				}
-				case 2:	//hide/show
+				case 3:	//hide/show
 				{
 					new vehid = pData[playerid][VehicleID];
 					if(IsValidObject(vtData[vehid][pvData[vehid][vtoySelected]][vtoy_model]))
@@ -1874,54 +1896,54 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						GameTextForPlayer(playerid, "~r~~h~Object Show~y~!", 3000, 4);
 					}
 				}
-				case 3:	//change toy colour
+				case 4:	//change toy colour
 				{
 					Servers(playerid,"Fungsi ini belum permanent");
 					ShowPlayerDialog(playerid, VTOYSET_COLOUR, DIALOG_STYLE_LIST, "Select Object Colour", "White\nBlack\nRed\nBlue\nYellow", "Select", "Back");
 				}
-				case 4:	//share toy pos
+				case 5:	//share toy pos
 				{
 					new x = pData[playerid][VehicleID];
 					SendNearbyMessage(playerid, 10.0, COLOR_GREEN, "[VTOY BY %s] "WHITE_E"PosX: %.3f | PosY: %.3f | PosZ: %.3f | PosRX: %.3f | PosRY: %.3f | PosRZ: %.3f",
 					ReturnName(playerid), vtData[x][pvData[x][vtoySelected]][vtoy_x], vtData[x][pvData[x][vtoySelected]][vtoy_y], vtData[x][pvData[x][vtoySelected]][vtoy_z],
 					vtData[x][pvData[x][vtoySelected]][vtoy_rx], vtData[x][pvData[x][vtoySelected]][vtoy_ry], vtData[x][pvData[x][vtoySelected]][vtoy_rz]);
 				}
-				case 5: //Pos X
+				case 6: //Pos X
 				{
 					new x = pData[playerid][VehicleID];
 					new mstr[128];
 					format(mstr, sizeof(mstr), ""WHITE_E"Current vehicle Toy PosX: %f\nInput new Toy PosX:(Float)", vtData[x][pvData[x][vtoySelected]][vtoy_x]);
 					ShowPlayerDialog(playerid, DIALOG_VTOYPOSX, DIALOG_STYLE_INPUT, "vehicle Toy PosX", mstr, "Edit", "Cancel");
 				}
-				case 6: //Pos Y
+				case 7: //Pos Y
 				{
 					new x = pData[playerid][VehicleID];
 					new mstr[128];
 					format(mstr, sizeof(mstr), ""WHITE_E"Current vehicle Toy PosY: %f\nInput new Toy PosY:(Float)", vtData[x][pvData[x][vtoySelected]][vtoy_y]);
 					ShowPlayerDialog(playerid, DIALOG_VTOYPOSY, DIALOG_STYLE_INPUT, "vehicle Toy PosY", mstr, "Edit", "Cancel");
 				}
-				case 7: //Pos Z
+				case 8: //Pos Z
 				{
 					new x = pData[playerid][VehicleID];
 					new mstr[128];
 					format(mstr, sizeof(mstr), ""WHITE_E"Current vehicle Toy PosZ: %f\nInput new Toy PosZ:(Float)", vtData[x][pvData[x][vtoySelected]][vtoy_z]);
 					ShowPlayerDialog(playerid, DIALOG_VTOYPOSZ, DIALOG_STYLE_INPUT, "vehicle Toy PosZ", mstr, "Edit", "Cancel");
 				}
-				case 8: //Pos RX
+				case 9: //Pos RX
 				{
 					new x = pData[playerid][VehicleID];
 					new mstr[128];
 					format(mstr, sizeof(mstr), ""WHITE_E"Current vehicle Toy PosRX: %f\nInput new Toy PosRX:(Float)", vtData[x][pvData[x][vtoySelected]][vtoy_rx]);
 					ShowPlayerDialog(playerid, DIALOG_VTOYPOSRX, DIALOG_STYLE_INPUT, "vehicle Toy PosRX", mstr, "Edit", "Cancel");
 				}
-				case 9: //Pos RY
+				case 10: //Pos RY
 				{
 					new x = pData[playerid][VehicleID];
 					new mstr[128];
 					format(mstr, sizeof(mstr), ""WHITE_E"Current vehicle Toy PosRY: %f\nInput new Toy PosRY:(Float)", vtData[x][pvData[x][vtoySelected]][vtoy_ry]);
 					ShowPlayerDialog(playerid, DIALOG_VTOYPOSRY, DIALOG_STYLE_INPUT, "Toy PosRY", mstr, "Edit", "Cancel");
 				}
-				case 10: //Pos RZ
+				case 11: //Pos RZ
 				{
 					new x = pData[playerid][VehicleID];
 					new mstr[128];
@@ -2072,12 +2094,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			new Float:posisi = floatstr(inputtext), vehid = pData[playerid][VehicleID], idxs = pvData[pData[playerid][VehicleID]][vtoySelected];
 
 			AttachDynamicObjectToVehicle(vtData[vehid][idxs][vtoy_model],
-			vehid, 
-			posisi, 
-			vtData[vehid][idxs][vtoy_y], 
-			vtData[vehid][idxs][vtoy_z], 
-			vtData[vehid][idxs][vtoy_rx], 
-			vtData[vehid][idxs][vtoy_ry], 
+			vehid,
+			posisi,
+			vtData[vehid][idxs][vtoy_y],
+			vtData[vehid][idxs][vtoy_z],
+			vtData[vehid][idxs][vtoy_rx],
+			vtData[vehid][idxs][vtoy_ry],
 			vtData[vehid][idxs][vtoy_rz]);
 
 			vtData[vehid][idxs][vtoy_x] = posisi;
@@ -2101,16 +2123,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			new Float:posisi = floatstr(inputtext), vehid = pData[playerid][VehicleID], idxs = pvData[pData[playerid][VehicleID]][vtoySelected];
-			
+
 			AttachDynamicObjectToVehicle(vtData[vehid][idxs][vtoy_model],
-			vehid, 
-			vtData[vehid][idxs][vtoy_x], 
-			posisi, 
-			vtData[vehid][idxs][vtoy_z], 
-			vtData[vehid][idxs][vtoy_rx], 
-			vtData[vehid][idxs][vtoy_ry], 
+			vehid,
+			vtData[vehid][idxs][vtoy_x],
+			posisi,
+			vtData[vehid][idxs][vtoy_z],
+			vtData[vehid][idxs][vtoy_rx],
+			vtData[vehid][idxs][vtoy_ry],
 			vtData[vehid][idxs][vtoy_rz]);
-			
+
 			vtData[vehid][idxs][vtoy_y] = posisi;
 			new x = GetPlayerVehicleID(playerid);
 			foreach(new i: PVehicles)
@@ -2120,7 +2142,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					MySQL_SaveVehicleToys(i);
 				}
 			}
-			
+
 			new string[512];
 			format(string, sizeof(string), ""dot""GREY_E"Edit Toy Position(Andoid & Pc)\n"dot"Remove vtoy\n"dot"Show/Hide Object\n"dot"Share Position\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
 			vtData[vehid][idxs][vtoy_x], vtData[vehid][idxs][vtoy_y], vtData[vehid][idxs][vtoy_z],
@@ -2133,16 +2155,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			new Float:posisi = floatstr(inputtext), vehid = pData[playerid][VehicleID], idxs = pvData[pData[playerid][VehicleID]][vtoySelected];
-			
+
 			AttachDynamicObjectToVehicle(vtData[vehid][idxs][vtoy_model],
-			vehid, 
-			vtData[vehid][idxs][vtoy_x], 
-			vtData[vehid][idxs][vtoy_y], 
-			posisi, 
-			vtData[vehid][idxs][vtoy_rx], 
-			vtData[vehid][idxs][vtoy_ry], 
+			vehid,
+			vtData[vehid][idxs][vtoy_x],
+			vtData[vehid][idxs][vtoy_y],
+			posisi,
+			vtData[vehid][idxs][vtoy_rx],
+			vtData[vehid][idxs][vtoy_ry],
 			vtData[vehid][idxs][vtoy_rz]);
-			
+
 			vtData[vehid][idxs][vtoy_z] = posisi;
 			new x = GetPlayerVehicleID(playerid);
 			foreach(new i: PVehicles)
@@ -2152,7 +2174,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					MySQL_SaveVehicleToys(i);
 				}
 			}
-			
+
 			new string[512];
 			format(string, sizeof(string), ""dot""GREY_E"Edit Toy Position(Andoid & Pc)\n"dot"Remove vtoy\n"dot"Show/Hide Object\n"dot"Share Position\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
 			vtData[vehid][idxs][vtoy_x], vtData[vehid][idxs][vtoy_y], vtData[vehid][idxs][vtoy_z],
@@ -2165,16 +2187,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			new Float:posisi = floatstr(inputtext), vehid = pData[playerid][VehicleID], idxs = pvData[pData[playerid][VehicleID]][vtoySelected];
-			
+
 			AttachDynamicObjectToVehicle(vtData[vehid][idxs][vtoy_model],
-			vehid, 
-			vtData[vehid][idxs][vtoy_x], 
-			vtData[vehid][idxs][vtoy_y], 
-			vtData[vehid][idxs][vtoy_z], 
-			posisi, 
-			vtData[vehid][idxs][vtoy_ry], 
+			vehid,
+			vtData[vehid][idxs][vtoy_x],
+			vtData[vehid][idxs][vtoy_y],
+			vtData[vehid][idxs][vtoy_z],
+			posisi,
+			vtData[vehid][idxs][vtoy_ry],
 			vtData[vehid][idxs][vtoy_rz]);
-			
+
 			vtData[vehid][idxs][vtoy_rx] = posisi;
 			new x = GetPlayerVehicleID(playerid);
 			foreach(new i: PVehicles)
@@ -2184,7 +2206,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					MySQL_SaveVehicleToys(i);
 				}
 			}
-			
+
 			new string[512];
 			format(string, sizeof(string), ""dot""GREY_E"Edit Toy Position(Andoid & Pc)\n"dot"Remove vtoy\n"dot"Show/Hide Object\n"dot"Share Position\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
 			vtData[vehid][idxs][vtoy_x], vtData[vehid][idxs][vtoy_y], vtData[vehid][idxs][vtoy_z],
@@ -2197,16 +2219,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			new Float:posisi = floatstr(inputtext), vehid = pData[playerid][VehicleID], idxs = pvData[pData[playerid][VehicleID]][vtoySelected];
-			
+
 			AttachDynamicObjectToVehicle(vtData[vehid][idxs][vtoy_model],
-			vehid, 
-			vtData[vehid][idxs][vtoy_x], 
-			vtData[vehid][idxs][vtoy_y], 
-			vtData[vehid][idxs][vtoy_z], 
-			vtData[vehid][idxs][vtoy_rx], 
-			posisi, 
+			vehid,
+			vtData[vehid][idxs][vtoy_x],
+			vtData[vehid][idxs][vtoy_y],
+			vtData[vehid][idxs][vtoy_z],
+			vtData[vehid][idxs][vtoy_rx],
+			posisi,
 			vtData[vehid][idxs][vtoy_rz]);
-			
+
 			vtData[vehid][idxs][vtoy_ry] = posisi;
 			new x = GetPlayerVehicleID(playerid);
 			foreach(new i: PVehicles)
@@ -2216,7 +2238,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					MySQL_SaveVehicleToys(i);
 				}
 			}
-			
+
 			new string[512];
 			format(string, sizeof(string), ""dot""GREY_E"Edit Toy Position(Andoid & Pc)\n"dot"Remove vtoy\n"dot"Show/Hide Object\n"dot"Share Position\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
 			vtData[vehid][idxs][vtoy_x], vtData[vehid][idxs][vtoy_y], vtData[vehid][idxs][vtoy_z],
@@ -2229,16 +2251,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			new Float:posisi = floatstr(inputtext), vehid = pData[playerid][VehicleID], idxs = pvData[pData[playerid][VehicleID]][vtoySelected];
-			
+
 			AttachDynamicObjectToVehicle(vtData[vehid][idxs][vtoy_model],
-			vehid, 
-			vtData[vehid][idxs][vtoy_x], 
-			vtData[vehid][idxs][vtoy_y], 
-			vtData[vehid][idxs][vtoy_z], 
-			vtData[vehid][idxs][vtoy_rx], 
-			vtData[vehid][idxs][vtoy_ry], 
+			vehid,
+			vtData[vehid][idxs][vtoy_x],
+			vtData[vehid][idxs][vtoy_y],
+			vtData[vehid][idxs][vtoy_z],
+			vtData[vehid][idxs][vtoy_rx],
+			vtData[vehid][idxs][vtoy_ry],
 			posisi);
-			
+
 			vtData[vehid][idxs][vtoy_rz] = posisi;
 			new x = GetPlayerVehicleID(playerid);
 			foreach(new i: PVehicles)
@@ -2248,7 +2270,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					MySQL_SaveVehicleToys(i);
 				}
 			}
-			
+
 			new string[512];
 			format(string, sizeof(string), ""dot""GREY_E"Edit Toy Position(Andoid & Pc)\n"dot"Remove vtoy\n"dot"Show/Hide Object\n"dot"Share Position\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
 			vtData[vehid][idxs][vtoy_x], vtData[vehid][idxs][vtoy_y], vtData[vehid][idxs][vtoy_z],
@@ -2348,7 +2370,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							pToys[playerid][i][toy_sx] = 1.0;
 							pToys[playerid][i][toy_sy] = 1.0;
 							pToys[playerid][i][toy_sz] = 1.0;
-							
+
 							if(IsPlayerAttachedObjectSlotUsed(playerid, i))
 							{
 								RemovePlayerAttachedObject(playerid, i);
@@ -2375,12 +2397,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					//if(IsPlayerAndroid(playerid))
 					//	return Error(playerid, "You're connected from android. This feature only for PC users!");
-						
+
 					EditAttachedObject(playerid, pData[playerid][toySelected]);
 					InfoTD_MSG(playerid, 4000, "~b~~h~You are now editing your toy.");
 				}
 				case 1: // td edit
-				{		
+				{
 					Info(playerid,"Fungsi ini untuk mengatur berapa jumlah float pos +/- untuk sekali click pada textdraw.");
 					ShowPlayerDialog(playerid, TOYSET_VALUE, DIALOG_STYLE_INPUT, "Vehicle Toy PosX", "Set current float value\nNormal Value = 0.01\n\nEnter Float NudgeValue in here:", "Select", "Back");
 				}
@@ -2778,11 +2800,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				pToys[playerid][pData[playerid][toySelected]][toy_sx],
 				pToys[playerid][pData[playerid][toySelected]][toy_sy],
 				pToys[playerid][pData[playerid][toySelected]][toy_sz]);
-			
+
 			pToys[playerid][pData[playerid][toySelected]][toy_x] = posisi;
 			//SetPVarInt(playerid, "UpdatedToy", 1);
 			MySQL_SavePlayerToys(playerid);
-			
+
 			new string[512];
 			format(string, sizeof(string), ""dot"Edit Toy Position(PC)\n"dot"Edit Toy Position(Android)\n"dot"Change Bone\n"dot""GREY_E"Remove Toy\n"dot"Share Toy Pos\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
 			pToys[playerid][pData[playerid][toySelected]][toy_x], pToys[playerid][pData[playerid][toySelected]][toy_y], pToys[playerid][pData[playerid][toySelected]][toy_z],
@@ -2795,7 +2817,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			new Float:posisi = floatstr(inputtext);
-			
+
 			SetPlayerAttachedObject(playerid,
 				pData[playerid][toySelected],
 				pToys[playerid][pData[playerid][toySelected]][toy_model],
@@ -2809,11 +2831,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				pToys[playerid][pData[playerid][toySelected]][toy_sx],
 				pToys[playerid][pData[playerid][toySelected]][toy_sy],
 				pToys[playerid][pData[playerid][toySelected]][toy_sz]);
-			
+
 			pToys[playerid][pData[playerid][toySelected]][toy_y] = posisi;
 			SetPVarInt(playerid, "UpdatedToy", 1);
 			//MySQL_SavePlayerToys(playerid);
-			
+
 			new string[512];
 			format(string, sizeof(string), ""dot"Edit Toy Position(PC)\n"dot"Edit Toy Position(Android)\n"dot"Change Bone\n"dot""GREY_E"Remove Toy\n"dot"Share Toy Pos\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
 			pToys[playerid][pData[playerid][toySelected]][toy_x], pToys[playerid][pData[playerid][toySelected]][toy_y], pToys[playerid][pData[playerid][toySelected]][toy_z],
@@ -2826,7 +2848,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			new Float:posisi = floatstr(inputtext);
-			
+
 			SetPlayerAttachedObject(playerid,
 				pData[playerid][toySelected],
 				pToys[playerid][pData[playerid][toySelected]][toy_model],
@@ -2840,11 +2862,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				pToys[playerid][pData[playerid][toySelected]][toy_sx],
 				pToys[playerid][pData[playerid][toySelected]][toy_sy],
 				pToys[playerid][pData[playerid][toySelected]][toy_sz]);
-			
+
 			pToys[playerid][pData[playerid][toySelected]][toy_z] = posisi;
 			SetPVarInt(playerid, "UpdatedToy", 1);
 			//MySQL_SavePlayerToys(playerid);
-			
+
 			new string[512];
 			format(string, sizeof(string), ""dot"Edit Toy Position(PC)\n"dot"Edit Toy Position(Android)\n"dot"Change Bone\n"dot""GREY_E"Remove Toy\n"dot"Share Toy Pos\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
 			pToys[playerid][pData[playerid][toySelected]][toy_x], pToys[playerid][pData[playerid][toySelected]][toy_y], pToys[playerid][pData[playerid][toySelected]][toy_z],
@@ -2857,7 +2879,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			new Float:posisi = floatstr(inputtext);
-			
+
 			SetPlayerAttachedObject(playerid,
 				pData[playerid][toySelected],
 				pToys[playerid][pData[playerid][toySelected]][toy_model],
@@ -2871,11 +2893,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				pToys[playerid][pData[playerid][toySelected]][toy_sx],
 				pToys[playerid][pData[playerid][toySelected]][toy_sy],
 				pToys[playerid][pData[playerid][toySelected]][toy_sz]);
-			
+
 			pToys[playerid][pData[playerid][toySelected]][toy_rx] = posisi;
 			SetPVarInt(playerid, "UpdatedToy", 1);
 			//MySQL_SavePlayerToys(playerid);
-			
+
 			new string[512];
 			format(string, sizeof(string), ""dot"Edit Toy Position(PC)\n"dot"Edit Toy Position(Android)\n"dot"Change Bone\n"dot""GREY_E"Remove Toy\n"dot"Share Toy Pos\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
 			pToys[playerid][pData[playerid][toySelected]][toy_x], pToys[playerid][pData[playerid][toySelected]][toy_y], pToys[playerid][pData[playerid][toySelected]][toy_z],
@@ -2888,7 +2910,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			new Float:posisi = floatstr(inputtext);
-			
+
 			SetPlayerAttachedObject(playerid,
 				pData[playerid][toySelected],
 				pToys[playerid][pData[playerid][toySelected]][toy_model],
@@ -2902,11 +2924,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				pToys[playerid][pData[playerid][toySelected]][toy_sx],
 				pToys[playerid][pData[playerid][toySelected]][toy_sy],
 				pToys[playerid][pData[playerid][toySelected]][toy_sz]);
-			
+
 			pToys[playerid][pData[playerid][toySelected]][toy_ry] = posisi;
 			SetPVarInt(playerid, "UpdatedToy", 1);
 			//MySQL_SavePlayerToys(playerid);
-			
+
 			new string[512];
 			format(string, sizeof(string), ""dot"Edit Toy Position(PC)\n"dot"Edit Toy Position(Android)\n"dot"Change Bone\n"dot""GREY_E"Remove Toy\n"dot"Share Toy Pos\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
 			pToys[playerid][pData[playerid][toySelected]][toy_x], pToys[playerid][pData[playerid][toySelected]][toy_y], pToys[playerid][pData[playerid][toySelected]][toy_z],
@@ -2919,7 +2941,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			new Float:posisi = floatstr(inputtext);
-			
+
 			SetPlayerAttachedObject(playerid,
 				pData[playerid][toySelected],
 				pToys[playerid][pData[playerid][toySelected]][toy_model],
@@ -2933,11 +2955,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				pToys[playerid][pData[playerid][toySelected]][toy_sx],
 				pToys[playerid][pData[playerid][toySelected]][toy_sy],
 				pToys[playerid][pData[playerid][toySelected]][toy_sz]);
-			
+
 			pToys[playerid][pData[playerid][toySelected]][toy_rz] = posisi;
 			SetPVarInt(playerid, "UpdatedToy", 1);
 			//MySQL_SavePlayerToys(playerid);
-			
+
 			new string[512];
 			format(string, sizeof(string), ""dot"Edit Toy Position(PC)\n"dot"Edit Toy Position(Android)\n"dot"Change Bone\n"dot""GREY_E"Remove Toy\n"dot"Share Toy Pos\nPosX: %f\nPosY: %f\nPosZ: %f\nPosRX: %f\nPosRY: %f\nPosRZ: %f",
 			pToys[playerid][pData[playerid][toySelected]][toy_x], pToys[playerid][pData[playerid][toySelected]][toy_y], pToys[playerid][pData[playerid][toySelected]][toy_z],
@@ -3220,9 +3242,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			case 11:
 			{
 				new str[3500];
-				strcat(str, ""LB_E"GUIDE: DrugSmugller Job berada didaerah terpencil\nAmbil Packet dan jual ke Blackmarket!\n");
+				strcat(str, ""LB_E"GUIDE: DrugSmugller Job berada didaerah blackmarket\nAmbil Packet dan jual ke Blackmarket!\n");
 				strcat(str, ""LB_E"");
-				strcat(str, ""WHITE_E"COMMAND: /takepacket /unloadpacket /droppacket\n");
+				strcat(str, ""WHITE_E"COMMAND: /takepacket /findpacket /droppacket /enablecp \n");
 				ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, ""WHITE_E"Sweeper Sidejobs", str, "Close", "");
 			}
 		}
@@ -3240,6 +3262,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			case 1:
 			{
 			    return callcmd::dealermission(playerid);
+			}
+			case 2:
+			{
+			    ShowPlayerDialog(playerid, DIALOG_CONTAINER, DIALOG_STYLE_MSGBOX, "Container - Delivery", "Anda akan bekerja sebagai pemuat container dengan kendaraan DFT-30?", "Start Job", "Close");
 			}
 		}
 		return 1;
@@ -3261,23 +3287,20 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 2:
 				{
-					ShowPlayerDialog(playerid, DIALOG_GPS_PUBLIC, DIALOG_STYLE_LIST, "Public Gps", "Ganton Gym\nWillowfield Gym\nLas Venturas Casino", "Select", "Close");
+					ShowPlayerDialog(playerid, DIALOG_GPS_PUBLIC, DIALOG_STYLE_LIST, "Public Gps", "Find Business\nFind Dealership\nFind Atm\nFind Trees\nGanton Gym\nWillowfield Gym\nLas Venturas Casino", "Select", "Close");
 				}
 				case 3:
 				{
-					return callcmd::gpsbis(playerid);
+					ShowPlayerDialog(playerid, DIALOG_GPS_JOB, DIALOG_STYLE_LIST, "GPS JOB", "Taxi Driver\nMechanic Service\nLumber Jack\nTrucker\nHauling Trailer\nHauling Box\nMiner\nProduction\nFarmer\nSweeper(Side Job)\nBus Driver(Side Job)\nTrashmaster(Side Job)\nForklift(Side Job)\nPizzaboy(Side Job)\nCouriers", "Select", "Close");
 				}
 				case 4:
 				{
-					return callcmd::gpsdealer(playerid);
+					ShowPlayerDialog(playerid, DIALOG_GPS_PROPERTY, DIALOG_STYLE_LIST, "Property", "My House\nMy Bisnis\nMy Vehicle\nMy Mission(Trucker)\nMy Hauling(Trucker)\nMy Dealer(Restock)", "Select", "Close");
 				}
 				case 5:
 				{
-					ShowPlayerDialog(playerid, DIALOG_GPS_JOB, DIALOG_STYLE_LIST, "GPS JOB", "Taxi\nMechanic\nLumber Jack\nTrucker\nHauling Trailer\nHauling Box\nMiner\nProduction\nFarmer\nSweeper(Side Job)\nBus(Side Job)\nTrashmaster(Side Job)\nForklift(Side Job)\nPizzaboy(Side Job)", "Select", "Close");
-				}
-				case 6:
-				{
-					ShowPlayerDialog(playerid, DIALOG_GPS_PROPERTY, DIALOG_STYLE_LIST, "Property", "My House\nMy Bisnis\nMy Vehicle\nMy Mission(Trucker)\nMy Hauling(Trucker)\nMy Dealer(Restock)", "Select", "Close");
+					SetPlayerRaceCheckpoint(playerid,1, 1081.2939,-1696.7833,13.5469, 0.0,0.0,0.0, 3.5);
+					Info(playerid, "GPS active! follow the checkpoint.");
 				}
 			}
 		}
@@ -3288,12 +3311,28 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			switch(listitem)
 			{
-				case 0:
+			    case 0:
+				{
+					return callcmd::gpsbis(playerid);
+				}
+				case 1:
+				{
+					return callcmd::gpsdealer(playerid);
+				}
+				case 2:
+				{
+					return callcmd::findatm(playerid);
+				}
+				case 3:
+				{
+					return callcmd::findtree(playerid);
+				}
+				case 4:
 				{
 					SetPlayerRaceCheckpoint(playerid,1, 2493.0403,-1957.7141,13.5899, 0.0,0.0,0.0, 3.5);
 					Info(playerid, "GPS active! follow the checkpoint.");
 				}
-				case 1:
+				case 5:
 				{
 					SetPlayerRaceCheckpoint(playerid,1, 2229.8333,-1721.2175,13.5608, 0.0, 0.0, 0.0, 3.5);
 					Info(playerid, "GPS active! follow the checkpoint.");
@@ -3378,11 +3417,33 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 	    if(response)
 	    {
-	        
+
             SetPlayerRaceCheckpoint(playerid,1, DealerData[listitem][dealerPosX], DealerData[listitem][dealerPosY], DealerData[listitem][dealerPosZ], 0.0, 0.0, 0.0, 3.5);
 
 
 			SendClientMessage(playerid, COLOR_RIKO, "GPS: {FFFFFF}The Dealership You Selected Is Marked On You Map");
+		}
+	}
+	if(dialogid == DIALOG_FIND_ATM)
+	{
+	    if(response)
+	    {
+
+            SetPlayerRaceCheckpoint(playerid,1, AtmData[listitem][atmX], AtmData[listitem][atmY], AtmData[listitem][atmZ], 0.0, 0.0, 0.0, 3.5);
+
+
+			SendClientMessage(playerid, COLOR_RIKO, "GPS: {FFFFFF}The Atm You Selected Is Marked On You Map");
+		}
+	}
+    if(dialogid == DIALOG_FIND_TREES)
+	{
+	    if(response)
+	    {
+
+            SetPlayerRaceCheckpoint(playerid,1, TreeData[listitem][treeX], TreeData[listitem][treeY], TreeData[listitem][treeZ], 0.0, 0.0, 0.0, 3.5);
+
+
+			SendClientMessage(playerid, COLOR_RIKO, "GPS: {FFFFFF}The Trees You Selected Is Marked On You Map");
 		}
 	}
 	if(dialogid == DIALOG_FIND_BISNIS)
@@ -3461,7 +3522,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					SetPlayerRaceCheckpoint(playerid,1, -265.81, -2213.57, 29.04, 0.0, 0.0, 0.0, 3.5); //Lumber
 					Info(playerid, "GPS active! follow the checkpoint.");
-					
+
 				}
 				case 3:
 				{
@@ -3497,13 +3558,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					SetPlayerRaceCheckpoint(playerid,1, 1618.6729, -1888.1080, 13.5469, 0.0, 0.0, 0.0, 3.5); //Swpper
 					Info(playerid, "GPS active! follow the checkpoint.");
-					
+
 				}
 				case 10:
 				{
 					SetPlayerRaceCheckpoint(playerid,1, 1699.25, -1513.80, 13.38, 0.0, 0.0, 0.0, 3.5); //Bus
 					Info(playerid, "GPS active! follow the checkpoint.");
-					
+
 				}
 				case 11:
 				{
@@ -3521,7 +3582,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					SetPlayerRaceCheckpoint(playerid,1, 2108.7407,-1785.5049,13.3868, 0.0, 0.0, 0.0, 3.5); //pizza
 					Info(playerid, "GPS active! follow the checkpoint.");
-
+				}
+				case 14:
+				{
+					SetPlayerRaceCheckpoint(playerid,1, 1622.707,-1894.286,13.667, 0.0, 0.0, 0.0, 3.5); //pizza
+					Info(playerid, "GPS active! follow the checkpoint.");
 				}
 			}
 		}
@@ -3547,7 +3612,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			InfoTD_MSG(otherid, 3500, "~g~~h~Money received!");
 			ApplyAnimation(playerid, "DEALER", "DEALER_DEAL", 4.0, 0, 0, 0, 0, 0);
    			ApplyAnimation(otherid, "DEALER", "DEALER_DEAL", 4.0, 0, 0, 0, 0, 0);
-			
+
 			new query[512];
 			mysql_format(g_SQL, query, sizeof(query), "INSERT INTO logpay (player,playerid,toplayer,toplayerid,ammount,time) VALUES('%s','%d','%s','%d','%d',UNIX_TIMESTAMP())", pData[playerid][pName], pData[playerid][pID], pData[otherid][pName], pData[otherid][pID], money);
 			mysql_tquery(g_SQL, query);
@@ -3560,13 +3625,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			new weaponid = EditingWeapon[playerid], weaponname[18], string[150];
-	 
+
 			GetWeaponName(weaponid, weaponname, sizeof(weaponname));
-		   
+
 			WeaponSettings[playerid][weaponid - 22][Bone] = listitem + 1;
 
 			Servers(playerid, "You have successfully changed the bone of your %s.", weaponname);
-		   
+
 			mysql_format(g_SQL, string, sizeof(string), "INSERT INTO weaponsettings (Owner, WeaponID, Bone) VALUES ('%d', %d, %d) ON DUPLICATE KEY UPDATE Bone = VALUES(Bone)", pData[playerid][pID], weaponid, listitem + 1);
 			mysql_tquery(g_SQL, string);
 		}
@@ -3577,7 +3642,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(!response) return 1;
 		new fid = pData[playerid][pFamily];
-		switch(listitem) 
+		switch(listitem)
 		{
 			case 0: Family_OpenStorage(playerid, fid);
 			case 1:
@@ -3608,7 +3673,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		new fid = pData[playerid][pFamily];
 		if(response)
 		{
-			if(listitem == 0) 
+			if(listitem == 0)
 			{
 				Family_WeaponStorage(playerid, fid);
 			}
@@ -3624,7 +3689,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				if(pData[playerid][pFamilyRank] < 5)
 					return Error(playerid, "Only boss can taken the weapon!");
-					
+
 				GivePlayerWeaponEx(playerid, fData[fid][fGun][listitem], fData[fid][fAmmo][listitem]);
 
 				SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s has taken a \"%s\" from their weapon storage.", ReturnName(playerid), ReturnWeaponName(fData[fid][fGun][listitem]));
@@ -3676,16 +3741,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch (listitem)
 				{
-					case 0: 
+					case 0:
 					{
 						if(pData[playerid][pFamilyRank] < 5)
 							return Error(playerid, "Only boss can withdraw marijuana!");
-							
+
 						new str[128];
 						format(str, sizeof(str), "Marijuana Balance: %d\n\nPlease enter how much marijuana you wish to withdraw from the safe:", fData[fid][fMarijuana]);
 						ShowPlayerDialog(playerid, FAMILY_WITHDRAWMARIJUANA, DIALOG_STYLE_INPUT, "Withdraw from safe", str, "Withdraw", "Back");
 					}
-					case 1: 
+					case 1:
 					{
 						new str[128];
 						format(str, sizeof(str), "Marijuana Balance: %d\n\nPlease enter how much marijuana you wish to deposit into the safe:", fData[fid][fMarijuana]);
@@ -3701,7 +3766,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		new fid = pData[playerid][pFamily];
 		if(fid == -1) return Error(playerid, "You don't have family.");
-		
+
 		if(response)
 		{
 			new amount = strval(inputtext);
@@ -3772,16 +3837,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch (listitem)
 				{
-					case 0: 
+					case 0:
 					{
 						if(pData[playerid][pFamilyRank] < 5)
 							return Error(playerid, "Only boss can withdraw component!");
-							
+
 						new str[128];
 						format(str, sizeof(str), "Component Balance: %d\n\nPlease enter how much component you wish to withdraw from the safe:", fData[fid][fComponent]);
 						ShowPlayerDialog(playerid, FAMILY_WITHDRAWCOMPONENT, DIALOG_STYLE_INPUT, "Withdraw from safe", str, "Withdraw", "Back");
 					}
-					case 1: 
+					case 1:
 					{
 						new str[128];
 						format(str, sizeof(str), "Component Balance: %d\n\nPlease enter how much component you wish to deposit into the safe:", fData[fid][fComponent]);
@@ -3797,7 +3862,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		new fid = pData[playerid][pFamily];
 		if(fid == -1) return Error(playerid, "You don't have family.");
-		
+
 		if(response)
 		{
 			new amount = strval(inputtext);
@@ -3868,16 +3933,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch (listitem)
 				{
-					case 0: 
+					case 0:
 					{
 						if(pData[playerid][pFamilyRank] < 5)
 							return Error(playerid, "Only boss can withdraw material!");
-							
+
 						new str[128];
 						format(str, sizeof(str), "Material Balance: %d\n\nPlease enter how much material you wish to withdraw from the safe:", fData[fid][fMaterial]);
 						ShowPlayerDialog(playerid, FAMILY_WITHDRAWMATERIAL, DIALOG_STYLE_INPUT, "Withdraw from safe", str, "Withdraw", "Back");
 					}
-					case 1: 
+					case 1:
 					{
 						new str[128];
 						format(str, sizeof(str), "Material Balance: %d\n\nPlease enter how much material you wish to deposit into the safe:", fData[fid][fMaterial]);
@@ -3893,7 +3958,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		new fid = pData[playerid][pFamily];
 		if(fid == -1) return Error(playerid, "You don't have family.");
-		
+
 		if(response)
 		{
 			new amount = strval(inputtext);
@@ -3964,16 +4029,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch (listitem)
 				{
-					case 0: 
+					case 0:
 					{
 						if(pData[playerid][pFamilyRank] < 5)
 							return Error(playerid, "Only boss can withdraw money!");
-							
+
 						new str[128];
 						format(str, sizeof(str), "Money Balance: %s\n\nPlease enter how much money you wish to withdraw from the safe:", FormatMoney(fData[fid][fMoney]));
 						ShowPlayerDialog(playerid, FAMILY_WITHDRAWMONEY, DIALOG_STYLE_INPUT, "Withdraw from safe", str, "Withdraw", "Back");
 					}
-					case 1: 
+					case 1:
 					{
 						new str[128];
 						format(str, sizeof(str), "Money Balance: %s\n\nPlease enter how much money you wish to deposit into the safe:", FormatMoney(fData[fid][fMoney]));
@@ -3989,7 +4054,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		new fid = pData[playerid][pFamily];
 		if(fid == -1) return Error(playerid, "You don't have family.");
-		
+
 		if(response)
 		{
 			new amount = strval(inputtext);
@@ -4068,7 +4133,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pFamily] == -1)
 						return Error(playerid, "You dont have family!");
-						
+
 					new lstr[1024];
 					format(lstr, sizeof(lstr), "Rank\tName\n");
 					foreach(new i: Player)
@@ -4081,7 +4146,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					format(lstr, sizeof(lstr), "%s\n", lstr);
 					ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_TABLIST_HEADERS, "Family Online", lstr, "Close", "");
-					
+
 				}
 				case 2:
 				{
@@ -4114,7 +4179,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pFarm] == -1)
 						return Error(playerid, "You dont have farm!");
-						
+
 					new lstr[1024];
 					format(lstr, sizeof(lstr), "Rank\tName\n");
 					foreach(new i: Player)
@@ -4127,7 +4192,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					format(lstr, sizeof(lstr), "%s\n", lstr);
 					ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_TABLIST_HEADERS, "Farm Emplooye Online", lstr, "Close", "");
-					
+
 				}
 				case 2:
 				{
@@ -4144,7 +4209,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	if(dialogid == FARM_STORAGE)
 	{
 		if(!response) return 1;
-		switch(listitem) 
+		switch(listitem)
 		{
 			case 0:
 			{
@@ -4179,13 +4244,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch (listitem)
 				{
-					case 0: 
-					{		
+					case 0:
+					{
 						new str[128];
 						format(str, sizeof(str), "Potato Balance: %d\n\nPlease enter how much Potato you wish to withdraw from the safe:", farmData[fid][farmPotato]);
 						ShowPlayerDialog(playerid, FARM_WITHDRAWPOTATO, DIALOG_STYLE_INPUT, "Withdraw from safe", str, "Withdraw", "Back");
 					}
-					case 1: 
+					case 1:
 					{
 						new str[128];
 						format(str, sizeof(str), "Potato Balance: %d\n\nPlease enter how much Potato you wish to deposit into the safe:", farmData[fid][farmPotato]);
@@ -4201,7 +4266,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		new fid = pData[playerid][pFarm];
 		if(fid == -1) return Error(playerid, "You don't have farm.");
-		
+
 		if(response)
 		{
 			new amount = strval(inputtext);
@@ -4272,13 +4337,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch (listitem)
 				{
-					case 0: 
-					{							
+					case 0:
+					{
 						new str[128];
 						format(str, sizeof(str), "Wheat Balance: %d\n\nPlease enter how much wheat you wish to withdraw from the safe:", farmData[fid][farmWheat]);
 						ShowPlayerDialog(playerid, FARM_WITHDRAWWHEAT, DIALOG_STYLE_INPUT, "Withdraw from safe", str, "Withdraw", "Back");
 					}
-					case 1: 
+					case 1:
 					{
 						new str[128];
 						format(str, sizeof(str), "Wheat Balance: %d\n\nPlease enter how much wheat you wish to deposit into the safe:", farmData[fid][farmWheat]);
@@ -4294,7 +4359,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		new fid = pData[playerid][pFarm];
 		if(fid == -1) return Error(playerid, "You don't have farm.");
-		
+
 		if(response)
 		{
 			new amount = strval(inputtext);
@@ -4365,16 +4430,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch (listitem)
 				{
-					case 0: 
+					case 0:
 					{
 						if(pData[playerid][pFarmRank] < 5)
 							return Error(playerid, "Only boss can withdraw orange!");
-							
+
 						new str[128];
 						format(str, sizeof(str), "Orange Balance: %d\n\nPlease enter how much orange you wish to withdraw from the safe:", farmData[fid][farmOrange]);
 						ShowPlayerDialog(playerid, FARM_WITHDRAWORANGE, DIALOG_STYLE_INPUT, "Withdraw from safe", str, "Withdraw", "Back");
 					}
-					case 1: 
+					case 1:
 					{
 						new str[128];
 						format(str, sizeof(str), "Orange Balance: %d\n\nPlease enter how much orange you wish to deposit into the safe:", farmData[fid][farmOrange]);
@@ -4390,7 +4455,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		new fid = pData[playerid][pFarm];
 		if(fid == -1) return Error(playerid, "You don't have farm.");
-		
+
 		if(response)
 		{
 			new amount = strval(inputtext);
@@ -4461,16 +4526,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch (listitem)
 				{
-					case 0: 
+					case 0:
 					{
 						if(pData[playerid][pFarmRank] < 5)
 							return Error(playerid, "Only boss can withdraw money!");
-							
+
 						new str[128];
 						format(str, sizeof(str), "Money Balance: %s\n\nPlease enter how much money you wish to withdraw from the safe:", FormatMoney(farmData[fid][farmMoney]));
 						ShowPlayerDialog(playerid, FARM_WITHDRAWMONEY, DIALOG_STYLE_INPUT, "Withdraw from safe", str, "Withdraw", "Back");
 					}
-					case 1: 
+					case 1:
 					{
 						new str[128];
 						format(str, sizeof(str), "Money Balance: %s\n\nPlease enter how much money you wish to deposit into the safe:", FormatMoney(farmData[fid][farmMoney]));
@@ -4486,7 +4551,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		new fid = pData[playerid][pFarm];
 		if(fid == -1) return Error(playerid, "You don't have farm.");
-		
+
 		if(response)
 		{
 			new amount = strval(inputtext);
@@ -4552,9 +4617,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(response)
 		{
-			switch (listitem) 
+			switch (listitem)
 			{
-				case 0: 
+				case 0:
 				{
 					SetPlayerHealthEx(playerid, 100);
 				}
@@ -4621,9 +4686,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(response)
 		{
-			switch (listitem) 
+			switch (listitem)
 			{
-				case 0: 
+				case 0:
 				{
 					if(pData[playerid][pOnDuty] == 1)
 					{
@@ -4655,7 +4720,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "* %s withdraws their badge and on duty from their locker", ReturnName(playerid));
 					}
 				}
-				case 1: 
+				case 1:
 				{
 					SetPlayerHealthEx(playerid, 100);
 					SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "* %s telah mengambil medical kit dari locker", ReturnName(playerid));
@@ -4669,14 +4734,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pOnDuty] <= 0)
 						return Error(playerid, "Kamu harus On duty untuk mengambil barang!");
-						
+
 					ShowPlayerDialog(playerid, DIALOG_WEAPONSAPD, DIALOG_STYLE_LIST, "SAPD Weapons", "SPRAYCAN\nPARACHUTE\nNITE STICK\nKNIFE\nCOLT45\nSILENCED\nDEAGLE\nSHOTGUN\nSHOTGSPA\nMP5\nM4\nRIFLE\nSNIPER", "Pilih", "Batal");
 				}
 				case 4:
 				{
 					if(pData[playerid][pOnDuty] <= 0)
 						return Error(playerid, "Kamu harus On duty untuk mengambil barang!");
-					
+
 					switch (pData[playerid][pGender])
 					{
 						case 1: ShowModelSelectionMenu(playerid, SAPDMale, "Choose your skin");
@@ -4689,7 +4754,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						return Error(playerid, "Kamu harus On duty untuk mengambil barang!");
 					if(pData[playerid][pFactionRank] < 3)
 						return Error(playerid, "You are not allowed!");
-					
+
 					switch (pData[playerid][pGender])
 					{
 						case 1: ShowModelSelectionMenu(playerid, SAPDWar, "Choose your skin");
@@ -4704,7 +4769,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(response)
 		{
-			switch (listitem) 
+			switch (listitem)
 			{
 				case 0:
 				{
@@ -4735,7 +4800,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pFactionRank] < 2)
 						return Error(playerid, "You are not allowed!");
-						
+
 					GivePlayerWeaponEx(playerid, 23, 200);
 					SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s reaches inside the locker and equips a %s.", ReturnName(playerid), ReturnWeaponName(23));
 				}
@@ -4743,10 +4808,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pFactionRank] < 2)
 						return Error(playerid, "You are not allowed!");
-						
+
 					GivePlayerWeaponEx(playerid, 24, 200);
 					SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s reaches inside the locker and equips a %s.", ReturnName(playerid), ReturnWeaponName(24));
-				}	
+				}
 				case 7:
 				{
 					if(pData[playerid][pFactionRank] < 3)
@@ -4797,9 +4862,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(response)
 		{
-			switch (listitem) 
+			switch (listitem)
 			{
-				case 0: 
+				case 0:
 				{
 					if(pData[playerid][pOnDuty] == 1)
 					{
@@ -4825,7 +4890,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "* %s withdraws their badge and on duty from their locker", ReturnName(playerid));
 					}
 				}
-				case 1: 
+				case 1:
 				{
 					SetPlayerHealthEx(playerid, 100);
 					SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "* %s telah mengambil medical kit dari locker", ReturnName(playerid));
@@ -4839,7 +4904,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pOnDuty] <= 0)
 						return Error(playerid, "Kamu harus On duty untuk mengambil barang!");
-						
+
 					ShowPlayerDialog(playerid, DIALOG_WEAPONSAGS, DIALOG_STYLE_LIST, "SAGS Weapons", "SPRAYCAN\nPARACHUTE\nNITE STICK\nKNIFE\nCOLT45\nSILENCED\nDEAGLE\nMP5", "Pilih", "Batal");
 				}
 				case 4:
@@ -4860,7 +4925,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(response)
 		{
-			switch (listitem) 
+			switch (listitem)
 			{
 				case 0:
 				{
@@ -4891,7 +4956,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pFactionRank] < 2)
 						return Error(playerid, "You are not allowed!");
-						
+
 					GivePlayerWeaponEx(playerid, 23, 200);
 					SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s reaches inside the locker and equips a %s.", ReturnName(playerid), ReturnWeaponName(23));
 				}
@@ -4899,10 +4964,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pFactionRank] < 3)
 						return Error(playerid, "You are not allowed!");
-						
+
 					GivePlayerWeaponEx(playerid, 24, 200);
 					SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s reaches inside the locker and equips a %s.", ReturnName(playerid), ReturnWeaponName(24));
-				}	
+				}
 				case 7:
 				{
 					if(pData[playerid][pFactionRank] < 4)
@@ -4918,9 +4983,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(response)
 		{
-			switch (listitem) 
+			switch (listitem)
 			{
-				case 0: 
+				case 0:
 				{
 					if(pData[playerid][pOnDuty] == 1)
 					{
@@ -4946,9 +5011,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "* %s withdraws their badge and on duty from their locker", ReturnName(playerid));
 					}
 				}
-				case 1: 
+				case 1:
 				{
 					SetPlayerHealthEx(playerid, 100);
+					pData[playerid][pMedicine]++;
 					SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "* %s telah mengambil medical kit dari locker", ReturnName(playerid));
 				}
 				case 2:
@@ -4960,7 +5026,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pOnDuty] <= 0)
 						return Error(playerid, "Kamu harus On duty untuk mengambil barang!");
-					
+
 					ShowPlayerDialog(playerid, DIALOG_WEAPONSAMD, DIALOG_STYLE_LIST, "SAMD Weapons", "FIREEXTINGUISHER\nSPRAYCAN\nPARACHUTE\nNITE STICK\nKNIFE\nCOLT45\nSILENCED\nDEAGLE", "Pilih", "Batal");
 				}
 				case 4:
@@ -4981,7 +5047,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(response)
 		{
-			switch (listitem) 
+			switch (listitem)
 			{
 				case 0:
 				{
@@ -5012,7 +5078,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pFactionRank] < 3)
 						return Error(playerid, "You are not allowed!");
-						
+
 					//GivePlayerWeaponEx(playerid, 22, 200);
 					//SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s reaches inside the locker and equips a %s.", ReturnName(playerid), ReturnWeaponName(22));
 				}
@@ -5020,7 +5086,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pFactionRank] < 3)
 						return Error(playerid, "You are not allowed!");
-						
+
 					//GivePlayerWeaponEx(playerid, 23, 200);
 					//SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s reaches inside the locker and equips a %s.", ReturnName(playerid), ReturnWeaponName(23));
 				}
@@ -5028,10 +5094,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pFactionRank] < 3)
 						return Error(playerid, "You are not allowed!");
-						
+
 					//GivePlayerWeaponEx(playerid, 24, 200);
 					//SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s reaches inside the locker and equips a %s.", ReturnName(playerid), ReturnWeaponName(24));
-				}	
+				}
 			}
 		}
 		return 1;
@@ -5040,9 +5106,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(response)
 		{
-			switch (listitem) 
+			switch (listitem)
 			{
-				case 0: 
+				case 0:
 				{
 					if(pData[playerid][pOnDuty] == 1)
 					{
@@ -5068,7 +5134,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "* %s withdraws their badge and on duty from their locker", ReturnName(playerid));
 					}
 				}
-				case 1: 
+				case 1:
 				{
 					SetPlayerHealthEx(playerid, 100);
 					SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "* %s telah mengambil medical kit dari locker", ReturnName(playerid));
@@ -5082,7 +5148,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pOnDuty] <= 0)
 						return Error(playerid, "Kamu harus On duty untuk mengambil barang!");
-						
+
 					ShowPlayerDialog(playerid, DIALOG_WEAPONSANEW, DIALOG_STYLE_LIST, "SAPD Weapons", "CAMERA\nSPRAYCAN\nPARACHUTE\nNITE STICK\nKNIFE\nCOLT45", "Pilih", "Batal");
 				}
 				case 4:
@@ -5122,7 +5188,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(response)
 		{
-			switch (listitem) 
+			switch (listitem)
 			{
 				case 0:
 				{
@@ -5153,7 +5219,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pFactionRank] < 3)
 						return Error(playerid, "You are not allowed!");
-						
+
 					//GivePlayerWeaponEx(playerid, 22, 200);
 					//SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s reaches inside the locker and equips a %s.", ReturnName(playerid), ReturnWeaponName(22));
 				}
@@ -5179,7 +5245,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						if(health > 1000.0) health = 1000.0;
 						if(health > 0.0) health *= -1;
 						comp = floatround(health, floatround_round) / 10 + 100;
-						
+
 						if(pData[playerid][pComponent] < comp) return Error(playerid, "Component anda kurang!");
 						if(comp <= 0) return Error(playerid, "This vehicle can't be fixing.");
 						pData[playerid][pComponent] -= comp;
@@ -5206,7 +5272,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false)== pData[playerid][pMechVeh])
 					{
 						new panels, doors, light, tires, comp;
-						
+
 						GetVehicleDamageStatus(pData[playerid][pMechVeh], panels, doors, light, tires);
 						new cpanels = panels / 1000000;
 						new lights = light / 2;
@@ -5214,7 +5280,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						if(doors != 0) pintu = 5;
 						if(doors == 0) pintu = 0;
 						comp = cpanels + lights + pintu + 20;
-						
+
 						if(pData[playerid][pComponent] < comp) return Error(playerid, "Component anda kurang!");
 						if(comp <= 0) return Error(playerid, "This vehicle can't be fixing.");
 						pData[playerid][pComponent] -= comp;
@@ -5295,7 +5361,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 				    if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
-					
+
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 						if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 						{
@@ -5319,7 +5385,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 				    if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
-					
+
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 						if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 						{
@@ -5343,7 +5409,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 				    if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
-					
+
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 						if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 						{
@@ -5367,7 +5433,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 				    if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
-					
+
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 						if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 						{
@@ -5389,10 +5455,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 8:
 				{
-				    
+
 					if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
-					
+
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 						if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 						{
@@ -5414,10 +5480,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 9:
 				{
-				    
+
 					if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
-					
+
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 						if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 						{
@@ -5439,10 +5505,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 10:
 				{
-				    
+
 					if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
-					
+
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 						if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 						{
@@ -5464,10 +5530,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 11:
 				{
-				    
+
 					if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
-					
+
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 						if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 						{
@@ -5489,10 +5555,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 12:
 				{
-				    
+
 					if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
-					
+
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 						if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 						{
@@ -5514,10 +5580,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 13:
 				{
-				    
+
 					if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
-					
+
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 						if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 						{
@@ -5539,10 +5605,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 14:
 				{
-				    
+
 					if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
-					
+
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 						if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 						{
@@ -5565,10 +5631,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 15:
 				{
-				    
+
 					if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
-					
+
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 						if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 						{
@@ -5590,16 +5656,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 16:
 				{
-				    
+
 					if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
-					
+
 						pData[playerid][pMechColor1] = 1086;
 						pData[playerid][pMechColor2] = 0;
-				
+
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 						if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-						{	
+						{
 							if(pData[playerid][pComponent] < 150) return Error(playerid, "Component anda kurang!");
 							pData[playerid][pComponent] -= 150;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"150 component.");
@@ -5627,13 +5693,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
-					
+
 						pData[playerid][pMechColor1] = 1087;
 						pData[playerid][pMechColor2] = 0;
-				
+
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 						if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-						{	
+						{
 							if(pData[playerid][pComponent] < 150) return Error(playerid, "Component anda kurang!");
 							pData[playerid][pComponent] -= 150;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"150 component.");
@@ -5658,15 +5724,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					else return Error(playerid, "You must in Mechanic/Workshop Area!");
 				}
 				case 18:
-				{    
+				{
 					if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
 						pData[playerid][pMechColor1] = 1009;
 						pData[playerid][pMechColor2] = 0;
-				
+
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 						if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-						{	
+						{
 							if(pData[playerid][pComponent] < 250) return Error(playerid, "Component anda kurang!");
 							pData[playerid][pComponent] -= 250;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"250 component.");
@@ -5692,16 +5758,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 19:
 				{
-				    
+
 					if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
-					
+
 						pData[playerid][pMechColor1] = 1008;
 						pData[playerid][pMechColor2] = 0;
-				
+
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 						if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-						{	
+						{
 							if(pData[playerid][pComponent] < 375) return Error(playerid, "Component anda kurang!");
 							pData[playerid][pComponent] -= 375;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"375 component.");
@@ -5727,15 +5793,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 20:
 				{
-				    
+
 					if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
 						pData[playerid][pMechColor1] = 1010;
 						pData[playerid][pMechColor2] = 0;
-				
+
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 						if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-						{	
+						{
 							if(pData[playerid][pComponent] < 500) return Error(playerid, "Component anda kurang!");
 							pData[playerid][pComponent] -= 500;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"500 component.");
@@ -5761,7 +5827,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 21:
 				{
-				    
+
 					if(IsPlayerInRangeOfPoint(playerid, 50.0, wsData[id][WsRepX], wsData[id][WsRepY], wsData[id][WsRepZ]))
 					{
 						if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
@@ -5791,10 +5857,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			pData[playerid][pMechColor1] = floatround(strval(inputtext));
-			
+
 			if(pData[playerid][pMechColor1] < 0 || pData[playerid][pMechColor1] > 255)
 				return ShowPlayerDialog(playerid, DIALOG_SERVICE_COLOR, DIALOG_STYLE_INPUT, "Color ID 1", "Enter the color id 1:(0 - 255)", "Next", "Close");
-			
+
 			ShowPlayerDialog(playerid, DIALOG_SERVICE_COLOR2, DIALOG_STYLE_INPUT, "Color ID 2", "Enter the color id 2:(0 - 255)", "Next", "Close");
 		}
 		return 1;
@@ -5804,13 +5870,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			pData[playerid][pMechColor2] = floatround(strval(inputtext));
-			
+
 			if(pData[playerid][pMechColor2] < 0 || pData[playerid][pMechColor2] > 255)
 				return ShowPlayerDialog(playerid, DIALOG_SERVICE_COLOR2, DIALOG_STYLE_INPUT, "Color ID 2", "Enter the color id 2:(0 - 255)", "Next", "Close");
-			
+
 			if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 			if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-			{	
+			{
 				if(pData[playerid][pComponent] < 40) return Error(playerid, "Component anda kurang!");
 				pData[playerid][pComponent] -= 40;
 				Info(playerid, "Anda mengganti warna kendaraan dengan "RED_E"30 component.");
@@ -5839,13 +5905,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			pData[playerid][pMechColor1] = floatround(strval(inputtext));
-			
+
 			if(pData[playerid][pMechColor1] < 0 || pData[playerid][pMechColor1] > 3)
 				return ShowPlayerDialog(playerid, DIALOG_SERVICE_PAINTJOB, DIALOG_STYLE_INPUT, "Paintjob", "Enter the vehicle paintjob id:(0 - 2 | 3 - Remove paintJob)", "Paintjob", "Close");
-			
+
 			if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 			if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-			{	
+			{
 				if(pData[playerid][pComponent] < 100) return Error(playerid, "Component anda kurang!");
 				pData[playerid][pComponent] -= 100;
 				Info(playerid, "Anda mengganti paintjob kendaraan dengan "RED_E"50 component.");
@@ -5908,10 +5974,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					pData[playerid][pMechColor1] = 1074;
 					pData[playerid][pMechColor2] = 0;
-			
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-					{	
+					{
 						if(pData[playerid][pComponent] < 60) return Error(playerid, "Component anda kurang!");
 						pData[playerid][pComponent] -= 60;
 						Info(playerid, "Anda memodif kendaraan dengan "RED_E"60 component.");
@@ -5937,10 +6003,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					pData[playerid][pMechColor1] = 1076;
 					pData[playerid][pMechColor2] = 0;
-			
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-					{	
+					{
 						if(pData[playerid][pComponent] < 60) return Error(playerid, "Component anda kurang!");
 						pData[playerid][pComponent] -= 60;
 						Info(playerid, "Anda memodif kendaraan dengan "RED_E"60 component.");
@@ -5966,10 +6032,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					pData[playerid][pMechColor1] = 1078;
 					pData[playerid][pMechColor2] = 0;
-			
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-					{	
+					{
 						if(pData[playerid][pComponent] < 60) return Error(playerid, "Component anda kurang!");
 						pData[playerid][pComponent] -= 60;
 						Info(playerid, "Anda memodif kendaraan dengan "RED_E"60 component.");
@@ -5995,10 +6061,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					pData[playerid][pMechColor1] = 1081;
 					pData[playerid][pMechColor2] = 0;
-			
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-					{	
+					{
 						if(pData[playerid][pComponent] < 60) return Error(playerid, "Component anda kurang!");
 						pData[playerid][pComponent] -= 60;
 						Info(playerid, "Anda memodif kendaraan dengan "RED_E"60 component.");
@@ -6024,10 +6090,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					pData[playerid][pMechColor1] = 1082;
 					pData[playerid][pMechColor2] = 0;
-			
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-					{	
+					{
 						if(pData[playerid][pComponent] < 60) return Error(playerid, "Component anda kurang!");
 						pData[playerid][pComponent] -= 60;
 						Info(playerid, "Anda memodif kendaraan dengan "RED_E"60 component.");
@@ -6053,10 +6119,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					pData[playerid][pMechColor1] = 1085;
 					pData[playerid][pMechColor2] = 0;
-			
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-					{	
+					{
 						if(pData[playerid][pComponent] < 60) return Error(playerid, "Component anda kurang!");
 						pData[playerid][pComponent] -= 60;
 						Info(playerid, "Anda memodif kendaraan dengan "RED_E"60 component.");
@@ -6082,10 +6148,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					pData[playerid][pMechColor1] = 1096;
 					pData[playerid][pMechColor2] = 0;
-			
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-					{	
+					{
 						if(pData[playerid][pComponent] < 60) return Error(playerid, "Component anda kurang!");
 						pData[playerid][pComponent] -= 60;
 						Info(playerid, "Anda memodif kendaraan dengan "RED_E"60 component.");
@@ -6111,10 +6177,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					pData[playerid][pMechColor1] = 1097;
 					pData[playerid][pMechColor2] = 0;
-			
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-					{	
+					{
 						if(pData[playerid][pComponent] < 60) return Error(playerid, "Component anda kurang!");
 						pData[playerid][pComponent] -= 60;
 						Info(playerid, "Anda memodif kendaraan dengan "RED_E"60 component.");
@@ -6140,10 +6206,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					pData[playerid][pMechColor1] = 1098;
 					pData[playerid][pMechColor2] = 0;
-			
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-					{	
+					{
 						if(pData[playerid][pComponent] < 60) return Error(playerid, "Component anda kurang!");
 						pData[playerid][pComponent] -= 60;
 						Info(playerid, "Anda memodif kendaraan dengan "RED_E"60 component.");
@@ -6169,10 +6235,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					pData[playerid][pMechColor1] = 1084;
 					pData[playerid][pMechColor2] = 0;
-			
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-					{	
+					{
 						if(pData[playerid][pComponent] < 60) return Error(playerid, "Component anda kurang!");
 						pData[playerid][pComponent] -= 60;
 						Info(playerid, "Anda memodif kendaraan dengan "RED_E"60 component.");
@@ -6198,10 +6264,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					pData[playerid][pMechColor1] = 1073;
 					pData[playerid][pMechColor2] = 0;
-			
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-					{	
+					{
 						if(pData[playerid][pComponent] < 60) return Error(playerid, "Component anda kurang!");
 						pData[playerid][pComponent] -= 60;
 						Info(playerid, "Anda memodif kendaraan dengan "RED_E"60 component.");
@@ -6227,10 +6293,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					pData[playerid][pMechColor1] = 1075;
 					pData[playerid][pMechColor2] = 0;
-			
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-					{	
+					{
 						if(pData[playerid][pComponent] < 60) return Error(playerid, "Component anda kurang!");
 						pData[playerid][pComponent] -= 60;
 						Info(playerid, "Anda memodif kendaraan dengan "RED_E"60 component.");
@@ -6256,10 +6322,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					pData[playerid][pMechColor1] = 1077;
 					pData[playerid][pMechColor2] = 0;
-			
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-					{	
+					{
 						if(pData[playerid][pComponent] < 60) return Error(playerid, "Component anda kurang!");
 						pData[playerid][pComponent] -= 60;
 						Info(playerid, "Anda memodif kendaraan dengan "RED_E"60 component.");
@@ -6285,10 +6351,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					pData[playerid][pMechColor1] = 1079;
 					pData[playerid][pMechColor2] = 0;
-			
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-					{	
+					{
 						if(pData[playerid][pComponent] < 60) return Error(playerid, "Component anda kurang!");
 						pData[playerid][pComponent] -= 60;
 						Info(playerid, "Anda memodif kendaraan dengan "RED_E"60 component.");
@@ -6314,10 +6380,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					pData[playerid][pMechColor1] = 1080;
 					pData[playerid][pMechColor2] = 0;
-			
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-					{	
+					{
 						if(pData[playerid][pComponent] < 60) return Error(playerid, "Component anda kurang!");
 						pData[playerid][pComponent] -= 60;
 						Info(playerid, "Anda memodif kendaraan dengan "RED_E"60 component.");
@@ -6343,10 +6409,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					pData[playerid][pMechColor1] = 1083;
 					pData[playerid][pMechColor2] = 0;
-			
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
-					{	
+					{
 						if(pData[playerid][pComponent] < 60) return Error(playerid, "Component anda kurang!");
 						pData[playerid][pComponent] -= 60;
 						Info(playerid, "Anda memodif kendaraan dengan "RED_E"60 component.");
@@ -6381,7 +6447,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 0:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -6448,7 +6514,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 1:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -6515,7 +6581,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 2:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -6534,10 +6600,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						VehicleModel == 550 ||
 						VehicleModel == 549)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1001;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -6563,7 +6629,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 3:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -6579,10 +6645,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						VehicleModel == 550 ||
 						VehicleModel == 549)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1023;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -6608,7 +6674,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 4:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -6624,10 +6690,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						VehicleModel == 550 ||
 						VehicleModel == 549)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1003;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -6653,7 +6719,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 5:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -6663,10 +6729,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						VehicleModel == 547 ||
 						VehicleModel == 405)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1000;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -6692,7 +6758,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 6:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -6701,10 +6767,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						VehicleModel == 542 ||
 						VehicleModel == 405)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1014;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -6730,7 +6796,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 7:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -6738,10 +6804,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						if(VehicleModel == 527 ||
 						VehicleModel == 542)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1015;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -6767,7 +6833,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 8:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -6775,10 +6841,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						if(VehicleModel == 546 ||
 						VehicleModel == 517)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1002;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -6813,7 +6879,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 0:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -6826,10 +6892,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						VehicleModel == 426 ||
 						VehicleModel == 550)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1005;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -6855,7 +6921,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 1:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -6867,10 +6933,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						VehicleModel == 426 ||
 						VehicleModel == 550)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1004;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -6896,17 +6962,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 2:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
 						if(pData[playerid][pComponent] < 70) return Error(playerid, "Component anda kurang!");
 						if(VehicleModel == 401)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1011;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -6932,17 +6998,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 3:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
 						if(pData[playerid][pComponent] < 70) return Error(playerid, "Component anda kurang!");
 						if(VehicleModel == 549)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1012;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -6978,7 +7044,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 0:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -6993,10 +7059,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						VehicleModel == 550 ||
 						VehicleModel == 549)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1142;
 							pData[playerid][pMechColor2] = 1143;
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -7022,7 +7088,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 1:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -7037,10 +7103,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						VehicleModel == 550 ||
 						VehicleModel == 549)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1144;
 							pData[playerid][pMechColor2] = 1145;
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -7075,7 +7141,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 0:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -7087,10 +7153,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						VehicleModel == 436 ||
 						VehicleModel == 439)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1013;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -7116,7 +7182,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 1:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -7125,10 +7191,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						VehicleModel == 603 ||
 						VehicleModel == 400)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1024;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -7164,7 +7230,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 0:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -7231,7 +7297,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 1:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -7298,7 +7364,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 2:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -7365,7 +7431,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 3:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -7432,7 +7498,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 4:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -7454,10 +7520,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						VehicleModel == 549 ||
 						VehicleModel == 477)
 						{
-							
+
 							pData[playerid][pMechColor1] = 1020;
 							pData[playerid][pMechColor2] = 0;
-								
+
 							pData[playerid][pComponent] -= 80;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"80 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -7483,7 +7549,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 5:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -7498,10 +7564,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						VehicleModel == 405 ||
 						VehicleModel == 477)
 						{
-							
+
 							pData[playerid][pMechColor1] = 1021;
 							pData[playerid][pMechColor2] = 0;
-								
+
 							pData[playerid][pComponent] -= 80;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"80 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -7527,17 +7593,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 6:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
 						if(pData[playerid][pComponent] < 80) return Error(playerid, "Component anda kurang!");
 						if(VehicleModel == 436)
 						{
-							
+
 							pData[playerid][pMechColor1] = 1022;
 							pData[playerid][pMechColor2] = 0;
-								
+
 							pData[playerid][pComponent] -= 80;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"80 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -7563,7 +7629,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 7:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -7584,10 +7650,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						VehicleModel == 549 ||
 						VehicleModel == 477)
 						{
-							
+
 							pData[playerid][pMechColor1] = 1019;
 							pData[playerid][pMechColor2] = 0;
-								
+
 							pData[playerid][pComponent] -= 80;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"80 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -7613,7 +7679,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 8:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -7635,10 +7701,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						VehicleModel == 549 ||
 						VehicleModel == 477)
 						{
-							
+
 							pData[playerid][pMechColor1] = 1018;
 							pData[playerid][pMechColor2] = 0;
-								
+
 							pData[playerid][pComponent] -= 80;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"80 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -7674,7 +7740,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 0:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -7716,7 +7782,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								pData[playerid][pMechColor1] = 1169;
 								pData[playerid][pMechColor2] = 0;
 							}
-							
+
 							pData[playerid][pComponent] -= 100;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"100 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -7742,7 +7808,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 1:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -7784,7 +7850,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								pData[playerid][pMechColor1] = 1170;
 								pData[playerid][pMechColor2] = 0;
 							}
-							
+
 							pData[playerid][pComponent] -= 100;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"100 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -7810,7 +7876,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 2:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -7852,7 +7918,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								pData[playerid][pMechColor1] = 1115;
 								pData[playerid][pMechColor2] = 0;
 							}
-							
+
 							pData[playerid][pComponent] -= 100;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"100 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -7878,7 +7944,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 3:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -7920,7 +7986,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								pData[playerid][pMechColor1] = 1116;
 								pData[playerid][pMechColor2] = 0;
 							}
-							
+
 							pData[playerid][pComponent] -= 100;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"100 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -7956,7 +8022,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 0:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -7998,7 +8064,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								pData[playerid][pMechColor1] = 1141;
 								pData[playerid][pMechColor2] = 0;
 							}
-							
+
 							pData[playerid][pComponent] -= 100;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"100 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8024,7 +8090,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 1:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -8066,7 +8132,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								pData[playerid][pMechColor1] = 1140;
 								pData[playerid][pMechColor2] = 0;
 							}
-							
+
 							pData[playerid][pComponent] -= 100;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"100 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8092,7 +8158,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 2:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -8134,7 +8200,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								pData[playerid][pMechColor1] = 1109;
 								pData[playerid][pMechColor2] = 0;
 							}
-							
+
 							pData[playerid][pComponent] -= 100;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"100 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8160,7 +8226,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 3:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -8202,7 +8268,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								pData[playerid][pMechColor1] = 1110;
 								pData[playerid][pMechColor2] = 0;
 							}
-							
+
 							pData[playerid][pComponent] -= 100;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"100 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8238,7 +8304,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 0:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -8280,7 +8346,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								pData[playerid][pMechColor1] = 1032;
 								pData[playerid][pMechColor2] = 0;
 							}
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8306,7 +8372,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 1:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -8348,7 +8414,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								pData[playerid][pMechColor1] = 1033;
 								pData[playerid][pMechColor2] = 0;
 							}
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8374,7 +8440,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 2:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -8392,7 +8458,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								pData[playerid][pMechColor1] = 1128;
 								pData[playerid][pMechColor2] = 0;
 							}
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8418,7 +8484,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 3:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -8436,7 +8502,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								pData[playerid][pMechColor1] = 1103;
 								pData[playerid][pMechColor2] = 0;
 							}
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8462,7 +8528,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 4:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -8483,7 +8549,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 							pData[playerid][pMechColor1] = 1006;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 70;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"70 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8519,7 +8585,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 0:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -8561,7 +8627,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								pData[playerid][pMechColor1] = 1026;
 								pData[playerid][pMechColor2] = 1027;
 							}
-							
+
 							pData[playerid][pComponent] -= 90;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"90 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8587,7 +8653,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 1:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -8629,7 +8695,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								pData[playerid][pMechColor1] = 1031;
 								pData[playerid][pMechColor2] = 1030;
 							}
-							
+
 							pData[playerid][pComponent] -= 90;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"90 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8655,7 +8721,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 2:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -8685,7 +8751,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								pData[playerid][pMechColor1] = 1102;
 								pData[playerid][pMechColor2] = 1133;
 							}
-							
+
 							pData[playerid][pComponent] -= 90;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"90 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8711,17 +8777,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 3:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
 						if(pData[playerid][pComponent] < 90) return Error(playerid, "Component anda kurang!");
 						if(VehicleModel == 534)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1102;
 							pData[playerid][pMechColor2] = 1101;
-							
+
 							pData[playerid][pComponent] -= 90;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"90 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8747,17 +8813,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 4:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
 						if(pData[playerid][pComponent] < 90) return Error(playerid, "Component anda kurang!");
 						if(VehicleModel == 534)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1106;
 							pData[playerid][pMechColor2] = 1124;
-							
+
 							pData[playerid][pComponent] -= 90;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"90 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8783,17 +8849,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 5:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
 						if(pData[playerid][pComponent] < 90) return Error(playerid, "Component anda kurang!");
 						if(VehicleModel == 535)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1118;
 							pData[playerid][pMechColor2] = 1120;
-							
+
 							pData[playerid][pComponent] -= 90;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"90 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8819,17 +8885,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 6:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
 						if(pData[playerid][pComponent] < 90) return Error(playerid, "Component anda kurang!");
 						if(VehicleModel == 535)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1119;
 							pData[playerid][pMechColor2] = 1121;
-							
+
 							pData[playerid][pComponent] -= 90;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"90 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8855,7 +8921,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 7:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
@@ -8875,10 +8941,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						VehicleModel == 549 ||
 						VehicleModel == 477)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1007;
 							pData[playerid][pMechColor2] = 1017;
-							
+
 							pData[playerid][pComponent] -= 90;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"90 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8914,17 +8980,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 0:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
 						if(pData[playerid][pComponent] < 50) return Error(playerid, "Component anda kurang!");
 						if(VehicleModel == 534)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1100;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 50;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"50 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8950,17 +9016,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 1:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
 						if(pData[playerid][pComponent] < 50) return Error(playerid, "Component anda kurang!");
 						if(VehicleModel == 534)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1123;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 50;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"50 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -8986,17 +9052,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 2:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
 						if(pData[playerid][pComponent] < 50) return Error(playerid, "Component anda kurang!");
 						if(VehicleModel == 534)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1125;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 50;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"50 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -9022,17 +9088,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 3:
 				{
 					new VehicleModel = GetVehicleModel(pData[playerid][pMechVeh]);
-					
+
 					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "You already checking vehicle!");
 					if(GetNearestVehicleToPlayer(playerid, 3.8, false) == pData[playerid][pMechVeh])
 					{
 						if(pData[playerid][pComponent] < 50) return Error(playerid, "Component anda kurang!");
 						if(VehicleModel == 534)
 						{
-				
+
 							pData[playerid][pMechColor1] = 1117;
 							pData[playerid][pMechColor2] = 0;
-							
+
 							pData[playerid][pComponent] -= 50;
 							Info(playerid, "Anda memodif kendaraan dengan "RED_E"50 component.");
 							pData[playerid][pMechanic] = SetTimerEx("ModifCar", 1000, true, "id", playerid, pData[playerid][pMechVeh]);
@@ -9278,11 +9344,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(pData[playerid][pMaterial] < 350) return Error(playerid, "Material tidak cukup!(Butuh: 350).");
 					if(pData[playerid][pComponent] < 450) return Error(playerid, "Component tidak cukup!(Butuh: 450).");
 					if(GetPlayerMoney(playerid) < 730) return Error(playerid, "Not enough money!");
-					
+
 					pData[playerid][pMaterial] -= 350;
 					pData[playerid][pComponent] -= 450;
-					GivePlayerMoneyEx(playerid, -1000);
-					
+					GivePlayerMoneyEx(playerid, -500000);
+
 					TogglePlayerControllable(playerid, 0);
 					Info(playerid, "Anda membuat senjata ilegal dengan 350 material dan 450 component dengan harga $73.0!");
 					ApplyAnimation(playerid, "BD_FIRE", "wash_up", 4.1, 0, 0, 0, 0, 0, 1);
@@ -9297,11 +9363,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(pData[playerid][pMaterial] < 250) return Error(playerid, "Material tidak cukup!(Butuh: 250).");
 					if(pData[playerid][pComponent] < 350) return Error(playerid, "Component tidak cukup!(Butuh: 350).");
 					if(GetPlayerMoney(playerid) < 1500) return Error(playerid, "Not enough money!");
-					
+
 					pData[playerid][pMaterial] -= 250;
 					pData[playerid][pComponent] -= 350;
-					GivePlayerMoneyEx(playerid, -1500);
-					
+					GivePlayerMoneyEx(playerid, -500000);
+
 					TogglePlayerControllable(playerid, 0);
 					Info(playerid, "Anda membuat senjata ilegal dengan 250 material dan 350 component dengan harga $300!");
 					ApplyAnimation(playerid, "BD_FIRE", "wash_up", 4.1, 0, 0, 0, 0, 0, 1);
@@ -9316,11 +9382,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(pData[playerid][pMaterial] < 450) return Error(playerid, "Material tidak cukup!(Butuh: 450).");
 					if(pData[playerid][pComponent] < 400) return Error(playerid, "Component tidak cukup!(Butuh: 400).");
 					if(GetPlayerMoney(playerid) < 2000) return Error(playerid, "Not enough money!");
-					
+
 					pData[playerid][pMaterial] -= 450;
 					pData[playerid][pComponent] -= 400;
-					GivePlayerMoneyEx(playerid, -2000);
-					
+					GivePlayerMoneyEx(playerid, -800000);
+
 					TogglePlayerControllable(playerid, 0);
 					Info(playerid, "Anda membuat senjata ilegal dengan 450 material dan 400 component dengan harga $6.000!");
 					ApplyAnimation(playerid, "BD_FIRE", "wash_up", 4.1, 0, 0, 0, 0, 0, 1);
@@ -9335,11 +9401,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(pData[playerid][pMaterial] < 480) return Error(playerid, "Material tidak cukup!(Butuh: 480).");
 					if(pData[playerid][pComponent] < 500) return Error(playerid, "Component tidak cukup!(Butuh: 500).");
 					if(GetPlayerMoney(playerid) < 2500) return Error(playerid, "Not enough money!");
-					
+
 					pData[playerid][pMaterial] -= 480;
 					pData[playerid][pComponent] -= 500;
-					GivePlayerMoneyEx(playerid, -2500);
-					
+					GivePlayerMoneyEx(playerid, -1000000);
+
 					TogglePlayerControllable(playerid, 0);
 					Info(playerid, "Anda membuat senjata ilegal dengan 480 material dan 500 component dengan harga $4.000!");
 					ApplyAnimation(playerid, "BD_FIRE", "wash_up", 4.1, 0, 0, 0, 0, 0, 1);
@@ -9354,11 +9420,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(pData[playerid][pMaterial] < 500) return Error(playerid, "Material tidak cukup!(Butuh: 500).");
 					if(pData[playerid][pComponent] < 500) return Error(playerid, "Component tidak cukup!(Butuh: 500).");
 					if(GetPlayerMoney(playerid) < 4000) return Error(playerid, "Not enough money!");
-					
+
 					pData[playerid][pMaterial] -= 500000;
 					pData[playerid][pComponent] -= 500;
-					GivePlayerMoneyEx(playerid, -4000);
-					
+					GivePlayerMoneyEx(playerid, -1500000);
+
 					TogglePlayerControllable(playerid, 0);
 					Info(playerid, "Anda membuat senjata ilegal dengan 500 material dan 500 component dengan harga $8.000!");
 					ApplyAnimation(playerid, "BD_FIRE", "wash_up", 4.1, 0, 0, 0, 0, 0, 1);
@@ -9373,34 +9439,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(pData[playerid][pMaterial] < 500) return Error(playerid, "Material tidak cukup!(Butuh: 500).");
 					if(pData[playerid][pComponent] < 500) return Error(playerid, "Component tidak cukup!(Butuh: 500).");
 					if(GetPlayerMoney(playerid) < 5000) return Error(playerid, "Not enough money!");
-					
+
 					pData[playerid][pMaterial] -= 500;
 					pData[playerid][pComponent] -= 500;
-					GivePlayerMoneyEx(playerid, -5000);
-					
+					GivePlayerMoneyEx(playerid, -1800000);
+
 					TogglePlayerControllable(playerid, 0);
 					Info(playerid, "Anda membuat senjata ilegal dengan 500 material dan 500 component dengan harga $12.000!");
 					ApplyAnimation(playerid, "BD_FIRE", "wash_up", 4.1, 0, 0, 0, 0, 0, 1);
 					pData[playerid][pArmsDealer] = SetTimerEx("CreateGun", 1000, true, "idd", playerid, WEAPON_AK47, 100);
-					PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Creating...");
-					PlayerTextDrawShow(playerid, ActiveTD[playerid]);
-					ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
-				}
-				case 6: //Micro smg uzi
-				{
-					if(pData[playerid][pActivityTime] > 5) return Error(playerid, "Anda masih memiliki activity progress!");
-					if(pData[playerid][pMaterial] < 500) return Error(playerid, "Material tidak cukup!(Butuh: 500).");
-					if(pData[playerid][pComponent] < 500) return Error(playerid, "Component tidak cukup!(Butuh: 500).");
-					if(GetPlayerMoney(playerid) < 5000) return Error(playerid, "Not enough money!");
-					
-					pData[playerid][pMaterial] -= 500;
-					pData[playerid][pComponent] -= 500;
-					GivePlayerMoneyEx(playerid, -5000);
-					
-					TogglePlayerControllable(playerid, 0);
-					Info(playerid, "Anda membuat senjata ilegal dengan 500 material dan 500 component dengan harga $10.000!");
-					ApplyAnimation(playerid, "BD_FIRE", "wash_up", 4.1, 0, 0, 0, 0, 0, 1);
-					pData[playerid][pArmsDealer] = SetTimerEx("CreateGun", 1000, true, "idd", playerid, WEAPON_UZI, 200);
 					PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Creating...");
 					PlayerTextDrawShow(playerid, ActiveTD[playerid]);
 					ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
@@ -9420,21 +9467,21 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(pData[playerid][pSeed] < 5) return Error(playerid, "Not enough seed!");
 					new pid = GetNearPlant(playerid);
 					if(pid != -1) return Error(playerid, "You too closes with other plant!");
-					
+
 					new id = Iter_Free(Plants), idx = pData[playerid][pFarm];
 					if(id == -1) return Error(playerid, "Cant plant any more plant!");
-					
+
 					if(pData[playerid][pPlantTime] > 0) return Error(playerid, "You must wait 10 minutes for plant again!");
-					
+
 					if(IsPlayerInRangeOfPoint(playerid, 80.0, -237.43, -1357.56, 8.52) || IsPlayerInRangeOfPoint(playerid, 100.0, -475.43, -1343.56, 28.14)
 					|| IsPlayerInRangeOfPoint(playerid, 50.0, -265.43, -1511.56, 5.49) || IsPlayerInRangeOfPoint(playerid, 30.0, -419.43, -1623.56, 18.87)
 					|| IsPlayerInRangeOfPoint(playerid, 400.0, farmData[idx][FarmRepX], farmData[idx][FarmRepY], farmData[idx][FarmRepZ]))
 					{
-					
+
 						pData[playerid][pSeed] -= 5;
 						new Float:x, Float:y, Float:z, query[512];
 						GetPlayerPos(playerid, x, y, z);
-						
+
 						PlantData[id][PlantType] = 1;
 						PlantData[id][PlantTime] = 1800;
 						PlantData[id][PlantX] = x;
@@ -9455,20 +9502,20 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(pData[playerid][pSeed] < 18) return Error(playerid, "Not enough seed!");
 					new pid = GetNearPlant(playerid);
 					if(pid != -1) return Error(playerid, "You too closes with other plant!");
-					
+
 					new id = Iter_Free(Plants);
 					if(id == -1) return Error(playerid, "Cant plant any more plant!");
-					
+
 					if(pData[playerid][pPlantTime] > 0) return Error(playerid, "You must wait 10 minutes for plant again!");
-					
+
 					if(IsPlayerInRangeOfPoint(playerid, 80.0, -237.43, -1357.56, 8.52) || IsPlayerInRangeOfPoint(playerid, 100.0, -475.43, -1343.56, 28.14)
 					|| IsPlayerInRangeOfPoint(playerid, 50.0, -265.43, -1511.56, 5.49) || IsPlayerInRangeOfPoint(playerid, 30.0, -419.43, -1623.56, 18.87))
 					{
-					
+
 						pData[playerid][pSeed] -= 18;
 						new Float:x, Float:y, Float:z, query[512];
 						GetPlayerPos(playerid, x, y, z);
-						
+
 						PlantData[id][PlantType] = 2;
 						PlantData[id][PlantTime] = 3600;
 						PlantData[id][PlantX] = x;
@@ -9489,20 +9536,20 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(pData[playerid][pSeed] < 11) return Error(playerid, "Not enough seed!");
 					new pid = GetNearPlant(playerid);
 					if(pid != -1) return Error(playerid, "You too closes with other plant!");
-					
+
 					new id = Iter_Free(Plants);
 					if(id == -1) return Error(playerid, "Cant plant any more plant!");
-					
+
 					if(pData[playerid][pPlantTime] > 0) return Error(playerid, "You must wait 10 minutes for plant again!");
-					
+
 					if(IsPlayerInRangeOfPoint(playerid, 80.0, -237.43, -1357.56, 8.52) || IsPlayerInRangeOfPoint(playerid, 100.0, -475.43, -1343.56, 28.14)
 					|| IsPlayerInRangeOfPoint(playerid, 50.0, -265.43, -1511.56, 5.49) || IsPlayerInRangeOfPoint(playerid, 30.0, -419.43, -1623.56, 18.87))
 					{
-					
+
 						pData[playerid][pSeed] -= 11;
 						new Float:x, Float:y, Float:z, query[512];
 						GetPlayerPos(playerid, x, y, z);
-						
+
 						PlantData[id][PlantType] = 3;
 						PlantData[id][PlantTime] = 2700;
 						PlantData[id][PlantX] = x;
@@ -9523,20 +9570,20 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(pData[playerid][pSeed] < 50) return Error(playerid, "Not enough seed!");
 					new pid = GetNearPlant(playerid);
 					if(pid != -1) return Error(playerid, "You too closes with other plant!");
-					
+
 					new id = Iter_Free(Plants);
 					if(id == -1) return Error(playerid, "Cant plant any more plant!");
-					
+
 					if(pData[playerid][pPlantTime] > 0) return Error(playerid, "You must wait 10 minutes for plant again!");
-					
+
 					if(IsPlayerInRangeOfPoint(playerid, 80.0, -237.43, -1357.56, 8.52) || IsPlayerInRangeOfPoint(playerid, 100.0, -475.43, -1343.56, 28.14)
 					|| IsPlayerInRangeOfPoint(playerid, 50.0, -265.43, -1511.56, 5.49) || IsPlayerInRangeOfPoint(playerid, 30.0, -419.43, -1623.56, 18.87))
 					{
-					
+
 						pData[playerid][pSeed] -= 50;
 						new Float:x, Float:y, Float:z, query[512];
 						GetPlayerPos(playerid, x, y, z);
-						
+
 						PlantData[id][PlantType] = 4;
 						PlantData[id][PlantTime] = 4500;
 						PlantData[id][PlantX] = x;
@@ -9651,14 +9698,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			new id = ReturnRestockGStationID((listitem + 1)), vehicleid = GetPlayerVehicleID(playerid);
-			
+
 			if(pData[playerid][pMission] > -1 || pData[playerid][pHauling] > -1 || pData[playerid][pDealerMission] > -1)
 				return Error(playerid, "Anda sudah sedang melakukan mission/hauling/dealermission!");
-			
+
 			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER && !IsATruck(vehicleid)) return Error(playerid, "Anda harus mengendarai truck.");
-				
+
 			pData[playerid][pHauling] = id;
-			
+
 			new line9[900];
 
 			format(line9, sizeof(line9), "Silahkan anda membeli stock gasoil di gudang miner!\n\nGas Station ID: %d\nLocation: %s\n\nSetelah itu ikuti checkpoint dan antarkan ke Gas Station tujuan hauling anda!",
@@ -9678,15 +9725,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			new id = ReturnRestockBisnisID((listitem + 1)), vehicleid = GetPlayerVehicleID(playerid);
 			if(bData[id][bMoney] < 1000)
 				return Error(playerid, "Maaf, Bisnis ini kehabisan uang product.");
-			
+
 			if(pData[playerid][pMission] > -1 || pData[playerid][pHauling] > -1 || pData[playerid][pDealerMission] > -1)
 				return Error(playerid, "Anda sudah sedang melakukan mission/hauling/dealermission!");
-			
+
 			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER && !IsATruck(vehicleid)) return Error(playerid, "Anda harus mengendarai truck.");
-				
+
 			pData[playerid][pMission] = id;
 			bData[id][bRestock] = 0;
-			
+
 			new line9[900];
 			new type[128];
 			if(bData[id][bType] == 1)
@@ -9790,7 +9837,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				pvData[carid][cProduct] += amount;
 			}
-			
+
 			Product -= amount;
 			Server_AddMoney(value);
 			Info(playerid, "Anda berhasil membeli "GREEN_E"%d "WHITE_E"product seharga "RED_E"%s.", amount, FormatMoney(value));
@@ -9804,7 +9851,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			new value = amount * GasOilPrice;
 			new vehicleid = GetPlayerVehicleID(playerid), carid = -1;
 			new total = VehGasOil[vehicleid] + amount;
-			
+
 			if(amount < 0 || amount > 100) return Error(playerid, "amount maximal 0 - 100.");
 			if(GetPlayerMoney(playerid) < value) return Error(playerid, "Uang anda kurang.");
 			if(GasOil < amount) return Error(playerid, "Gasoil stock tidak mencukupi.");
@@ -9815,7 +9862,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				pvData[carid][cGasOil] += amount;
 			}
-			
+
 			GasOil -= amount;
 			Server_AddMoney(value);
 			Info(playerid, "Anda berhasil membeli "GREEN_E"%d "WHITE_E"liter gas oil seharga "RED_E"%s.", amount, FormatMoney(value));
@@ -9974,7 +10021,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			new amount = floatround(strval(inputtext));
-			
+
 			if(amount < 0 || amount > 500) return Error(playerid, "Invalid price! 1 - 500.");
 			pData[playerid][pPrice1] = amount;
 			Info(playerid, "Anda berhasil mengedit price 1(Sprunk) ke "GREEN_E"%s.", FormatMoney(amount));
@@ -9986,7 +10033,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			new amount = floatround(strval(inputtext));
-			
+
 			if(amount < 0 || amount > 500) return Error(playerid, "Invalid price! 1 - 500.");
 			pData[playerid][pPrice2] = amount;
 			Info(playerid, "Anda berhasil mengedit price 2(Snack) ke "GREEN_E"%s.", FormatMoney(amount));
@@ -9998,7 +10045,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			new amount = floatround(strval(inputtext));
-			
+
 			if(amount < 0 || amount > 500) return Error(playerid, "Invalid price! 1 - 500.");
 			pData[playerid][pPrice3] = amount;
 			Info(playerid, "Anda berhasil mengedit price 3(Ice Cream Orange) ke "GREEN_E"%s.", FormatMoney(amount));
@@ -10010,7 +10057,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			new amount = floatround(strval(inputtext));
-			
+
 			if(amount < 0 || amount > 500) return Error(playerid, "Invalid price! 1 - 500.");
 			pData[playerid][pPrice4] = amount;
 			Info(playerid, "Anda berhasil mengedit price 4(Hotdog) ke "GREEN_E"%s.", FormatMoney(amount));
@@ -10028,19 +10075,19 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					new id = pData[playerid][pOffer];
 					if(!IsPlayerConnected(id) || !NearPlayer(playerid, id, 4.0))
 						return Error(playerid, "You not near with offer player!");
-					
+
 					if(GetPlayerMoney(playerid) < pData[id][pPrice1])
 						return Error(playerid, "Not enough money!");
-						
+
 					if(pData[id][pFood] < 5)
 						return Error(playerid, "Food stock empty!");
-					
+
 					GivePlayerMoneyEx(id, pData[id][pPrice1]);
 					pData[id][pFood] -= 5;
-					
+
 					GivePlayerMoneyEx(playerid, -pData[id][pPrice1]);
 					pData[playerid][pSprunk] += 1;
-					
+
 					SendNearbyMessage(playerid, 10.0, COLOR_PURPLE, "** %s telah membeli sprunk seharga %s.", ReturnName(playerid), FormatMoney(pData[id][pPrice1]));
 				}
 				case 1:
@@ -10048,39 +10095,39 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					new id = pData[playerid][pOffer];
 					if(!IsPlayerConnected(id) || !NearPlayer(playerid, id, 4.0))
 						return Error(playerid, "You not near with offer player!");
-					
+
 					if(GetPlayerMoney(playerid) < pData[id][pPrice2])
 						return Error(playerid, "Not enough money!");
-					
+
 					if(pData[id][pFood] < 5)
 						return Error(playerid, "Food stock empty!");
-						
+
 					GivePlayerMoneyEx(id, pData[id][pPrice2]);
 					pData[id][pFood] -= 5;
-					
+
 					GivePlayerMoneyEx(playerid, -pData[id][pPrice2]);
 					pData[playerid][pSnack] += 1;
-					
-					SendNearbyMessage(playerid, 10.0, COLOR_PURPLE, "** %s telah membeli snack seharga %s.", ReturnName(playerid), FormatMoney(pData[id][pPrice2]));	
+
+					SendNearbyMessage(playerid, 10.0, COLOR_PURPLE, "** %s telah membeli snack seharga %s.", ReturnName(playerid), FormatMoney(pData[id][pPrice2]));
 				}
 				case 2:
 				{
 					new id = pData[playerid][pOffer];
 					if(!IsPlayerConnected(id) || !NearPlayer(playerid, id, 4.0))
 						return Error(playerid, "You not near with offer player!");
-					
+
 					if(GetPlayerMoney(playerid) < pData[id][pPrice3])
 						return Error(playerid, "Not enough money!");
-					
+
 					if(pData[id][pFood] < 10)
 						return Error(playerid, "Food stock empty!");
-						
+
 					GivePlayerMoneyEx(id, pData[id][pPrice3]);
 					pData[id][pFood] -= 10;
-					
+
 					GivePlayerMoneyEx(playerid, -pData[id][pPrice3]);
 					pData[playerid][pEnergy] += 30;
-					
+
 					SendNearbyMessage(playerid, 10.0, COLOR_PURPLE, "** %s telah membeli ice cream orange seharga %s.", ReturnName(playerid), FormatMoney(pData[id][pPrice3]));
 				}
 				case 3:
@@ -10088,19 +10135,19 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					new id = pData[playerid][pOffer];
 					if(!IsPlayerConnected(id) || !NearPlayer(playerid, id, 4.0))
 						return Error(playerid, "You not near with offer player!");
-					
+
 					if(GetPlayerMoney(playerid) < pData[id][pPrice4])
 						return Error(playerid, "Not enough money!");
-						
+
 					if(pData[id][pFood] < 10)
 						return Error(playerid, "Food stock empty!");
-					
+
 					GivePlayerMoneyEx(id, pData[id][pPrice4]);
 					pData[id][pFood] -= 10;
-					
+
 					GivePlayerMoneyEx(playerid, -pData[id][pPrice4]);
 					pData[playerid][pHunger] += 30;
-					
+
 					SendNearbyMessage(playerid, 10.0, COLOR_PURPLE, "** %s telah membeli hotdog seharga %s.", ReturnName(playerid), FormatMoney(pData[id][pPrice4]));
 				}
 			}
@@ -10163,7 +10210,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				new mstr[128];
 				format(mstr, sizeof(mstr), ""WHITE_E"My Balance: "LB_E"%s", FormatMoney(pData[playerid][pBankMoney]));
-				ShowPlayerDialog(playerid, DIALOG_ATMWITHDRAW, DIALOG_STYLE_LIST, mstr, "$50\n$200\n$500\n$1.000\n$5.000", "Withdraw", "Cancel");
+				ShowPlayerDialog(playerid, DIALOG_ATMWITHDRAW, DIALOG_STYLE_LIST, mstr, "$50.00\n$200.00\n$500.00\n$1.000.00\n$5.000.00", "Withdraw", "Cancel");
 			}
 			case 2: // Transfer Money
 			{
@@ -10185,7 +10232,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pBankMoney] < 5000)
 						return Error(playerid, "Not enough balance!");
-					
+
 					GivePlayerMoneyEx(playerid, 5000);
 					pData[playerid][pBankMoney] -= 50;
 					Info(playerid, "ATM withdraw "LG_E"$50.00");
@@ -10194,7 +10241,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pBankMoney] < 20000)
 						return Error(playerid, "Not enough balance!");
-					
+
 					GivePlayerMoneyEx(playerid, 20000);
 					pData[playerid][pBankMoney] -= 20000;
 					Info(playerid, "ATM withdraw "LG_E"$200.00");
@@ -10203,7 +10250,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pBankMoney] < 50000)
 						return Error(playerid, "Not enough balance!");
-					
+
 					GivePlayerMoneyEx(playerid, 50000);
 					pData[playerid][pBankMoney] -= 50000;
 					Info(playerid, "ATM withdraw "LG_E"$500.00");
@@ -10212,7 +10259,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pBankMoney] < 100000)
 						return Error(playerid, "Not enough balance!");
-					
+
 					GivePlayerMoneyEx(playerid, 100000);
 					pData[playerid][pBankMoney] -= 100000;
 					Info(playerid, "ATM withdraw "LG_E"$1,000.00");
@@ -10221,7 +10268,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(pData[playerid][pBankMoney] < 500000)
 						return Error(playerid, "Not enough balance!");
-					
+
 					GivePlayerMoneyEx(playerid, 500000);
 					pData[playerid][pBankMoney] -= 500000;
 					Info(playerid, "ATM withdraw "LG_E"$5,000.00");
@@ -10314,7 +10361,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(!response) return true;
 		new rek = floatround(strval(inputtext)), query[128];
-		
+
 		mysql_format(g_SQL, query, sizeof(query), "SELECT brek FROM players WHERE brek='%d'", rek);
 		mysql_tquery(g_SQL, query, "SearchRek", "id", playerid, rek);
 		return 1;
@@ -10326,7 +10373,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			new query[128], mstr[248];
 			mysql_format(g_SQL, query, sizeof(query), "UPDATE players SET bmoney=bmoney+%d WHERE brek=%d", pData[playerid][pTransfer], pData[playerid][pTransferRek]);
 			mysql_tquery(g_SQL, query);
-			
+
 			foreach(new ii : Player)
 			{
 				if(pData[ii][pBankRek] == pData[playerid][pTransferRek])
@@ -10334,9 +10381,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					pData[ii][pBankMoney] += pData[playerid][pTransfer];
 				}
 			}
-			
+
 			pData[playerid][pBankMoney] -= pData[playerid][pTransfer];
-			
+
 			format(mstr, sizeof(mstr), ""WHITE_E"No Rek Target: "YELLOW_E"%d\n"WHITE_E"Nama Target: "YELLOW_E"%s\n"WHITE_E"Jumlah: "GREEN_E"%s\n\n"WHITE_E"Anda telah berhasil mentransfer!", pData[playerid][pTransferRek], pData[playerid][pTransferName], FormatMoney(pData[playerid][pTransfer]));
 			ShowPlayerDialog(playerid, DIALOG_BANKSUKSES, DIALOG_STYLE_MSGBOX, ""LB_E"Transfer Sukses", mstr, "Sukses", "");
 		}
@@ -10365,7 +10412,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	}
 	if(dialogid == DIALOG_REPORTS)
 	{
-		if(response) 
+		if(response)
 		{
 			//new i = strval(inputtext);
 			new i = listitem;
@@ -10418,7 +10465,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					else return Error(playerid, "Anda sudah memiliki 2 pekerjaan!");
 				}
 				case 2:
-				{	
+				{
 					if(pData[playerid][pJob] == 0 || pData[playerid][pJob2] == 0)
 					{
 						if(pData[playerid][pJob] == 0)
@@ -10676,9 +10723,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					format(str, sizeof(str), "%s"WHITE_E"%s\t"LG_E"%s\n", str, GetVehicleModelName(521), FormatMoney(GetVehicleCost(521)));
 					format(str, sizeof(str), "%s"WHITE_E"%s\t"LG_E"%s\n", str, GetVehicleModelName(463), FormatMoney(GetVehicleCost(463)));
 					format(str, sizeof(str), "%s"WHITE_E"%s\t"LG_E"%s\n", str, GetVehicleModelName(468), FormatMoney(GetVehicleCost(468)));*/
-					
-					format(str, sizeof(str), ""WHITE_E"%s\t\t"LG_E"%s\n%s\t\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n", 
-					GetVehicleModelName(481), FormatMoney(GetVehicleCost(481)), 
+
+					format(str, sizeof(str), ""WHITE_E"%s\t\t"LG_E"%s\n%s\t\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n",
+					GetVehicleModelName(481), FormatMoney(GetVehicleCost(481)),
 					GetVehicleModelName(509), FormatMoney(GetVehicleCost(509)),
 					GetVehicleModelName(510), FormatMoney(GetVehicleCost(510)),
 					GetVehicleModelName(462), FormatMoney(GetVehicleCost(462)),
@@ -10689,15 +10736,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					GetVehicleModelName(463), FormatMoney(GetVehicleCost(463)),
 					GetVehicleModelName(468), FormatMoney(GetVehicleCost(468))
 					);
-					
+
 					ShowPlayerDialog(playerid, DIALOG_BUYPVCP_BIKES, DIALOG_STYLE_LIST, "Bikes", str, "Buy", "Close");
 				}
 				case 1:
 				{
 					//Cars
 					new str[1024];
-					format(str, sizeof(str), ""WHITE_E"%s\t\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n", 
-					GetVehicleModelName(400), FormatMoney(GetVehicleCost(400)), 
+					format(str, sizeof(str), ""WHITE_E"%s\t\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n",
+					GetVehicleModelName(400), FormatMoney(GetVehicleCost(400)),
 					GetVehicleModelName(412), FormatMoney(GetVehicleCost(412)),
 					GetVehicleModelName(419), FormatMoney(GetVehicleCost(419)),
 					GetVehicleModelName(426), FormatMoney(GetVehicleCost(426)),
@@ -10718,15 +10765,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					GetVehicleModelName(579), FormatMoney(GetVehicleCost(579)),
 					GetVehicleModelName(507), FormatMoney(GetVehicleCost(507))
 					);
-					
+
 					ShowPlayerDialog(playerid, DIALOG_BUYPVCP_CARS, DIALOG_STYLE_LIST, "Cars", str, "Buy", "Close");
 				}
 				case 2:
 				{
 					//Unique Cars
 					new str[1024];
-					format(str, sizeof(str), ""WHITE_E"%s\t\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n", 
-					GetVehicleModelName(483), FormatMoney(GetVehicleCost(483)), 
+					format(str, sizeof(str), ""WHITE_E"%s\t\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n",
+					GetVehicleModelName(483), FormatMoney(GetVehicleCost(483)),
 					GetVehicleModelName(534), FormatMoney(GetVehicleCost(534)),
 					GetVehicleModelName(535), FormatMoney(GetVehicleCost(535)),
 					GetVehicleModelName(536), FormatMoney(GetVehicleCost(536)),
@@ -10740,17 +10787,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					GetVehicleModelName(575), FormatMoney(GetVehicleCost(575)),
 					GetVehicleModelName(576), FormatMoney(GetVehicleCost(576))
 					);
-					
+
 					ShowPlayerDialog(playerid, DIALOG_BUYPVCP_UCARS, DIALOG_STYLE_LIST, "Unique Cars", str, "Buy", "Close");
 				}
 				case 3:
 				{
 					//Job Cars
 					new str[1024];
-					format(str, sizeof(str), ""WHITE_E"%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s", 
-					GetVehicleModelName(420), FormatMoney(GetVehicleCost(420)), 
-					GetVehicleModelName(438), FormatMoney(GetVehicleCost(438)), 
-					GetVehicleModelName(403), FormatMoney(GetVehicleCost(403)), 
+					format(str, sizeof(str), ""WHITE_E"%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s\n%s\t"LG_E"%s",
+					GetVehicleModelName(420), FormatMoney(GetVehicleCost(420)),
+					GetVehicleModelName(438), FormatMoney(GetVehicleCost(438)),
+					GetVehicleModelName(403), FormatMoney(GetVehicleCost(403)),
 					GetVehicleModelName(413), FormatMoney(GetVehicleCost(413)),
 					GetVehicleModelName(414), FormatMoney(GetVehicleCost(414)),
 					GetVehicleModelName(422), FormatMoney(GetVehicleCost(422)),
@@ -10772,29 +10819,29 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					GetVehicleModelName(609), FormatMoney(GetVehicleCost(609))
 					//GetVehicleModelName(530), FormatMoney(GetVehicleCost(530)) //fortklift
 					);
-					
+
 					ShowPlayerDialog(playerid, DIALOG_BUYPVCP_JOBCARS, DIALOG_STYLE_LIST, "Job Cars", str, "Buy", "Close");
 				}
 				case 4:
 				{
 					// VIP Cars
 					new str[1024];
-					format(str, sizeof(str), ""WHITE_E"%s\t\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n", 
-					GetVehicleModelName(522), GetVipVehicleCost(522), 
-					GetVehicleModelName(411), GetVipVehicleCost(411), 
+					format(str, sizeof(str), ""WHITE_E"%s\t\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n%s\t"YELLOW_E"%d gold\n",
+					GetVehicleModelName(522), GetVipVehicleCost(522),
+					GetVehicleModelName(411), GetVipVehicleCost(411),
 					GetVehicleModelName(451), GetVipVehicleCost(451),
-					GetVehicleModelName(415), GetVipVehicleCost(415), 
-					GetVehicleModelName(402), GetVipVehicleCost(402), 
-					GetVehicleModelName(541), GetVipVehicleCost(541), 
-					GetVehicleModelName(429), GetVipVehicleCost(429), 
-					GetVehicleModelName(506), GetVipVehicleCost(506), 
-					GetVehicleModelName(494), GetVipVehicleCost(494), 
-					GetVehicleModelName(502), GetVipVehicleCost(502), 
-					GetVehicleModelName(503), GetVipVehicleCost(503), 
-					GetVehicleModelName(409), GetVipVehicleCost(409), 
+					GetVehicleModelName(415), GetVipVehicleCost(415),
+					GetVehicleModelName(402), GetVipVehicleCost(402),
+					GetVehicleModelName(541), GetVipVehicleCost(541),
+					GetVehicleModelName(429), GetVipVehicleCost(429),
+					GetVehicleModelName(506), GetVipVehicleCost(506),
+					GetVehicleModelName(494), GetVipVehicleCost(494),
+					GetVehicleModelName(502), GetVipVehicleCost(502),
+					GetVehicleModelName(503), GetVipVehicleCost(503),
+					GetVehicleModelName(409), GetVipVehicleCost(409),
 					GetVehicleModelName(477), GetVipVehicleCost(477)
 					);
-					
+
 					ShowPlayerDialog(playerid, DIALOG_BUYPVCP_VIPCARS, DIALOG_STYLE_LIST, "Vip Cars", str, "Buy", "Close");
 				}
 			}
@@ -11939,15 +11986,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			if(pData[playerid][pPaycheck] < 3600) return Error(playerid, "Sekarang belum waktunya anda mengambil paycheck.");
-			
+
 			new query[512];
 			mysql_format(g_SQL, query, sizeof(query), "SELECT * FROM salary WHERE owner='%d' ORDER BY id ASC LIMIT 30", pData[playerid][pID]);
 			mysql_query(g_SQL, query);
 			new rows = cache_num_rows();
-			if(rows) 
+			if(rows)
 			{
 				new list[2000], date[30], info[16], money, totalduty, gajiduty, totalsal, total, pajak, hasil;
-				
+
 				totalduty = pData[playerid][pOnDutyTime] + pData[playerid][pTaxiTime];
 				for(new i; i < rows; ++i)
 				{
@@ -11956,7 +12003,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					cache_get_value_name_int(i, "money", money);
 					totalsal += money;
 				}
-				
+
 				if(totalduty > 600)
 				{
 					gajiduty = 600;
@@ -11968,7 +12015,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				total = gajiduty + totalsal;
 				pajak = total / 100 * 10;
 				hasil = total - pajak;
-				
+
 				format(list, sizeof(list), "Total gaji yang masuk ke rekening bank anda adalah: "LG_E"%s", FormatMoney(hasil));
 				ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Paycheck", list, "Close", "");
 				pData[playerid][pBankMoney] += hasil;
@@ -11982,9 +12029,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			else
 			{
 				new list[2000], totalduty, gajiduty, total, pajak, hasil;
-				
+
 				totalduty = pData[playerid][pOnDutyTime] + pData[playerid][pTaxiTime];
-				
+
 				if(totalduty > 600)
 				{
 					gajiduty = 600;
@@ -11996,7 +12043,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				total = gajiduty;
 				pajak = total / 100 * 10;
 				hasil = total - pajak;
-				
+
 				format(list, sizeof(list), "Total gaji yang masuk ke rekening bank anda adalah: "LG_E"%s", FormatMoney(hasil));
 				ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Paycheck", list, "Close", "");
 				pData[playerid][pBankMoney] += hasil;
@@ -12019,6 +12066,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
 				return 1;
 			}*/
+			SendClientMessage(playerid,COLOR_RIKO, "TRASHMASTER SIDEJOB: {ffffff}Cari tong sampah dan letakan di kendaraan truck mu, dan hati hati dijalan!.");
 			InfoTD_MSG(playerid, 3000, "Find a Trash.!");
 		}
 		else
@@ -12039,6 +12087,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
 				return 1;
 			}*/
+			SendClientMessage(playerid,COLOR_RIKO, "PIZZA SIDEJOB: {ffffff}Ikuti checkpoint pada map dan hati hati dijalan!.");
 			InfoTD_MSG(playerid, 3000, "Antarkan Pizza!");
 		}
 		else
@@ -12052,22 +12101,18 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		new vehicleid = GetPlayerVehicleID(playerid);
 		if(response)
 		{
+			if(pData[playerid][pSweeperTime] > 0)
 			{
-				if(pData[playerid][pSideJobTime] > 0)
-					{
-						Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
-						RemovePlayerFromVehicle(playerid);
-						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
-						return 1;
-					}
-					else if(pData[playerid][pSideJobTime] == 0)
-					{
-						pData[playerid][pSideJob] = 2;
-						SetPlayerCheckpoint(playerid, sweperpoint1, 3.0);
-						InfoTD_MSG(playerid, 3000, "Follow the checkpoint!");
-					}
-				}
+				Error(playerid, "Anda harus menunggu "YELLOW_E"%d "WHITE_E"detik lagi.", pData[playerid][pSweeperTime]);
+				RemovePlayerFromVehicle(playerid);
+				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
+				return 1;
 			}
+
+			pData[playerid][pSideJob] = 1;
+			SetPlayerCheckpoint(playerid, sweperpoint1, 3.0);
+			SendClientMessage(playerid,COLOR_RIKO, "SWEEPER SIDEJOB: {ffffff}Ikuti checkpoint pada map dan hati hati dijalan!.");
+			InfoTD_MSG(playerid, 3000, "Follow the checkpoint!");
 		}
 		else
 		{
@@ -12084,50 +12129,53 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 			    case 0:
 			    {
-					if(pData[playerid][pSideJobTime] > 0)
+					if(pData[playerid][pBusTime] > 0)
 					{
-						Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
+						Error(playerid, "Anda harus menunggu "YELLOW_E"%d "WHITE_E"detik lagi.", pData[playerid][pBusTime]);
 						RemovePlayerFromVehicle(playerid);
 						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
 						return 1;
 					}
-					else if(pData[playerid][pSideJobTime] == 0)
+					else if(pData[playerid][pBusTime] == 0)
 					{
 						pData[playerid][pSideJob] = 2;
-						SetPlayerCheckpoint(playerid, buspoint1, 3.0);
+						SetPlayerCheckpoint(playerid, buspoint1, 7.0);
+						SendClientMessage(playerid,COLOR_RIKO, "BUS SIDEJOB: {ffffff}Ikuti checkpoint pada map dan hati hati dijalan!.");
 						InfoTD_MSG(playerid, 3000, "Follow the checkpoint!");
 					}
 				}
                 case 1:
 			    {
-					if(pData[playerid][pSideJobTime] > 0)
+					if(pData[playerid][pBusTime] > 0)
 					{
-						Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
+						Error(playerid, "Anda harus menunggu "YELLOW_E"%d "WHITE_E"detik lagi.", pData[playerid][pBusTime]);
 						RemovePlayerFromVehicle(playerid);
 						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
 						return 1;
 					}
-					else if(pData[playerid][pSideJobTime] == 0)
+					else if(pData[playerid][pBusTime] == 0)
 					{
 						pData[playerid][pSideJob] = 2;
-						SetPlayerRaceCheckpoint(playerid, 1, cpbus1, 0.0, 0.0, 0.0, 7.0);
+						SetPlayerCheckpoint(playerid, cpbus1, 7.0);
+						SendClientMessage(playerid,COLOR_RIKO, "BUS SIDEJOB: {ffffff}Ikuti checkpoint pada map dan hati hati dijalan!.");
 						InfoTD_MSG(playerid, 3000, "Follow the checkpoint!");
 					}
 				}
-                case 2:
+				case 2:
 			    {
-					if(pData[playerid][pSideJobTime] > 0)
+					if(pData[playerid][pBusTime] > 0)
 					{
-						Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
+						Error(playerid, "Anda harus menunggu "YELLOW_E"%d "WHITE_E"detik lagi.", pData[playerid][pBusTime]);
 						RemovePlayerFromVehicle(playerid);
 						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
 						return 1;
 					}
-					else if(pData[playerid][pSideJobTime] == 0)
+					else if(pData[playerid][pBusTime] == 0)
 					{
-						RemovePlayerFromVehicle(playerid);
-						SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
-						SendClientMessage(playerid, COLOR_JOB, "JOBS: "WHITE_E"Sorry This Route is Under Construction ");
+						pData[playerid][pSideJob] = 2;
+						SetPlayerCheckpoint(playerid, buscp1, 7.0);
+						SendClientMessage(playerid,COLOR_RIKO, "BUS SIDEJOB: {ffffff}Ikuti checkpoint pada map dan hati hati dijalan!.");
+						InfoTD_MSG(playerid, 3000, "Follow the checkpoint!");
 					}
 				}
 			}
@@ -12161,9 +12209,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		new vehicleid = GetPlayerVehicleID(playerid);
 		if(response)
 		{
-			if(pData[playerid][pSideJobTime] > 0)
+			if(pData[playerid][pForkliftTime] > 0)
 			{
-				Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
+				Error(playerid, "Anda harus menunggu "YELLOW_E"%d "WHITE_E"detik lagi.", pData[playerid][pForkliftTime]);
 				RemovePlayerFromVehicle(playerid);
 				SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
 				return 1;
@@ -12171,12 +12219,37 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 			pData[playerid][pSideJob] = 3;
 			SetPlayerCheckpoint(playerid, forpoint1, 3.0);
+			SendClientMessage(playerid,COLOR_RIKO, "FORKLIFT SIDEJOB: {ffffff}Ikuti checkpoint pada map dan hati hati dijalan!.");
 			InfoTD_MSG(playerid, 3000, "Ikuti Checkpoint!");
 		}
 		else
 		{
 			RemovePlayerFromVehicle(playerid);
 			SetTimerEx("RespawnPV", 3000, false, "d", vehicleid);
+		}
+	}
+    if(dialogid == DIALOG_CONTAINER)
+	{
+	    new modelid = GetVehicleModel(GetPlayerVehicleID(playerid));
+
+		if(modelid != 578)
+			return Error(playerid, "You must be inside a dft-30.");
+			
+		if(response)
+		{
+			if(pData[playerid][pJobTime] > 0)
+			{
+				Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pJobTime]);
+				return 1;
+			}
+
+			SetPlayerCheckpoint(playerid, containerpoint1, 3.0);
+			InfoTD_MSG(playerid, 3000, "Ikuti Checkpoint!");
+			SendClientMessage(playerid, COLOR_JOB, "TRUCKING: {FFFFFF}Anda memulai Container Delivery Hati hati di jalan!");
+		}
+		else
+		{
+			Info(playerid, "Anda membatalkan Hauling Container!.");
 		}
 	}
 	/*if(dialogid == DIALOG_HAULINGTR)
@@ -12649,7 +12722,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				new carid = pvData[i][cVeh];
 				new amount = strval(inputtext);
 				new total = vsData[carid][tComp] + amount;
-				
+
 				if(isnull(inputtext))
 				{
 					new str[128];
@@ -12847,7 +12920,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 case 0: ShowPlayerDialog(playerid, DIALOG_INPUTGRAFF, DIALOG_STYLE_INPUT, "Graffiti", "Please Enter Graffiti text", "Continue", "Cancel");
             }
         }
-        return 1; 
+        return 1;
     }
     if(dialogid == BUY_SPRAYCAN)
     {
@@ -12860,7 +12933,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 case 2: GivePlayerMoneyEx(playerid, -200), GivePlayerWeaponEx(playerid, 41, 900);
             }
         }
-        return 1; 
+        return 1;
     }
     if(dialogid == DIALOG_LIST)
     {
@@ -12882,7 +12955,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
     		DestroyDynamicObject( gInfo[id][OBJECTID] );
         }
         else return ShowPlayerDialog(playerid, DIALOG_SELECT, DIALOG_STYLE_LIST, "Graffiti Menu", "Enter Graffiti Text\nGraffiti List", "Select", "Exit");
-        return 1; 
+        return 1;
     }
 
 
@@ -12934,9 +13007,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 			    case 0:
 			    {
-			    	
+
 			    }
-			    case 1: 
+			    case 1:
 			    {
 			    	DestroyDynamicObject(POBJECT[playerid]);
     				InfoTD_MSG(playerid, 4000, "Text ~r~Removed");
@@ -13009,7 +13082,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
     	if(response)
 		{
 			new number = floatround(strval(inputtext));
-			
+
 			foreach(new ii : Player)
 			{
 				if(pData[ii][pPhone] == number)
@@ -13165,7 +13238,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			if (isnull(inputtext))
 				return ShowPlayerDialog(playerid, TEXT_MESSAGE, DIALOG_STYLE_INPUT, "Text Message", "Error: Please enter a message to send.", "Send", "Back");
-			
+
 			new targetid = pData[playerid][pContact];
 			foreach(new ii : Player)
 			{
@@ -13176,7 +13249,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					Info(ii, "Gunakan "LB_E"'@<text>' "WHITE_E"untuk membalas SMS!");
 					PlayerPlaySound(ii, 6003, 0,0,0);
 					pData[ii][pSMS] = pData[playerid][pPhone];
-					
+
 					pData[playerid][pPhoneCredit] -= 1;
 				}
 			}
@@ -13194,14 +13267,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 		    if (isnull(inputtext) || !IsNumeric(inputtext))
 		        return ShowPlayerDialog(playerid, SEND_TEXT, DIALOG_STYLE_INPUT, "Send Text Message", "Please enter the number that you wish to send a text message to:", "Dial", "Back");
-		    
+
 		    foreach(new ii : Player)
 			{
 				if(pData[ii][pPhone] == ph)
 				{
 		        	if(ii == INVALID_PLAYER_ID || !IsPlayerConnected(ii))
 		            	return ShowPlayerDialog(playerid, SEND_TEXT, DIALOG_STYLE_INPUT, "Send Text Message", "Error: That number is not online right now.\n\nPlease enter the number that you wish to send a text message to:", "Dial", "Back");
-		        
+
 		            ShowPlayerDialog(playerid, TEXT_MESSAGE, DIALOG_STYLE_INPUT, "Text Message", "Please enter the message to send", "Send", "Back");
 		        	pData[playerid][pContact] = ph;
 		        }
@@ -13314,7 +13387,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			switch(listitem)
 	  		{
 				case 0:
-				{	
+				{
 					ShowPlayerDialog(playerid, DIALOG_TWEETMODE, DIALOG_STYLE_LIST, "Tweet Settings", ""GREEN_E"Enable\n"RED_E"Disable", "Set", "Close");
 				}
 			}
@@ -13372,7 +13445,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 	  			}
         		case 1:
-        		{	
+        		{
         			ShowPlayerDialog(playerid, TWEET_ACCEPT_CHANGENAME, DIALOG_STYLE_INPUT, "Change Username", "Input new username", "Confirm", "Back");
         		}
         	}

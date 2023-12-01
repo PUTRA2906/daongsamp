@@ -391,10 +391,7 @@ CMD:getloc(playerid, params[])
 	    Usage(playerid, "/getloc <ID/Name>");
 	    return true;
 	}
-
-	if(pData[playerid][pSuspectTimer] > 1)
-		return Error(playerid, "Anad harus menunggu %d detik untuk melanjutkan GetLoc",pData[playerid][pSuspectTimer]);
-
+	
     if(otherid == INVALID_PLAYER_ID)
         return Error(playerid, "Player tersebut belum masuk!");
 
@@ -402,7 +399,6 @@ CMD:getloc(playerid, params[])
 		return Error(playerid, "You cant getloc yourself!");
 
 	if(pData[otherid][pPhone] == 0) return Error(playerid, "Player tersebut belum memiliki Ponsel");
-	if(pData[otherid][pPhoneOff] == 1) return Error(playerid, "Tidak dapat mendeteksi lokasi, Ponsel tersebut yang dituju sedang Offline");
 
     new zone[MAX_ZONE_NAME];
 	GetPlayer3DZone(otherid, zone, sizeof(zone));
@@ -981,6 +977,43 @@ CMD:takeweapon(playerid, params[])
 	return 1;
 }
 
+CMD:blskit(playerid, params[])
+{
+	if(pData[playerid][pFaction] != 1)
+ 		return Error(playerid, "You must be a sapd officer.");
+	        
+	if(pData[playerid][pFactionRank] < 6)
+		return Error(playerid, "You must be 6 rank sapd chief!");
+
+	new otherid;
+    if(sscanf(params, "u", otherid))
+        return Usage(playerid, "/blskit [playerid/PartOfName]");
+        
+    if(pData[playerid][pBandage] < 5) return Error(playerid, "You need 5 Bandage.");
+
+    if(otherid == INVALID_PLAYER_ID || !NearPlayer(playerid, otherid, 5.0))
+        return Error(playerid, "That player is disconnected or not near you.");
+
+    if(otherid == playerid)
+        return Error(playerid, "You can't resalve yourself.");
+
+    if(!pData[otherid][pInjured])
+        return Error(playerid, "You can't revive a player that's not injured.");
+
+    SetPlayerHealthEx(otherid, 100.0);
+    pData[playerid][pMedicine]--;
+    pData[otherid][pInjured] = 0;
+    pData[otherid][pHunger] = 20;
+    pData[otherid][pEnergy] = 20;
+	pData[otherid][pHospital] = 0;
+	pData[otherid][pSick] = 0;
+    ClearAnimations(otherid);
+    
+    SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "* %s has given blskit to %s with the right hand.", ReturnName(playerid), ReturnName(otherid));
+    Info(otherid, "Officer %s has resalve your injured character.", ReturnName(playerid));
+	return 1;
+}
+
 CMD:takecard(playerid, params[])
 {
 	if(pData[playerid][pFaction] == 1 || pData[playerid][pFaction] == 2)
@@ -1120,6 +1153,32 @@ CMD:takedl(playerid, params[])
 }
 
 //SAGS Commands
+CMD:givebizlic(playerid, params[])
+{
+
+    if(pData[playerid][pFaction] != 2)
+        return Error(playerid, "You must be part of a Goverments.");
+	new to_player;
+    if(sscanf(params, "u", to_player))
+        return Usage(playerid, "/givebizlic [playerid/PartOfName]");
+
+    if(!NearPlayer(playerid, to_player, 6.0))
+		return SendClientMessage(playerid, 0xCECECEFF, "Pemainnya terlalu jauh");
+
+	if(pData[to_player][pBpjs] != 0) return Error(playerid, "Orang ini sudah mempunyai Licenses Business");
+	new sext[40], lstr[128], mstr[128];
+	if(pData[to_player][pGender] == 1) { sext = "Laki-Laki"; } else { sext = "Perempuan"; }
+	format(lstr, sizeof(lstr), "Licenses Business %s", pData[to_player][pName]);
+	format(mstr,sizeof(mstr), "{FFFFFF}Nama: %s\nNegara: San Andreas\nTgl Lahir: %s\nJenis Kelamin: %s\nBerlaku hingga 14 hari!", pData[to_player][pName], pData[to_player][pAge], sext);
+	ShowPlayerDialog(to_player, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, lstr, mstr, "Tutup", "");
+	Info(to_player, "Anda mendapatkan surat	License Business dari departemen Goverments");
+	SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s Memberikan Surat Licenses Business Kepada %s", ReturnName(playerid), ReturnName(to_player));
+	pData[to_player][pLicBiz] = 1;
+	pData[to_player][pLicBizTime] = gettime() +  (15 * 86400);
+	Info(playerid, "Anda Telah Memberikan Surat Licenses Business kepada %s", ReturnName(to_player));
+
+    return 1;
+}
 CMD:sagsonline(playerid, params[])
 {
 	if(pData[playerid][pFaction] != 2)
@@ -1313,7 +1372,7 @@ CMD:rescue(playerid, params[])
 {
 	if(pData[playerid][pFaction] != 3)
         return Error(playerid, "You must be a samd officer.");
-	
+
 	if(pData[playerid][pMedkit] < 1) return Error(playerid, "You need medkit.");
 	new otherid;
 	if(sscanf(params, "u", otherid))

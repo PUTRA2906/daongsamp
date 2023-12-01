@@ -477,30 +477,30 @@ function EngineStatus(playerid, vehicleid)
 		if(f_vHealth < 350.0) return Error(playerid, "The car won't start - it's totalled!");
 		if(GetVehicleFuel(vehicleid) <= 0.0) return Error(playerid, "The car won't start - there's no fuel in the tank!");
 
-		new rand = random(3);
+		new rand = random(2);
 		if(rand == 0)
 		{
 			SwitchVehicleEngine(vehicleid, true);
 			InfoTD_MSG(playerid, 4000, "Engine ~g~START");
 			SendClientMessage(playerid, COLOR_RIKO, "VEHICLE: {FFFFFF}You have "GREEN_E"succesfully {FFFFFF}started the vehicle engine.");
 			vehicleid = GetPlayerVehicleID(playerid);
-			SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s Turn On Engine Of The Vehicle %s.", ReturnName(playerid), GetVehicleName(vehicleid));
+			SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s Turn on engine of vehicle %s.", ReturnName(playerid), GetVehicleName(vehicleid));
 			//GameTextForPlayer(playerid, "~w~ENGINE ~g~START", 1000, 3);
 			//SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s berhasil menghidupkan kendaraan %s.", ReturnName(playerid, 0), GetVehicleNameByVehicle(vehicleid));
 		}
-		if(rand == 1)
+		/*if(rand == 1)
 		{
-			//Info(playerid, "Mesin kendaraan tidak dapat menyala, silahkan coba lagi!");
+			Info(playerid, "Mesin kendaraan tidak dapat menyala, silahkan coba lagi!");
 			InfoTD_MSG(playerid, 4000, "Engine ~r~CAN'T START");
 			//GameTextForPlayer(playerid, "~w~ENGINE ~r~CAN'T START", 1000, 3);
-		}
-		if(rand == 2)
+		}*/
+		if(rand == 1)
 		{
 			SwitchVehicleEngine(vehicleid, true);
 			InfoTD_MSG(playerid, 4000, "Engine ~g~START");
 			SendClientMessage(playerid, COLOR_RIKO, "VEHICLE: {FFFFFF}You have "GREEN_E"succesfully {FFFFFF}started the vehicle engine.");
 			vehicleid = GetPlayerVehicleID(playerid);
-			SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s Turn On Engine Of The Vehicle %s.", ReturnName(playerid), GetVehicleName(vehicleid));
+			SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s Turn on engine of vehicle %s.", ReturnName(playerid), GetVehicleName(vehicleid));
 			//GameTextForPlayer(playerid, "~w~ENGINE ~g~START", 1000, 3);
 			//SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s berhasil menghidupkan kendaraan %s.", ReturnName(playerid, 0), GetVehicleNameByVehicle(vehicleid));
 		}
@@ -512,7 +512,7 @@ function EngineStatus(playerid, vehicleid)
 		//Info(playerid, "Engine turn off..");
 		InfoTD_MSG(playerid, 4000, "Engine ~r~OFF");
 		vehicleid = GetPlayerVehicleID(playerid);
-		SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s Turn Off Engine Of The Vehicle %s.", ReturnName(playerid), GetVehicleName(vehicleid));
+		SendNearbyMessage(playerid, 30.0, COLOR_PURPLE, "** %s Turn off engine of vehicle %s.", ReturnName(playerid), GetVehicleName(vehicleid));
 	}
 	return 1;
 }

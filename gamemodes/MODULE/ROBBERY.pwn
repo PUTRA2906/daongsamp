@@ -9,11 +9,11 @@ function Robb(playerid)
 	    	HidePlayerProgressBar(playerid, pData[playerid][activitybar]);
 			PlayerTextDrawHide(playerid, ActiveTD[playerid]);
 			KillTimer(pData[playerid][pActivity]);
-			pData[playerid][pEnergy] -= 8;
+			pData[playerid][pEnergy] -= 15;
 			pData[playerid][pActivityTime] = 0;
 			ClearAnimations(playerid);
 	    	InRob[playerid] = 0;
-	    	GiveMoneyRob(playerid, 1, 185);
+	    	GiveMoneyRob(playerid, 1, 28500);
 	    	SetPVarInt(playerid, "Robb", gettime() + 3000);
 		}
  		else if(pData[playerid][pActivityTime] < 100)
@@ -32,13 +32,16 @@ CMD:robbery(playerid, params[])
 	id = GetClosestATM(playerid);
 	new Float:x, Float:y, Float:z, String[100];
 	GetPlayerPos(playerid, x, y, z);
+	
+	if(pData[playerid][pLevel] < 10)
+			return Error(playerid, "You must level 10 to use this!");
 
 	if(IsPlayerConnected(playerid))
 	{
         if(isnull(params))
 		{
             Usage(playerid, "USAGE: /robbery [name]");
-            Info(playerid, "Names: atm, biz, bank(coming)");
+            Info(playerid, "Names: atm, biz, bank");
             return 1;
         }
 		if(strcmp(params,"biz",true) == 0)
@@ -92,6 +95,31 @@ CMD:robbery(playerid, params[])
 				InRob[playerid] = 1;
 			}
 		}
+		if(strcmp(params,"bank",true) == 0)
+		{
+            if(IsPlayerInRangeOfPoint(playerid, 2.5, 2255.92, -1747.33, 1014.77))
+			{
+	    		if(GetPVarInt(playerid, "Robb") > gettime())
+					return Error(playerid, "Delays Rob, please wait.");
+                if(GetPlayerWeapon(playerid) != WEAPON_SHOTGUN) return Error(playerid, "You Need Shotgun.");
+
+				Info(playerid, "You're in robbery please wait...");
+				SendAdminMessage(COLOR_RIKO, "* %s Has Robbery Bank Pliss Admin Spec", pData[playerid][pName]);
+				
+                SendFactionMessage(playerid, COLOR_RED, "**[Warning]{FFFFFF} Telah Terjadi Perampokan diBank!");
+                SendClientMessageToAll(COLOR_RED, "**[Warning]{FFFFFF} Telah Terjadi Perampokan diBank harap menjauh!");
+
+				pData[playerid][pActivity] = SetTimerEx("Robb", 1300, true, "i", playerid);
+				Server_MinMoney(1000000);
+
+				PlayerTextDrawSetString(playerid, ActiveTD[playerid], "Robbing...");
+				PlayerTextDrawShow(playerid, ActiveTD[playerid]);
+				ShowPlayerProgressBar(playerid, pData[playerid][activitybar]);
+				TogglePlayerControllable(playerid, 0);
+				ApplyAnimation(playerid, "BOMBER", "BOM_Plant",	4.0, 1, 0, 0, 0, 0, 1);
+				InRob[playerid] = 1;
+			}
+        }
 	}
 	return 1;
 }

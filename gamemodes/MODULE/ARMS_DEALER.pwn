@@ -16,13 +16,12 @@ CMD:creategun(playerid, params[])
 	{
 		new Dstring[512];
 		format(Dstring, sizeof(Dstring), "Weapon\tMats & Comps & Price\n\
-		Silenced Pistol(ammo 70)\t350 & 450 / $1.000\n");
-		format(Dstring, sizeof(Dstring), "%sColt45 9MM(ammo 70)\t250 & 350 & $1.500\n", Dstring);
-		format(Dstring, sizeof(Dstring), "%sDesert Eagle(ammo 70)\t450 & 400 & $2.000\n", Dstring);
-		format(Dstring, sizeof(Dstring), "%sShotgun(ammo 50)\t480 & 500 & $2.500\n", Dstring);
-		format(Dstring, sizeof(Dstring), "%sMp5(ammo 200)\t500 & 500 & $4.000\n", Dstring);
-		format(Dstring, sizeof(Dstring), "%sAK-47(ammo 100)\t500 & 500 & $5.000\n", Dstring);
-		format(Dstring, sizeof(Dstring), "%sMicro SMG/Uzi(ammo 200)\t500 & 500 & $5.000\n", Dstring);
+		Silenced Pistol(ammo 70)\t350 & 450 / $5.000.00\n");
+		format(Dstring, sizeof(Dstring), "%sColt45 9MM(ammo 70)\t250 & 350 & $5.000.00\n", Dstring);
+		format(Dstring, sizeof(Dstring), "%sDesert Eagle(ammo 70)\t450 & 400 & $8.000.00\n", Dstring);
+		format(Dstring, sizeof(Dstring), "%sShotgun(ammo 50)\t480 & 500 & $10.000.00\n", Dstring);
+		format(Dstring, sizeof(Dstring), "%sMp5(ammo 200)\t500 & 500 & $15.000.00\n", Dstring);
+		format(Dstring, sizeof(Dstring), "%sAK-47(ammo 100)\t500 & 500 & $18.000.00\n", Dstring);
 		ShowPlayerDialog(playerid, DIALOG_ARMS_GUN, DIALOG_STYLE_TABLIST_HEADERS, "Create Gun", Dstring, "Create", "Cancel");	
 	}
 	else

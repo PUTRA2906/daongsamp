@@ -315,12 +315,12 @@ CMD:togooc(playerid, params[])
 
     if(TogOOC == 0)
     {
-        SendClientMessageToAllEx(COLOR_RED, "Server: "GREY2_E"Admin %s has disabled global OOC chat.", pData[playerid][pAdminname]);
+        SendClientMessageToAllEx(COLOR_RED, "SERVERS: "WHITE_E"Admin {FF0000}%s {FFFFFF}has {FFFF00}disabled {FFFFFF}global OOC chat.", pData[playerid][pAdminname]);
         TogOOC = 1;
     }
     else
     {
-        SendClientMessageToAllEx(COLOR_RED, "Server: "GREY2_E"Admin %s has enabled global OOC chat (DON'T SPAM).", pData[playerid][pAdminname]);
+        SendClientMessageToAllEx(COLOR_RED, "SERVERS: "WHITE_E"Admin {FF0000}%s {FFFFFF}has {FFFF00}enabled {FFFFFF}global OOC chat (DON'T SPAM).", pData[playerid][pAdminname]);
         TogOOC = 0;
     }
     return 1;
@@ -357,15 +357,15 @@ CMD:o(playerid, params[])
         {
             if(pData[playerid][pAdmin] > 1)
 			{
-                SendClientMessageEx(i, COLOR_WHITE, "(( {FF0000}[ADMIN] %s{FFFFFF}: %s {FFFFFF}))", pData[playerid][pAdminname], ColouredText(params));
+                SendClientMessageEx(i, COLOR_WHITE, "(( {FF0000}[STAFF] %s{FFFFFF}: %s {FFFFFF}))", pData[playerid][pAdminname], ColouredText(params));
 			}
 			else if(pData[playerid][pHelper] > 0 && pData[playerid][pAdmin] == 0)
 			{
-				SendClientMessageEx(i, COLOR_WHITE, "(( {00FF00}[HELPER] %s{FFFFFF}: %s {FFFFFF}))", pData[playerid][pAdminname], ColouredText(params));
+				SendClientMessageEx(i, COLOR_WHITE, "(( {00FF00}[SUPPORT] %s{FFFFFF}: %s {FFFFFF}))", pData[playerid][pAdminname], ColouredText(params));
 			}
             else
             {
-                SendClientMessageEx(i, COLOR_WHITE, "(( {33FFCC}%s(%s) %s{FFFFFF} (%d): %s ))", PlayerRank(playerid), VipRank, pData[playerid][pName], playerid, params);
+                SendClientMessageEx(i, COLOR_WHITE, "(( {33FFCC}%s (%s) %s{FFFFFF} (%d): %s ))", PlayerRank(playerid), VipRank, pData[playerid][pName], playerid, params);
             }
         }
     }
@@ -386,7 +386,8 @@ CMD:id(playerid, params[])
 	
 	if(!IsPlayerConnected(otherid))
 		return Error(playerid, "No player online or name is not found!");
-	Servers(playerid, "(ID:%d) %s - (Level:%d) - (Ping:%d) -", playerid, pData[otherid][pName], GetPlayerPing(playerid));
+		
+	Servers(playerid, "(ID:%d) %s - (Level:%d) - (Ping:%d) - Version (%s)", otherid, pData[otherid][pName], pData[otherid][pLevel], GetPlayerPing(playerid));
 	return 1;
 }
 
@@ -1069,14 +1070,14 @@ function OWarnPlayer(adminid, NameToWarn[], warnReason[])
 {
 	if(cache_num_rows() < 1)
 	{
-		return Error(adminid, "Account "GREY2_E"'%s' "WHITE_E"does not exist.", NameToWarn);
+		return Error(adminid, "Account "YELLOW_E"'%s' "WHITE_E"does not exist.", NameToWarn);
 	}
 	else
 	{
 	    new RegID, warn;
 		cache_get_value_index_int(0, 0, RegID);
 		cache_get_value_index_int(0, 1, warn);
-		SendClientMessageToAllEx(COLOR_RED, "Server: "GREY2_E"Admin %s telah memberi warning(offline) player %s. [Reason: %s]", pData[adminid][pAdminname], NameToWarn, warnReason);
+		SendClientMessageToAllEx(COLOR_BAN, "AdmCmd: Admin %s telah memberi warning(offline) player %s. [Reason: %s]", pData[adminid][pAdminname], NameToWarn, warnReason);
 		new query[512];
 		mysql_format(g_SQL, query, sizeof(query), "UPDATE players SET warn=%d WHERE reg_id=%d", warn+1, RegID);
 		mysql_tquery(g_SQL, query);
@@ -1122,14 +1123,14 @@ function OJailPlayer(adminid, NameToJail[], jailReason[], jailTime)
 {
 	if(cache_num_rows() < 1)
 	{
-		return Error(adminid, "Account "GREY2_E"'%s' "WHITE_E"does not exist.", NameToJail);
+		return Error(adminid, "Account "YELLOW_E"'%s' "WHITE_E"does not exist.", NameToJail);
 	}
 	else
 	{
 	    new RegID, JailMinutes = jailTime * 60;
 		cache_get_value_index_int(0, 0, RegID);
 
-		SendClientMessageToAllEx(COLOR_RED, "Server: "GREY2_E"Admin %s telah menjail(offline) player %s selama %d menit. [Reason: %s]", pData[adminid][pAdminname], NameToJail, jailTime, jailReason);
+		SendClientMessageToAllEx(COLOR_BAN, "AdmCmd: Admin %s telah menjail(offline) player %s selama %d menit. [Reason: %s]", pData[adminid][pAdminname], NameToJail, jailTime, jailReason);
 		new query[512];
 		mysql_format(g_SQL, query, sizeof(query), "UPDATE players SET jail=%d WHERE reg_id=%d", JailMinutes, RegID);
 		mysql_tquery(g_SQL, query);
@@ -1183,14 +1184,14 @@ CMD:jail(playerid, params[])
 	JailPlayer(otherid);
 	if(reason[0] == '*')
 	{
-		SendClientMessageToAllEx(0xFF5533FF, "AdmCmd: %s Has Jailed Player %s For %d Minute.", pData[playerid][pAdminname], pData[otherid][pName], timeSec);
+		SendClientMessageToAllEx(COLOR_BAN, "AdmCmd: %s Has Jailed Player %s For %d Minute.", pData[playerid][pAdminname], pData[otherid][pName], timeSec);
 	 	format(string, sizeof string, "```JAIL: Admin %s telah menjail player %s selama %d menit. ```", pData[playerid][pAdminname], pData[otherid][pName], timeSec);
     	DCC_SendChannelMessage(g_discord_admins, string);
 	}
 	else
 	{
-		SendClientMessageToAllEx(0xFF5533FF, "AdmCmd: %s Has Jailed Player %s For %d Minute.", pData[playerid][pAdminname], pData[otherid][pName], timeSec);
-		SendClientMessageToAllEx(0xFF5533FF, "Reason: %s ", reason);
+		SendClientMessageToAllEx(COLOR_BAN, "AdmCmd: %s Has Jailed Player %s For %d Minute.", pData[playerid][pAdminname], pData[otherid][pName], timeSec);
+		SendClientMessageToAllEx(COLOR_BAN, "Reason: %s ", reason);
 		format(string, sizeof string, "```JAIL: Admin %s telah menjail player %s selama %d menit. REASON: %s  ```", pData[playerid][pAdminname], pData[otherid][pName], timeSec, reason);
     	DCC_SendChannelMessage(g_discord_admins, string);
 	}
@@ -1225,7 +1226,7 @@ CMD:unjail(playerid, params[])
 	SetPlayerPos(otherid, 1529.6,-1691.2,13.3);
 	SetPlayerSpecialAction(otherid, SPECIAL_ACTION_NONE);
 
-	SendClientMessageToAllEx(0xFF5533FF, "AdmCmd: %s Unjailed Player %s", pData[playerid][pAdminname], pData[otherid][pName]);
+	SendClientMessageToAllEx(COLOR_BAN, "AdmCmd: %s Unjailed Player %s", pData[playerid][pAdminname], pData[otherid][pName]);
 	format(string, sizeof string, "```JAIL: Admin %s elah unjailed %s  ```", pData[playerid][pAdminname], pData[otherid][pName]);
 	DCC_SendChannelMessage(g_discord_admins, string);
 	return true;
@@ -1251,8 +1252,8 @@ CMD:kick(playerid, params[])
     if(pData[otherid][pAdmin] > pData[playerid][pAdmin])
         return Error(playerid, "The specified player has higher authority.");
 
-    SendClientMessageToAllEx(0xFF5533FF, "AdmCmd: %s Has Been Kicked By Admin %s.", pData[otherid][pName], pData[playerid][pAdminname]);
-    SendClientMessageToAllEx(0xFF5533FF, "Reason: %s ", reason);
+    SendClientMessageToAllEx(COLOR_BAN, "AdmCmd: %s Has Been Kicked By Admin %s.", pData[otherid][pName], pData[playerid][pAdminname]);
+    SendClientMessageToAllEx(COLOR_BAN, "Reason: %s ", reason);
     format(string, sizeof string, "```KICK: %s was kicked by admin %s. REASON: %s ```", pData[otherid][pName], pData[playerid][pAdminname], reason);
 	DCC_SendChannelMessage(g_discord_admins, string);
     //Log_Write("logs/kick_log.txt", "[%s] %s has kicked %s for: %s.", ReturnTime(), ReturnName(otherid, 0), ReturnName(otherid, 0), reason);
@@ -1305,15 +1306,15 @@ CMD:ban(playerid, params[])
 	else if(!strcmp(tmp, "ah", true)) tmp = "Ammo Hacks";
 	if(datez != 0)
 	{
-		SendClientMessageToAllEx(0xFF5533FF, "AdmCmd: %s Has Been Banned Player %s selama %d Days.", pData[playerid][pAdminname], giveplayer, datez);
-		SendClientMessageToAllEx(0xFF5533FF, "Reason: %s ", tmp);
+		SendClientMessageToAllEx(COLOR_BAN, "AdmCmd: %s Has Been Banned Player %s selama %d Days.", pData[playerid][pAdminname], giveplayer, datez);
+		SendClientMessageToAllEx(COLOR_BAN, "Reason: %s ", tmp);
 	 	format(string, sizeof string, "```Banned: %s Has Been Banned Player %s. REASON: %s ```",  pData[playerid][pAdminname], giveplayer, datez, tmp);
 		DCC_SendChannelMessage(g_discord_ban, string);
 	}
 	else
 	{
-		SendClientMessageToAllEx(0xFF5533FF, "AdmCmd: %s Has Been Permanently Banned Player %s.", pData[playerid][pAdminname], giveplayer);
-		SendClientMessageToAllEx(0xFF5533FF, "Reason: %s ", tmp);
+		SendClientMessageToAllEx(COLOR_BAN, "AdmCmd: %s Has Been Permanently Banned Player %s.", pData[playerid][pAdminname], giveplayer);
+		SendClientMessageToAllEx(COLOR_BAN, "Reason: %s ", tmp);
 		format(string, sizeof string, "```Banned: %s Has Been Permanently Banned %s. REASON: %s ```",  pData[playerid][pAdminname], giveplayer, tmp);
 		DCC_SendChannelMessage(g_discord_ban, string);
 	}
@@ -1363,7 +1364,7 @@ function OnUnbanQueryData(adminid, BannedName[])
 		mysql_format(g_SQL, query, sizeof(query), "DELETE FROM banneds WHERE ip = '%s'", banIP);
 		mysql_tquery(g_SQL, query);
 
-		SendClientMessageToAllEx(0xFF5533FF, "AdmCmd: %s(%i) Has Unbanned %s From This Server.", pData[adminid][pAdminname], adminid, BannedName);
+		SendClientMessageToAllEx(COLOR_BAN, "AdmCmd: %s(%i) Has Unbanned %s From This Server.", pData[adminid][pAdminname], adminid, BannedName);
 		format(string, sizeof string, "```Banned: %s(%i) Has Unbanned %s. From This Server```",  pData[adminid][pAdminname], adminid, BannedName);
 		DCC_SendChannelMessage(g_discord_ban, string);
 	}
@@ -1393,7 +1394,7 @@ CMD:warn(playerid, params[])
         return Error(playerid, "The specified player has higher authority.");
 
 	pData[otherid][pWarn]++;
-	SendClientMessageToAllEx(COLOR_RED, "Server: "GREY2_E"Admin %s telah memberikan warning kepada player %s. [Reason: %s] [Total Warning: %d/20]", pData[playerid][pAdminname], pData[otherid][pName], reason, pData[otherid][pWarn]);
+	SendClientMessageToAllEx(COLOR_BAN, "AdmCmd: Admin %s telah memberikan warning kepada player %s. [Reason: %s] [Total Warning: %d/20]", pData[playerid][pAdminname], pData[otherid][pName], reason, pData[otherid][pWarn]);
     return 1;
 }
 
@@ -1522,7 +1523,7 @@ CMD:respawnjobs(playerid, params[])
 			SwitchVehicleDoors(BusVeh[xx], false);
 		}
 	}
-	/*for(new xx;xx<sizeof(KurirCar);xx++)
+	for(new xx;xx<sizeof(KurirCar);xx++)
 	{
 		if(IsVehicleEmpty(KurirCar[xx]))
 		{
@@ -1531,7 +1532,7 @@ CMD:respawnjobs(playerid, params[])
 			SetVehicleFuel(KurirCar[xx], 1000);
 			SwitchVehicleDoors(KurirCar[xx], false);
 		}
-	}*/
+	}
 	for(new xx;xx<sizeof(TrashCar);xx++)
 	{
 		if(IsVehicleEmpty(TrashCar[xx]))
@@ -1586,8 +1587,8 @@ RespawnNearbyVehicles(playerid, Float:radi)
 				{
 					//SetVehicleToRespawn(i);
 					SetTimerEx("RespawnPV", 3000, false, "d", i);
-					SendClientMessageToAllEx(COLOR_RED, "Server: "GREY2_E"Admin %s telah merespawn kendaraan disekitar dengan radius %d.", pData[playerid][pAdminname], radi);
-					SendClientMessageToAllEx(COLOR_RED, "Server: "GREY2_E"Jika kendaraan lumber pribadi anda terkena respawn admin gunakan /v park untuk meload kembali lumber anda!");
+					SendClientMessageToAllEx(COLOR_BAN, "AdmCmd: Admin %s telah merespawn kendaraan disekitar dengan radius %d.", pData[playerid][pAdminname], radi);
+					SendClientMessageToAllEx(COLOR_BAN, "AdmCmd: Jika kendaraan lumber pribadi anda terkena respawn admin gunakan /v park untuk meload kembali lumber anda!");
 				}
 			}
         }
@@ -1766,11 +1767,11 @@ CMD:akill(playerid, params[])
 
 	if(reason[0] != '*')
 	{
-		SendClientMessageToAllEx(COLOR_RED, "Servers: "GREY2_E"Admin %s has killed %s. "GREY_E"[Reason: %s]", pData[playerid][pAdminname], pData[otherid][pName], reason);
+		SendClientMessageToAllEx(COLOR_BAN, "AdmCmd: Admin %s has killed %s. "GREY_E"[Reason: %s]", pData[playerid][pAdminname], pData[otherid][pName], reason);
 	}
 	else
 	{
-		SendClientMessageToAllEx(COLOR_RED, "Servers: "GREY2_E"Admin %s has killed %s.", pData[playerid][pAdminname], pData[otherid][pName]);
+		SendClientMessageToAllEx(COLOR_BAN, "AdmCmd: Admin %s has killed %s.", pData[playerid][pAdminname], pData[otherid][pName]);
 	}
 	return 1;
 }
@@ -1821,7 +1822,7 @@ CMD:settime(playerid, params[])
 		return true;
 	}
 
-	SendClientMessageToAllEx(COLOR_RED, "Server: "GREY2_E"Admin %s(%i) has changed the time to: "YELLOW_E"%d", pData[playerid][pAdminname], playerid, time);
+	SendClientMessageToAllEx(COLOR_RED, "SERVERS: Admin {FF0000}%s(%i) {FFFFFF}has changed the time to: "YELLOW_E"%d", pData[playerid][pAdminname], playerid, time);
 
 	format(mstr, sizeof(mstr), "~r~Time changed: ~b~%d", time);
 	GameTextForAll(mstr, 3000, 5);
@@ -1852,7 +1853,7 @@ CMD:setweather(playerid, params[])
 		SetPlayerWeather(ii, weatherid);
 	}
     SetGVarInt("g_Weather", weatherid);
-    SendClientMessageToAllEx(COLOR_RED,"Server: "GREY2_E"%s have changed the weather ID", pData[playerid][pAdminname]);
+    SendClientMessageToAllEx(COLOR_RED,"SERVERS: Admin "RED_E"%s {FFFFFF}have changed the weather ID", pData[playerid][pAdminname]);
     Servers(playerid, "You have changed the weather to ID: %d.", weatherid);
     return 1;
 }

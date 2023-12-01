@@ -1,14 +1,14 @@
 // Server Define
-#define TEXT_GAMEMODE	"IL:RP v1.5.8D"
-#define SHOT_SERVER_NAME	"IL:RP"
-#define TEXT_WEBURL		"Comingsoon"
+#define TEXT_GAMEMODE	"BremX"
+#define SHOT_SERVER_NAME	"BremX"
+#define TEXT_WEBURL		"discord.io/BremX"
 #define TEXT_LANGUAGE	"Indonesia/English"
 
 // MySQL configuration
-#define		MYSQL_HOST 			"127.0.0.1"
+#define		MYSQL_HOST 			"localhost"
 #define		MYSQL_USER 			"root"
 #define		MYSQL_PASSWORD 		""
-#define		MYSQL_DATABASE 		"ilrp"
+#define		MYSQL_DATABASE 		"bremx"
 
 // how many seconds until it kicks the player for taking too long to login
 #define		SECONDS_TO_LOGIN 	200
@@ -55,7 +55,7 @@ GetXYBehindPoint11(Float:x,Float:y,&Float:x2,&Float:y2,Float:A,Float:distance)
 #define Info(%1,%2) SendClientMessageEx(%1, -1, ""RIKO"INFO: "WHITE_E""%2)
 #define Usage(%1,%2) SendClientMessage(%1, -1, ""RIKO"USAGE: "WHITE_E""%2)
 #define Error(%1,%2) SendClientMessageEx(%1, -1, ""RED_E"ERROR: "WHITE_E""%2)
-#define PermissionError(%0) SendClientMessage(%0, COLOR_RED, "ERROR: "WHITE_E"You are not allowed to use this commands!")
+#define PermissionError(%0) SendClientMessage(%0, COLOR_RED, "ERROR: "WHITE"You are not allowed to use this commands!")
 #define SendMessage(%0,%1) \
 	SendClientMessageEx(%0, COLOR_YELLOW, "»{FFFFFF} "%1)
 

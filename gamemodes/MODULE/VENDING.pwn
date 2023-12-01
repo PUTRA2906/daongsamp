@@ -248,7 +248,7 @@ VendingRefresh(id)
 		new tstr[218];
 		if(VendingData[id][VendingPosX] != 0 && VendingData[id][VendingPosY] != 0 && VendingData[id][VendingPosZ] != 0 && strcmp(VendingData[id][VendingOwner], "-"))
 		{
-			format(tstr, sizeof(tstr), "[ID: %d]\n"WHITE_E"Vending Name: "YELLOW_E"%s\n"WHITE_E"Owned by %s\nStock: "YELLOW_E"%d\n"WHITE_E"Type: "YELLOW_E"%s\n"WHITE_E"Type /buy to buy in this vending machine", id, VendingData[id][VendingName], VendingData[id][VendingOwner], VendingData[id][VendingStock],type);
+			format(tstr, sizeof(tstr), "[ID: %d]\n"WHITE_E"Vending Name: "YELLOW_E"%s\n"WHITE_E"Owned by %s\nStock: "YELLOW_E"%d\n"WHITE_E"Type: "YELLOW_E"%s\n"WHITE_E"Type "RED_E"/buy "WHITE_E"to buy in this vending machine", id, VendingData[id][VendingName], VendingData[id][VendingOwner], VendingData[id][VendingStock],type);
 			VendingData[id][VendingLabel] = CreateDynamic3DTextLabel(tstr, COLOR_YELLOW, VendingData[id][VendingPosX], VendingData[id][VendingPosY], VendingData[id][VendingPosZ]+1.0, 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, VendingData[id][VendingWorld], VendingData[id][VendingInterior], -1, 10.0);
 			VendingData[id][VendingObjectID] = CreateDynamicObject(1209, VendingData[id][VendingPosX], VendingData[id][VendingPosY], VendingData[id][VendingPosZ], VendingData[id][VendingPosRX], VendingData[id][VendingPosRY], VendingData[id][VendingPosRZ], VendingData[id][VendingWorld], VendingData[id][VendingInterior]);
 		}
@@ -258,7 +258,7 @@ VendingRefresh(id)
 			VendingData[id][VendingLabel] = CreateDynamic3DTextLabel(tstr, COLOR_YELLOW, VendingData[id][VendingPosX], VendingData[id][VendingPosY], VendingData[id][VendingPosZ]+1.0, 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, VendingData[id][VendingWorld], VendingData[id][VendingInterior], -1, 10.0);
 			VendingData[id][VendingObjectID] = CreateDynamicObject(1209, VendingData[id][VendingPosX], VendingData[id][VendingPosY], VendingData[id][VendingPosZ], VendingData[id][VendingPosRX], VendingData[id][VendingPosRY], VendingData[id][VendingPosRZ], VendingData[id][VendingWorld], VendingData[id][VendingInterior]);
         }
-		printf("DEBUG: VendingRefresh Called on Vending ID %d", id);
+		//printf("DEBUG: VendingRefresh Called on Vending ID %d", id);
 	}
 }
 
@@ -386,7 +386,7 @@ function LoadVending()
 			VendingRefresh(bid);
 			Iter_Add(Vending, bid);
 		}
-		printf("[Dynamic Vending] Number of Loaded: %d.", rows);
+		printf("[MySQL Vending] Number of Loaded: %d.", rows);
 	}
 }
 

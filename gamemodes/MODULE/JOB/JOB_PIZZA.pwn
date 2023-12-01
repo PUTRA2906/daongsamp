@@ -5,10 +5,10 @@ new PizzaVeh[4];
 
 AddPizzaVehicle()
 {
-	PizzaVeh[0] = CreateVehicle(448, 2113.4700,-1784.5083,12.9872, 355.4538, -1, -1, VEHICLE_RESPAWN);
-	PizzaVeh[1] = CreateVehicle(448, 2117.5247,-1784.9316,12.9872, 1.1392, -1, -1, VEHICLE_RESPAWN);
-	PizzaVeh[2] = CreateVehicle(448, 2120.4673,-1784.8541,12.9858, 358.8643,-1, -1, VEHICLE_RESPAWN);
-	PizzaVeh[3] = CreateVehicle(448, 2123.2676,-1784.8853,12.9871, 356.8564,-1, -1, VEHICLE_RESPAWN);
+	PizzaVeh[0] = CreateVehicle(448, 2113.4700,-1784.5083,12.9872, 355.4538, 3, 3, VEHICLE_RESPAWN);
+	PizzaVeh[1] = CreateVehicle(448, 2117.5247,-1784.9316,12.9872, 1.1392, 3, 3, VEHICLE_RESPAWN);
+	PizzaVeh[2] = CreateVehicle(448, 2120.4673,-1784.8541,12.9858, 358.8643,3, 3, VEHICLE_RESPAWN);
+	PizzaVeh[3] = CreateVehicle(448, 2123.2676,-1784.8853,12.9871, 356.8564,-3, 3, VEHICLE_RESPAWN);
 }
 
 IsAPizzaVeh(carid)
@@ -28,9 +28,9 @@ CMD:getpizza(playerid, params[])
 	    if(SedangAnterPizza[playerid] == 1)
 	        return Error(playerid, "Kamu sedang membawa pizza!");
 
-	    if(pData[playerid][pSideJobTime] > 0)
+	    if(pData[playerid][pPizzaTime] > 0)
 		{
-	    	Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik lagi.", pData[playerid][pSideJobTime]);
+	    	Error(playerid, "Anda harus menunggu "YELLOW_E"%d "WHITE_E"detik lagi.", pData[playerid][pPizzaTime]);
 	    	return 1;
 		}
 

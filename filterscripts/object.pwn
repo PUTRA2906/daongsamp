@@ -11,7 +11,7 @@ new tmpobjid;
 //#include "./map/ext_newcityhall.pwn"
 #include "./map/ext_samd_asgh_back.pwn"
 #include "./map/ext_sana.pwn"
-#include "./map/more_mapping.pwn"
+//#include "./map/more_mapping.pwn"
 //#include "./map/ext_ls_showroom.pwn"
 //#include "./map/ext_newdealer.pwn"
 //#include "./map/ext_showroom.pwn"
@@ -146,7 +146,7 @@ public OnPlayerConnect(playerid)
 {
 	RemoveVendingMachines(playerid);
 	
-	RemoveMapping(playerid);
+	//RemoveMapping(playerid);
 	
 	RemoveExtSamdAsghBack(playerid);
 	//RemoveExtAsgh(playerid);
@@ -193,7 +193,7 @@ public OnFilterScriptInit()
 	//CreateExtSags();
 	//CreateExtCityhall();
 	CreateExtSapd();
-	CreateMapping();
+	//CreateMapping();
 	CreateExtSana();
 	//CreateExtAsgh();
 	CreateIntNewASGH();

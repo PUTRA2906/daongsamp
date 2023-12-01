@@ -116,12 +116,12 @@ UpdatePlayerData(playerid)
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`warn` = '%d', ", cQuery, pData[playerid][pWarn]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`job` = '%d', ", cQuery, pData[playerid][pJob]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`job2` = '%d', ", cQuery, pData[playerid][pJob2]);
-	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`lumbertime` = '%d', ", cQuery, pData[playerid][pLumberTime]);
-	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`minertime` = '%d', ", cQuery, pData[playerid][pMinerTime]);
-	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`productiontime` = '%d', ", cQuery, pData[playerid][pProductionTime]);
-	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`truckertime` = '%d', ", cQuery, pData[playerid][pTruckerTime]);
-	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`smugglertime` = '%d', ", cQuery, pData[playerid][pSmugglerTime]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`sidejobtime` = '%d', ", cQuery, pData[playerid][pSideJobTime]);
+	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`jobtime` = '%d', ", cQuery, pData[playerid][pJobTime]);
+	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`sweepertime` = '%d', ", cQuery, pData[playerid][pSweeperTime]);
+	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`bustime` = '%d', ", cQuery, pData[playerid][pBusTime]);
+	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`forklifttime` = '%d', ", cQuery, pData[playerid][pForkliftTime]);
+	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`pizzatime` = '%d', ", cQuery, pData[playerid][pPizzaTime]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`exitjob` = '%d', ", cQuery, pData[playerid][pExitJob]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`taxitime` = '%d', ", cQuery, pData[playerid][pTaxiTime]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`medicine` = '%d', ", cQuery, pData[playerid][pMedicine]);
@@ -135,6 +135,7 @@ UpdatePlayerData(playerid)
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`material` = '%d', ", cQuery, pData[playerid][pMaterial]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`component` = '%d', ", cQuery, pData[playerid][pComponent]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`food` = '%d', ", cQuery, pData[playerid][pFood]);
+	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`frozenpizza` = '%d', ", cQuery, pData[playerid][pFrozenPizza]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`seed` = '%d', ", cQuery, pData[playerid][pSeed]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`potato` = '%d', ", cQuery, pData[playerid][pPotato]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`wheat` = '%d', ", cQuery, pData[playerid][pWheat]);
@@ -154,6 +155,8 @@ UpdatePlayerData(playerid)
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`gvip` = '%d', ", cQuery, pData[playerid][pGymVip]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`idcard` = '%d', ", cQuery, pData[playerid][pIDCard]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`idcard_time` = '%d', ", cQuery, pData[playerid][pIDCardTime]);
+	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`licbiz` = '%d', ", cQuery, pData[playerid][pLicBiz]);
+	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`licbiz_time` = '%d', ", cQuery, pData[playerid][pLicBizTime]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`skck` = '%d', ", cQuery, pData[playerid][pSkck]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`skck_time` = '%d', ", cQuery, pData[playerid][pSkckTime]);
 	mysql_format(g_SQL, cQuery, sizeof(cQuery), "%s`penebang` = '%d', ", cQuery, pData[playerid][pPenebangs]);
@@ -244,6 +247,7 @@ ResetVariables(playerid)
 	pData[playerid][pFamOffer] = -1;
 	
 	pData[playerid][pHBEMode] = 1;
+	pData[playerid][pTDMode] = 1;
 	
 	gPlayerUsingLoopingAnim[playerid] = 0;
 	gPlayerAnimLibsPreloaded[playerid] = 0;
@@ -622,6 +626,55 @@ SendAdminMessage(color, const str[], {Float,_}:...)
     return 1;
 }
 
+SendAdminWarn(color, const str[], {Float,_}:...)
+{
+    static
+        args,
+        start,
+        end,
+        string[144]
+    ;
+    #emit LOAD.S.pri 8
+    #emit STOR.pri args
+
+    if(args > 8)
+    {
+        #emit ADDR.pri str
+        #emit STOR.pri start
+
+        for (end = start + (args - 8); end > start; end -= 4)
+        {
+            #emit LREF.pri end
+            #emit PUSH.pri
+        }
+        #emit PUSH.S str
+        #emit PUSH.C 144
+        #emit PUSH.C string
+
+        #emit LOAD.S.pri 8
+        #emit ADD.C 4
+        #emit PUSH.pri
+
+        #emit SYSREQ.C format
+        #emit LCTRL 5
+        #emit SCTRL 4
+
+        foreach (new i : Player)
+        {
+            if(pData[i][pAdmin] >= 1 /*&& !pData[i][pDisableAdmin]*/) {
+				SendClientMessageEx(i, color, "[AdminWarn] "WHITE_E"%s", string);
+            }
+        }
+        return 1;
+    }
+    foreach (new i : Player)
+    {
+        if(pData[i][pAdmin] >= 1 /*&& !pData[i][pDisableAdmin]*/) {
+			SendClientMessageEx(i, color, "[AdminWarn] "WHITE_E"%s", string);
+        }
+    }
+    return 1;
+}
 StaffCommandLog(const command[], adminid, player = INVALID_PLAYER_ID, logstr[] = '*')
 {
 	// Set the logging message to be correct
@@ -998,7 +1051,7 @@ GetJobName(type)
 		case 6: str = "Production";
 		case 7: str = "Farmer";
 		case 8: str = "Drug Smuggler";
-		case 9: str = "Depositor";
+		case 9: str = "Courier";
         default: str = "None";
     }
     return str;
@@ -1180,18 +1233,18 @@ DisplayStats(playerid, p2)
 
 	format(header,sizeof(header),"Stats: "GREEN_E"%s", pData[p2][pName]);
     format(gstr,sizeof(gstr),""RED_E"In Character"WHITE_E"\n");
-    format(gstr,sizeof(gstr),"%s{FFFFFF}Gender: [{C6E2FF}%s{FFFFFF}] | Money: [{00FF00}$%s{FFFFFF}] | Bank: [{00FF00}%s{FFFFFF}] | Rekening Bank: [{C6E2FF}%d{FFFFFF}] | Phone Number: [{C6E2FF}%d{FFFFFF}]\n", gstr,(pData[p2][pGender] == 2) ? ("Female") : ("Male") , FormatMoney(pData[p2][pMoney]), FormatMoney(pData[p2][pBankMoney]), pData[p2][pBankRek], pData[p2][pPhone]);
-    format(gstr,sizeof(gstr),"%sBirdthdate: [{C6E2FF}%s{FFFFFF}] | Job: [{C6E2FF}%s{FFFFFF}] | Job2: [{C6E2FF}%s{FFFFFF}] | [{C6E2FF}%s{FFFFFF}] | Family: [%s]\n\n", gstr, pData[p2][pAge], GetJobName(pData[p2][pJob]), GetJobName(pData[p2][pJob2]), fac, fname, wsname, frname);
+    format(gstr,sizeof(gstr),"%s{FFFFFF}Gender: [{FFFF00}%s{FFFFFF}] | Money: [{00FF00}$%s{FFFFFF}] | Bank: [{00FF00}%s{FFFFFF}] | Rekening Bank: [{C6E2FF}%d{FFFFFF}] | Phone Number: [{C6E2FF}%d{FFFFFF}]\n", gstr,(pData[p2][pGender] == 2) ? ("Female") : ("Male") , FormatMoney(pData[p2][pMoney]), FormatMoney(pData[p2][pBankMoney]), pData[p2][pBankRek], pData[p2][pPhone]);
+    format(gstr,sizeof(gstr),"%sBirdthdate: [{FFFF00}%s{FFFFFF}] | Job: [{C6E2FF}%s{FFFFFF}] | Job2: [{C6E2FF}%s{FFFFFF}] | [{C6E2FF}%s{FFFFFF}] | Family: [%s]\n\n", gstr, pData[p2][pAge], GetJobName(pData[p2][pJob]), GetJobName(pData[p2][pJob2]), fac, fname, wsname, frname);
     format(gstr,sizeof(gstr),"%s"LB_E"Out of Character"WHITE_E"\n", gstr);
-    format(gstr,sizeof(gstr),"%sLevel score: [{C6E2FF}%d/%d{FFFFFF}] | Email: [{C6E2FF}%s{FFFFFF}] | Warning:[{C6E2FF}%d/20{FFFFFF}] | Last Login: [{C6E2FF}%s{FFFFFF}]\n", gstr, pData[p2][pLevelUp], scoremath, pData[p2][pEmail], pData[p2][pWarn], pData[p2][pLastLogin]);
-    format(gstr,sizeof(gstr),"%sStaff: [%s{FFFFFF}] | Time Played: [{C6E2FF}%d hour(s) %d minute(s) %02d second(s){FFFFFF}] | Gold Coin: [{FFFF00}$%d{FFFFFF}]\n", gstr, GetStaffRank(p2), pData[p2][pHours], pData[p2][pMinutes], pData[p2][pSeconds], pData[p2][pGold]);
+    format(gstr,sizeof(gstr),"%sLevel score: [{FF0000}%d/%d{FFFFFF}] | Email: [{FFFF00}%s{FFFFFF}] | Warning:[{FF0000}%d/20{FFFFFF}] | Last Login: [{FFFF00}%s{FFFFFF}]\n", gstr, pData[p2][pLevelUp], scoremath, pData[p2][pEmail], pData[p2][pWarn], pData[p2][pLastLogin]);
+    format(gstr,sizeof(gstr),"%sStaff: [%s{FFFFFF}] | Time Played: [{FFFF00}%d hour(s) %d minute(s) %02d second(s){FFFFFF}] | Gold Coin: [{FFFF00}$%d{FFFFFF}]\n", gstr, GetStaffRank(p2), pData[p2][pHours], pData[p2][pMinutes], pData[p2][pSeconds], pData[p2][pGold]);
 	if(pData[p2][pVipTime] != 0)
 	{
-		format(gstr,sizeof(gstr),"%sInterior: [{C6E2FF}$d{FFFFFF} | Virtual World: [{C6E2FF}%d{FFFFFF}] | Register Date: [{C6E2FF}%s{FFFFFF}] | VIP Level: [%s{FFFFFF}] | VIP Time: [{C6E2FF}%s{FFFFFF}]", gstr, GetPlayerInterior(p2), GetPlayerVirtualWorld(p2), pData[p2][pRegDate], GetVipRank(p2), ReturnTimelapse(gettime(), pData[p2][pVipTime]));
+		format(gstr,sizeof(gstr),"%sInterior: [{FFFF00}$d{FFFFFF} | Virtual World: [{FFFF00}%d{FFFFFF}] | Register Date: [{C6E2FF}%s{FFFFFF}] | VIP Level: [%s{FFFFFF}] | VIP Time: [{C6E2FF}%s{FFFFFF}]", gstr, GetPlayerInterior(p2), GetPlayerVirtualWorld(p2), pData[p2][pRegDate], GetVipRank(p2), ReturnTimelapse(gettime(), pData[p2][pVipTime]));
 	}
 	else
 	{
-		format(gstr,sizeof(gstr),"%sInterior: [{C6E2FF}%d{FFFFFF}] | Virtual World: [{C6E2FF}%d{FFFFFF}] | Register Date: [{C6E2FF}%s{FFFFFF}] | VIP Level: [%s{FFFFFF}] | VIP Time: [None]", gstr, GetPlayerInterior(p2), GetPlayerVirtualWorld(p2), pData[p2][pRegDate], GetVipRank(p2));
+		format(gstr,sizeof(gstr),"%sInterior: [{FFFF00}%d{FFFFFF}] | Virtual World: [{FFFF00}%d{FFFFFF}] | Register Date: [{C6E2FF}%s{FFFFFF}] | VIP Level: [%s{FFFFFF}] | VIP Time: [None]", gstr, GetPlayerInterior(p2), GetPlayerVirtualWorld(p2), pData[p2][pRegDate], GetVipRank(p2));
 	}
 	ShowPlayerDialog(playerid, DIALOG_STATS, DIALOG_STYLE_MSGBOX, header, gstr, "Settings", "Close");
 	return 1;
@@ -1221,6 +1274,10 @@ DisplayItems(playerid, p2)
 	if(pData[p2][pBpjsTime] > 0)
 	{
 		format(lstr, sizeof(lstr), "%s\nBPJS\t%s", lstr, ReturnTimelapse(gettime(), pData[p2][pBpjsTime]));
+	}
+	if(pData[p2][pLicBizTime] > 0)
+	{
+		format(lstr, sizeof(lstr), "%s\nBusiness-Lic\t%s", lstr, ReturnTimelapse(gettime(), pData[p2][pLicBizTime]));
 	}
 	if(pData[p2][pBandage] > 0)
 	{
@@ -1257,6 +1314,10 @@ DisplayItems(playerid, p2)
 	if(pData[p2][pFood] > 0)
 	{
 		format(lstr, sizeof(lstr), "%s\nFood\t%d", lstr, pData[p2][pFood]);
+	}
+	if(pData[p2][pFrozenPizza] > 0)
+	{
+		format(lstr, sizeof(lstr), "%s\nFrozen Pizza\t%d", lstr, pData[p2][pFrozenPizza]);
 	}
 	if(pData[p2][pSeed] > 0)
 	{
@@ -1525,20 +1586,11 @@ IsAPizza(vehicleid)
 	return 0;
 }
 
-IsATowTrTruck(vehicleid)
-{
-	if(GetVehicleModel(vehicleid) == 403 || GetVehicleModel(vehicleid) == 514 || GetVehicleModel(vehicleid) == 515)
-	{
-		return 1;
-	}
-	return 0;
-}
-
 IsATruck(vehicleid)
 {
 	switch(GetVehicleModel(vehicleid))
 	{
-	    case 414, 455, 456, 498, 499, 609: return 1;
+	    case 414, 455, 456, 498, 499, 609, 578: return 1;
 	    default: return 0;
 	}
 

@@ -27,7 +27,7 @@ CreateJoinProductionPoint()
 
 CMD:createproduct(playerid, params[])
 {
-	if(pData[playerid][pProductionTime] > 0) return Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik untuk bisa bekerja kembali.", pData[playerid][pProductionTime]);
+	if(pData[playerid][pJobTime] > 0) return Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik untuk bisa bekerja kembali.", pData[playerid][pJobTime]);
 	if(pData[playerid][pJob] == 6 || pData[playerid][pJob2] == 6)
 	{
 		if(IsPlayerInRangeOfPoint(playerid, 2.0, -249.79, -2148.05, 29.30) || IsPlayerInRangeOfPoint(playerid, 2.0, -244.14, -2146.05, 29.30)
@@ -187,8 +187,8 @@ CMD:sellproduct(playerid, params[])
 		
 		Product += 10;
 		Server_MinMoney(10000);
-		Info(playerid, "Anda menjual 10 bahan makanan dengan harga "GREEN_E"$100.00");
-		pData[playerid][pProductionTime] += 600;
+		Info(playerid, "Anda menjual 10 bahan makanan dengan harga "GREEN_E"$180.00");
+		pData[playerid][pJobTime] += 600;
 	}
 	else if(pData[playerid][CarryProduct] == 2)
 	{
@@ -199,8 +199,8 @@ CMD:sellproduct(playerid, params[])
 		
 		Product += 10;
 		Server_MinMoney(12000);
-		Info(playerid, "Anda menjual 10 product baju dengan harga "GREEN_E"$120.00");
-		pData[playerid][pProductionTime] += 600;
+		Info(playerid, "Anda menjual 10 product baju dengan harga "GREEN_E"$200.00");
+		pData[playerid][pJobTime] += 600;
 	}
 	else if(pData[playerid][CarryProduct] == 3)
 	{
@@ -211,8 +211,8 @@ CMD:sellproduct(playerid, params[])
 		
 		Product += 10;
 		Server_MinMoney(13000);
-		Info(playerid, "Anda menjual 10 product equipment dengan harga "GREEN_E"$13000");
-		pData[playerid][pProductionTime] += 600;
+		Info(playerid, "Anda menjual 10 product equipment dengan harga "GREEN_E"$230.00");
+		pData[playerid][pJobTime] += 600;
 	}
 	return 1;
 }

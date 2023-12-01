@@ -345,7 +345,7 @@ CMD:lumber(playerid, params[])
 				
 			if(GetPlayerWeapon(playerid) == WEAPON_CHAINSAW && pData[playerid][CuttingTreeID] == -1 && !pData[playerid][CarryingLumber])
 			{
-				if(pData[playerid][pLumberTime] > 0) return Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik untuk bisa bekerja kembali.", pData[playerid][pLumberTime]);
+				if(pData[playerid][pJobTime] > 0) return Error(playerid, "Anda harus menunggu "GREY2_E"%d "WHITE_E"detik untuk bisa bekerja kembali.", pData[playerid][pJobTime]);
 				
 				new tid = GetClosestTree(playerid);
 
@@ -474,10 +474,10 @@ CMD:lumber(playerid, params[])
 			if(!pData[playerid][CarryingLumber]) return Error(playerid, "You're not carrying a log.");
 			if(!IsPlayerInRangeOfPoint(playerid, 3.0, -258.54, -2189.92, 28.97)) return Error(playerid, "You're not near a lumber warehouse.");
 			Player_RemoveLumber(playerid);
-			GivePlayerMoneyEx(playerid, LumberPrice);
+			AddPlayerSalary(playerid, "Lumberjack(Jobs)", LumberPrice);
 			Server_MinMoney(LumberPrice);
 			Material += 10;
-			pData[playerid][pLumberTime] += 180;
+			pData[playerid][pJobTime] += 90;
 			Info(playerid, "Sold a lumber for "GREEN_E"%s.", FormatMoney(LumberPrice));
 			// done
 		}
@@ -487,6 +487,26 @@ CMD:lumber(playerid, params[])
 }
 
 CMD:lum(playerid, params[]) return callcmd::lumber(playerid, params);
+
+CMD:findtree(playerid)
+{
+	if(pData[playerid][pJob] == 3 || pData[playerid][pJob2] == 3)
+	{
+		new
+ 		han2[MAX_TREES * 32];
+
+		han2 = "ID\tLocation\n";
+
+   		foreach(new bid : Trees)
+		{
+	 	   format(han2, sizeof(han2), "%s%d\t"RED_E"%.1f m\n", han2,
+	 	   bid, GetPlayerDistanceFromPoint(playerid, TreeData[bid][treeX], TreeData[bid][treeY], TreeData[bid][treeZ]));
+		}
+		ShowPlayerDialog(playerid, DIALOG_FIND_TREES, DIALOG_STYLE_TABLIST_HEADERS, "Trees Location", han2, "Select", "Close");
+	}
+	else return Error(playerid, "anda bukan pekerja lumber!");
+	return 1;
+}
 
 Vehicle_LumberCount(vehicleid)
 {

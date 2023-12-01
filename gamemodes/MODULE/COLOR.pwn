@@ -26,6 +26,7 @@
 #define COLOR_FIREBRICK 	0xB22222FF
 #define COLOR_GREEN 		0x3BBD44FF
 #define COLOR_GREY			0xBABABAFF
+#define COLOR_ERROR 		0xAFAFAFFF
 #define COLOR_GREY2 		0x778899FF
 #define COLOR_GREY3			0xC8C8C8FF
 #define COLOR_DARK 			0x7A7A7AFF
@@ -35,6 +36,7 @@
 #define COLOR_FAMILY		0x00F77AFF
 #define COLOR_JOB			0xC6E2FFFF
 #define COLOR_RIKO			0xADD8E6FF
+#define COLOR_BAN			0xFF5533FF
 
 #define FAMILY_E	"{F77AFF}"
 #define PURPLE_E2	"{7348EB}"
@@ -51,6 +53,7 @@
 #define GREY3_E 	"{C8C8C8}"
 #define DARK_E 		"{7A7A7A}"
 #define WHITE_E 	"{FFFFFF}"
+#define WHITE 	"{FFFFFF}"
 #define WHITEP_E 	"{FFE4C4}"
 #define IVORY_E 	"{FFFF82}"
 #define ORANGE_E 	"{DB881A}"
@@ -66,6 +69,7 @@
 #define REACTIONS   "{FD4141}"
 #define LBLUE   	"{00FFFF}"
 #define RIKO        "{ADD8E6}"
+#define ERROR_E     "{AFAFAF}"
 
 #define dot "{F2F853}> {F0F0F0}"
 

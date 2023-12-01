@@ -118,13 +118,12 @@ public creategraff( playerid )
     POBJECT[playerid] = CreateDynamicObject( 19482, XYZ[playerid][0], XYZ[playerid][1], XYZ[playerid][2], 0.0, 0.0, 0.0, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), -1, 200 ); //Creating the object
 	SetDynamicObjectMaterialText( POBJECT[playerid], 0, POBJECTN[playerid], OBJECT_MATERIAL_SIZE_256x256, "Diploma", 25, 0, 0xFFFFFFFF, 0, 1 ); 
 	GameTextForPlayer( playerid, "~w~Sprayed",5000,5 ); 
-	DeletePVar( playerid,"GraffitiCreating" ); 
+	new id = nGraffiti();
 	sprayammount[playerid] = 0;
 	GRAVEH[playerid] = 0;
 	isveh[playerid] = 0;
 	sprays ++;
 	new string[20];
-	new id = nGraffiti();
 	format(string, sizeof(string),Graffitis, id);
 	dini_Create(string);
 	strmid(gInfo[id][graffname] , POBJECTN[playerid], 0, strlen(POBJECTN[playerid]), 32);
@@ -136,6 +135,8 @@ public creategraff( playerid )
 	gInfo[id][XYpos] = 0.0;
 	gInfo[id][YYpos] = 0.0;
 	gInfo[id][ZYpos] = 0.0;
+	EditDynamicObject(playerid, gInfo[id][OBJECTID]);
+	GetPVarInt( playerid, "GraffitiCreating" );
 	SaveGraffitis();
 	return 1;
 }

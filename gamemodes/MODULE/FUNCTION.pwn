@@ -26,8 +26,8 @@ function OnPlayerDataLoaded(playerid, race_check)
         InterpolateCameraPos(playerid, 1330.757080, -1732.019042, 23.432754, 1484.328125, -1716.528442, 23.261428, 20000);
 		InterpolateCameraLookAt(playerid, 1335.739990, -1732.224365, 23.073688, 1483.968627, -1721.461547, 23.993165, 19000);
 		//---
-		format(string, sizeof string, "Account: {00FF00}%s\n\n{FFFFFF}This Account is registered, please enter your password below", pData[playerid][pName]);
-		ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", string, "Login", "Abort");
+		format(string, sizeof string, "{FFFF00}Welcome Back to Fierro City Roleplay\n{FFFFFF}You Account: {00FF00}%s\n{FFFFFF}Input Pasword:", pData[playerid][pName]);
+		ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login - Panel", string, "Login", "Abort");
 
 	}
 	else
@@ -50,14 +50,14 @@ function CheckVerify(playerid)
     format(player,sizeof(player),"Whitelist/%s.txt",name);
     if(!dini_Exists(player))
     {
-        format(strong, sizeof strong, "{33CCFF}Register Indoluck\n{FFFFFF}Account: {FF0000}%s\n\n{FFFFFF}This Account is not verifed, please verification your account\n\n - https://discord.io//indoluck", name);
-		ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Verifed Missing", strong, "Ok", "");
+        format(strong, sizeof strong, "{33CCFF}Register Indoluck\n{FFFFFF}Account: {FF0000}%s\n\n{FFFFFF}This Account is not verifed, please verification your account\n\n - bit.ly/discordfcrp", name);
+		ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, "Verifed - Missing", strong, "Ok", "");
         SetTimerEx("DelayedKick", 1000, false, "i", playerid);
     }
     else
     {
-        format(string, sizeof string, "Welcome {00FF00}%s, {FFFFFF}you can register by entering your password in the field below:", pData[playerid][pName]);
-		ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registration", string, "Register", "Abort");
+        format(string, sizeof string, "{FFFF00}Welcome Back to Indoluck Roleplay\n\n{FFFFFF}You Account: {00FF00}%s\n{FFFFFF}{FFFFFF}Register Paswword:", pData[playerid][pName]);
+		ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registration - Panel", string, "Register", "Abort");
 	}
     return 1;
 }
@@ -89,7 +89,7 @@ function CheckBan(playerid)
 			{
 				if(pData[pid][pTogLog] == 0)
 				{
-					SendClientMessageEx(pid, COLOR_RED, "Server: "GREY2_E"%s(%i) has been auto-kicked for ban evading.", pData[playerid][pName], playerid);
+					SendClientMessageEx(pid, COLOR_BAN, "BotCmd: "GREY2_E"%s(%i) has been auto-kicked for ban evading.", pData[playerid][pName], playerid);
 				}
 			}
 			new query[248], PlayerIP[16];
@@ -106,13 +106,13 @@ function CheckBan(playerid)
 			if(banTime_Int == 0)
 			{
 				new lstr[512];
-				format(lstr, sizeof(lstr), "{FF0000}You are banned from this server!\n\n"LB2_E"Ban Info:\n{FF0000}Name: {778899}%s\n{FF0000}IP: {778899}%s\n{FF0000}Admin: {778899}%s\n{FF0000}Ban Date: {778899}%s\n{FF0000}Ban Reason: {778899}%s\n{FF0000}Ban Time: {778899}Permanent\n\n{FFFFFF}Feel that you were wrongfully banned? Appeal at https://discord.gg/FunislandRp", BannedName, PlayerIP, PlayerName, ReturnDate(banDate), Reason);
+				format(lstr, sizeof(lstr), "{FF0000}You are banned from this server!\n\n"LB2_E"Ban Info:\n{FF0000}Name: {778899}%s\n{FF0000}IP: {778899}%s\n{FF0000}Admin: {778899}%s\n{FF0000}Ban Date: {778899}%s\n{FF0000}Ban Reason: {778899}%s\n{FF0000}Ban Time: {778899}Permanent\n\n{FFFFFF}Feel that you were wrongfully banned? Appeal at https://dsc.gg/indoluck", BannedName, PlayerIP, PlayerName, ReturnDate(banDate), Reason);
 				ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, ""RED_E"BANNED", lstr, "Exit", "");
 			}
 			else
 			{
 				new lstr[512];
-				format(lstr, sizeof(lstr), "{FF0000}You are banned from this server!\n\n"LB2_E"Ban Info:\n{FF0000}Name: {778899}%s\n{FF0000}IP: {778899}%s\n{FF0000}Admin: {778899}%s\n{FF0000}Ban Date: {778899}%s\n{FF0000}Ban Reason: {778899}%s\n{FF0000}Ban Time: {778899}%s\n\n{FFFFFF}Feel that you were wrongfully banned? Appeal at https://discord.gg/FunislandRp", BannedName, PlayerIP, PlayerName, ReturnDate(banDate), Reason, ReturnTimelapse(gettime(), banTime_Int));
+				format(lstr, sizeof(lstr), "{FF0000}You are banned from this server!\n\n"LB2_E"Ban Info:\n{FF0000}Name: {778899}%s\n{FF0000}IP: {778899}%s\n{FF0000}Admin: {778899}%s\n{FF0000}Ban Date: {778899}%s\n{FF0000}Ban Reason: {778899}%s\n{FF0000}Ban Time: {778899}%s\n\n{FFFFFF}Feel that you were wrongfully banned? Appeal at https://dsc.gg/indoluck", BannedName, PlayerIP, PlayerName, ReturnDate(banDate), Reason, ReturnTimelapse(gettime(), banTime_Int));
 				ShowPlayerDialog(playerid, DIALOG_UNUSED, DIALOG_STYLE_MSGBOX, ""RED_E"BANNED", lstr, "Exit", "");
 			}
 			KickEx(playerid);
@@ -202,12 +202,7 @@ function AssignPlayerData(playerid)
 	cache_get_value_name_int(0, "warn", pData[playerid][pWarn]);
 	cache_get_value_name_int(0, "job", pData[playerid][pJob]);
 	cache_get_value_name_int(0, "job2", pData[playerid][pJob2]);
-	cache_get_value_name_int(0, "lumbertime", pData[playerid][pLumberTime]);
-	cache_get_value_name_int(0, "minertime", pData[playerid][pMinerTime]);
-	cache_get_value_name_int(0, "productiontime", pData[playerid][pProductionTime]);
-	cache_get_value_name_int(0, "truckertime", pData[playerid][pTruckerTime]);
-	cache_get_value_name_int(0, "smugglertime", pData[playerid][pSmugglerTime]);
-	cache_get_value_name_int(0, "sidejobtime", pData[playerid][pSideJobTime]);
+	cache_get_value_name_int(0, "jobtime", pData[playerid][pJobTime]);
 	cache_get_value_name_int(0, "exitjob", pData[playerid][pExitJob]);
 	cache_get_value_name_int(0, "taxitime", pData[playerid][pTaxiTime]);
 	cache_get_value_name_int(0, "medicine", pData[playerid][pMedicine]);
@@ -224,6 +219,7 @@ function AssignPlayerData(playerid)
 	cache_get_value_name_int(0, "material", pData[playerid][pMaterial]);
 	cache_get_value_name_int(0, "component", pData[playerid][pComponent]);
 	cache_get_value_name_int(0, "food", pData[playerid][pFood]);
+	cache_get_value_name_int(0, "frozenpizza", pData[playerid][pFrozenPizza]);
 	cache_get_value_name_int(0, "seed", pData[playerid][pSeed]);
 	cache_get_value_name_int(0, "potato", pData[playerid][pPotato]);
 	cache_get_value_name_int(0, "wheat", pData[playerid][pWheat]);
@@ -246,6 +242,8 @@ function AssignPlayerData(playerid)
 	cache_get_value_name_int(0, "penebang_time", pData[playerid][pPenebangsTime]);
 	cache_get_value_name_int(0, "bpjs", pData[playerid][pBpjs]);
 	cache_get_value_name_int(0, "bpjs_time", pData[playerid][pBpjsTime]);
+	cache_get_value_name_int(0, "licbiz", pData[playerid][pLicBiz]);
+	cache_get_value_name_int(0, "licbiz_time", pData[playerid][pLicBizTime]);
 	cache_get_value_name_int(0, "drivelic", pData[playerid][pDriveLic]);
 	cache_get_value_name_int(0, "drivelic_time", pData[playerid][pDriveLicTime]);
 	cache_get_value_name_int(0, "boombox", pData[playerid][pBoombox]);
@@ -757,7 +755,7 @@ function DragUpdate(playerid, targetid)
         SetPlayerInterior(targetid, GetPlayerInterior(playerid));
         SetPlayerVirtualWorld(targetid, GetPlayerVirtualWorld(playerid));
 		//ApplyAnimation(targetid, "PED", "BIKE_fall_off", 4.1, 0, 1, 1, 1, 0, 1);
-		ApplyAnimation(targetid,"PED","WALK_civi",4.1,1,1,1,1,1);
+		ApplyAnimation(targetid,"PED","KO_skid_front",4.1,1,1,1,1,1);
     }
     return 1;
 }
@@ -1015,8 +1013,8 @@ function onlineTimer()
 						//SetPlayerTime(ii, hours, minutes);
 						if(pData[ii][pPaycheck] >= 3600)
 						{
-							Info(ii, "Waktunya mengambil paycheck!");
-							Servers(ii, "silahkan pergi ke bank atau ATM terdekat untuk mengambil paycheck.");
+							Info(ii, "It's time for your {FFFF00}Claim paycheck!");
+							Info(ii, "Pergi Ke Bank Atau Atm Untuk Claim Paycheck.");
 							PlayerPlaySound(ii, 1139, 0.0, 0.0, 0.0);
 						}
 					}
@@ -1024,8 +1022,8 @@ function onlineTimer()
 					{
 						if(pData[ii][pPaycheck] >= 3600)
 						{
-							Info(ii, "Waktunya mengambil paycheck!");
-							Servers(ii, "silahkan pergi ke bank atau ATM terdekat untuk mengambil paycheck.");
+							Info(ii, "It's time for your {FFFF00}Claim paycheck!!");
+							Info(ii, "Pergi Ke Bank Atau Atm Untuk Claim Paycheck.");
 							PlayerPlaySound(ii, 1139, 0.0, 0.0, 0.0);
 						}
 						
@@ -1074,7 +1072,7 @@ function onlineTimer()
 		}
 		if(Remaining == 0)
 		{
-			Remaining = 10;
+			Remaining = 300,
 			AuctionStart = 0;
 			RefreshAuctionText(PropID, PropType);
 			AuctionMessage("Auction Has Ended!");
@@ -1084,7 +1082,7 @@ function onlineTimer()
 		{
 			if(pData[ii][pVipTime] != 0 && pData[ii][pVipTime] <= gettime())
 			{
-				Info(ii, "Maaf, Level VIP player anda sudah habis! sekarang anda adalah player biasa!");
+				Servers(ii, "Sorry Your VIP period is over, now you are a regular player !");
 				pData[ii][pVip] = 0;
 				pData[ii][pVipTime] = 0;
 			}
@@ -1094,7 +1092,7 @@ function onlineTimer()
 		{
 			if(pData[ii][pIDCardTime] != 0 && pData[ii][pIDCardTime] <= gettime())
 			{
-				Info(ii, "Masa berlaku ID Card anda telah habis, silahkan perpanjang kembali!");
+				Servers(ii, "Your {FFFF00}ID Card has expired, please go to the City Hall to make a new one!");
 				pData[ii][pIDCard] = 0;
 				pData[ii][pIDCardTime] = 0;
 			}
@@ -1102,23 +1100,32 @@ function onlineTimer()
 
 		if(pData[ii][pExitJob] != 0 && pData[ii][pExitJob] <= gettime())
 		{
-			Info(ii, "Now you can exit from your current job!");
+			Info(ii, "Now you can exit your {FFFF00}jobs!");
 			pData[ii][pExitJob] = 0;
 		}
 		if(pData[ii][pDriveLic] > 0)
 		{
 			if(pData[ii][pDriveLicTime] != 0 && pData[ii][pDriveLicTime] <= gettime())
 			{
-				Info(ii, "Masa berlaku Driving anda telah habis, silahkan perpanjang kembali!");
+				Info(ii, "Masa berlaku {FFFF00}Driving License {FFFFFF}anda telah habis, silahkan perpanjang kembali!");
 				pData[ii][pDriveLic] = 0;
 				pData[ii][pDriveLicTime] = 0;
+			}
+		}
+		if(pData[ii][pLicBiz] > 0)
+		{
+			if(pData[ii][pLicBizTime] != 0 && pData[ii][pLicBizTime] <= gettime())
+			{
+				Info(ii, "Masa berlaku Business License anda telah habis, silahkan perpanjang kembali!");
+				pData[ii][pLicBiz] = 0;
+				pData[ii][pLicBizTime] = 0;
 			}
 		}
 		if(pData[ii][pPenebangs] > 0)
 		{
 			if(pData[ii][pPenebangsTime] != 0 && pData[ii][pPenebangsTime] <= gettime())
 			{
-				Info(ii, "License Lumber anda telah expired, silahkan perpanjang kembali!");
+				Info(ii, "{FFFF00}License Lumber {FFFFFF}anda telah expired, silahkan perpanjang kembali!");
 				pData[ii][pPenebangs] = 0;
 				pData[ii][pPenebangsTime] = 0;
 			}
@@ -1127,35 +1134,36 @@ function onlineTimer()
 		{
 			if(pData[ii][pSkckTime] != 0 && pData[ii][pSkckTime] <= gettime())
 			{
-				Info(ii, "SKCK anda telah expired, silahkan perpanjang kembali!");
+				Info(ii, "{FFFF00}SKCK {FFFFFF}anda telah expired, silahkan perpanjang kembali!");
 				pData[ii][pSkck] = 0;
 				pData[ii][pSkckTime] = 0;
 			}
 		}
+		//Sidejob Time delay
+		if(pData[ii][pSweeperTime] > 0)
+		{
+			pData[ii][pSweeperTime]--;
+		}
+		if(pData[ii][pBusTime] > 0)
+		{
+			pData[ii][pBusTime]--;
+		}
+		if(pData[ii][pForkliftTime] > 0)
+		{
+			pData[ii][pForkliftTime]--;
+		}
+		if(pData[ii][pPizzaTime] > 0)
+		{
+			pData[ii][pPizzaTime]--;
+		}
 		//Player JobTime Delay
-		if(pData[ii][pLumberTime] > 0)
-		{
-			pData[ii][pLumberTime]--;
-		}
-		if(pData[ii][pMinerTime] > 0)
-		{
-			pData[ii][pMinerTime]--;
-		}
-		if(pData[ii][pProductionTime] > 0)
-		{
-			pData[ii][pProductionTime]--;
-		}
-		if(pData[ii][pTruckerTime] > 0)
-		{
-			pData[ii][pTruckerTime]--;
-		}
-		if(pData[ii][pSmugglerTime] > 0)
-		{
-			pData[ii][pSmugglerTime]--;
-		}
 		if(pData[ii][pSideJobTime] > 0)
 		{
 			pData[ii][pSideJobTime]--;
+		}
+		if(pData[ii][pJobTime] > 0)
+		{
+			pData[ii][pJobTime]--;
 		}
 		//Warn Player Check
 		if(pData[ii][pWarn] >= 20)
